@@ -9,11 +9,12 @@
 		<version>0.0.1-SNAPSHOT</version>
 	</parent>
 
+	
 	<groupId>il.cshaifasweng.OCSFMediatorExample</groupId>
 	<artifactId>server</artifactId>
 	<packaging>jar</packaging>
 
-	
+
 	<name>server</name>
 	<!-- FIXME change it to the project's website -->
 	<url>http://www.example.com</url>
