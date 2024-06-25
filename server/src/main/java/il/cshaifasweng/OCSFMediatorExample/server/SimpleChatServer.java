@@ -3,7 +3,11 @@ package server.src.main.java.il.cshaifasweng.OCSFMediatorExample.server;
 import java.io.IOException;
 
 
+/*
+THIS WILL BE OUR MAIN CLASS WHERE EVERYTHING STARTS
+THIS STARTS THE SERVER VROOM VROOM
 
+*/
 public class SimpleChatServer
 {
 	

@@ -88,6 +88,8 @@ public class SimpleServer extends AbstractServer {
 	}
 
 
+	 	
+
 	public void sendToAllClients(Message message) {
 		try {
 			for (SubscribedClient SubscribedClient : SubscribersList) {
