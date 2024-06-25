@@ -1,4 +1,4 @@
-package il.cshaifasweng.OCSFMediatorExample.server;
+package server.src.main.java.il.cshaifasweng.OCSFMediatorExample.server;
 
 import java.io.IOException;
 

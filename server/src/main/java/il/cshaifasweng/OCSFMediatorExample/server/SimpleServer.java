@@ -1,4 +1,4 @@
-package il.cshaifasweng.OCSFMediatorExample.server;
+package server.src.main.java.il.cshaifasweng.OCSFMediatorExample.server;
 
 import il.cshaifasweng.OCSFMediatorExample.entities.Message;
 import il.cshaifasweng.OCSFMediatorExample.server.ocsf.AbstractServer;
