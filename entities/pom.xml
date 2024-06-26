@@ -5,7 +5,7 @@
     <artifactId>MainProject</artifactId>
     <version>0.0.1-SNAPSHOT</version>
   </parent>
-  <groupId>il.cshaifasweng.OCSFMediatorExample</groupId>
+  <groupId>MainProject</groupId>
   <artifactId>entities</artifactId>
   <packaging>jar</packaging>
 </project>
