@@ -1,9 +1,9 @@
-package il.cshaifasweng.OCSFMediatorExample.client;
+package client;
 
-import il.cshaifasweng.OCSFMediatorExample.entities.Message;
+import entities.Message;
 import org.greenrobot.eventbus.EventBus;
 
-import il.cshaifasweng.OCSFMediatorExample.client.ocsf.AbstractClient;
+import ocsf.AbstractClient;
 
 public class SimpleClient extends AbstractClient {
 	

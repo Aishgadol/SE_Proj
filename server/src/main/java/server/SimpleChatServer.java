@@ -1,5 +1,5 @@
-package server.src.main.java.il.cshaifasweng.OCSFMediatorExample.server;
 
+package server;
 import java.io.IOException;
 
 

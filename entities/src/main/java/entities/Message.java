@@ -1,4 +1,4 @@
-package il.cshaifasweng.OCSFMediatorExample.entities;
+package entities;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;

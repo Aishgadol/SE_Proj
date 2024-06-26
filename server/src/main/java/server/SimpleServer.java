@@ -1,9 +1,9 @@
-package server.src.main.java.il.cshaifasweng.OCSFMediatorExample.server;
+package server;
 
-import il.cshaifasweng.OCSFMediatorExample.entities.Message;
-import il.cshaifasweng.OCSFMediatorExample.server.ocsf.AbstractServer;
-import il.cshaifasweng.OCSFMediatorExample.server.ocsf.ConnectionToClient;
-import il.cshaifasweng.OCSFMediatorExample.server.ocsf.SubscribedClient;
+import entities.Message;
+import ocsf.AbstractServer;
+import ocsf.ConnectionToClient;
+import ocsf.SubscribedClient;
 
 import java.io.IOException;
 import java.time.format.DateTimeFormatter;

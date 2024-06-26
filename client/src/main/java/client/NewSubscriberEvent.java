@@ -1,6 +1,6 @@
-package il.cshaifasweng.OCSFMediatorExample.client;
+package client;
 
-import il.cshaifasweng.OCSFMediatorExample.entities.Message;
+import entities.Message;
 
 public class NewSubscriberEvent {
     private Message message;

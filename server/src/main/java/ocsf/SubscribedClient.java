@@ -1,4 +1,4 @@
-package server.src.main.java.il.cshaifasweng.OCSFMediatorExample.server.ocsf;
+package ocsf;
 
 public class SubscribedClient {
     private ConnectionToClient client;

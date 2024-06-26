@@ -1,11 +1,11 @@
-package il.cshaifasweng.OCSFMediatorExample.client;
+package client;
 
 
 import java.io.IOException;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 
-import il.cshaifasweng.OCSFMediatorExample.entities.Message;
+import entities.Message;
 import javafx.animation.Animation;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
