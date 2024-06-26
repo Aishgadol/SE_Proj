@@ -1,14 +1,13 @@
 
 package server;
 import java.io.IOException;
-import server.SimpleServer;
 
 /*
 THIS WILL BE OUR MAIN CLASS WHERE EVERYTHING STARTS
 THIS STARTS THE SERVER VROOM VROOM
 
 */
-public class SimpleChatServer
+public class ServerStarter
 {
 	
 	private static SimpleServer server;

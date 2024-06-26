@@ -84,7 +84,7 @@
                         </descriptorRefs>
                         <archive>
                             <manifest>
-                                <mainClass>server.SimpleChatServer</mainClass>
+                                <mainClass>server.ServerStarter</mainClass>
                             </manifest>
                         </archive>
                     </configuration>

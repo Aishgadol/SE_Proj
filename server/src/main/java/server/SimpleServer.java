@@ -7,21 +7,76 @@ import ocsf.SubscribedClient;
 
 import java.io.IOException;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
+import java.util.*;
+
+import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.CriteriaQuery;
+import org.hibernate.HibernateException;
+import org.hibernate.Session;
+import org.hibernate.SessionFactory;
+import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
+import org.hibernate.cfg.Configuration;
+import org.hibernate.service.ServiceRegistry;
+
 
 public class SimpleServer extends AbstractServer {
 	private static ArrayList<SubscribedClient> SubscribersList = new ArrayList<>();
+	private static Session session;
+	private static SessionFactory sessionFactory;
+
+	private static SessionFactory getSessionFactory() throws HibernateException{
+		Configuration configuration=new Configuration();
+		configuration.addAnnotatedClass(Msg.class);
+		ServiceRegistry serviceRegistry=new StandardServiceRegistryBuilder().applySettings(configuration.getProperties()).build();
+		return configuration.buildSessionFactory(serviceRegistry);
+	}
+
+	public static void addMsgToDB(String text) throws Exception{
+		Msg m=new Msg(text);
+		session.save(m);
+		session.flush();
+	}
 
 	public SimpleServer(int port) {
 		super(port);
+		try{
+			sessionFactory=getSessionFactory();
+			session=sessionFactory.openSession();
+			session.beginTransaction();
+		} catch(Exception e) {
+			if(session!=null){
+				session.getTransaction().rollback();
+			}
+			e.printStackTrace();
+		}
 		
 	}
-
+	private List<Msg> getMsgs(){
+		CriteriaBuilder builder=session.getCriteriaBuilder();
+		CriteriaQuery<Msg> query=builder.createQuery(Msg.class);
+		query.from(Msg.class);
+		List<Msg> msgs=session.createQuery(query).getResultList();
+		return msgs;
+	}
 	@Override
 	protected void handleMessageFromClient(Object msg, ConnectionToClient client) {
 		Message message = (Message) msg;
 		String request = message.getMessage();
 		try {
+			if (request.startsWith("add client")){
+				SubscribedClient connection = new SubscribedClient(client);
+				SubscribersList.add(connection);
+				message.setMessage("client added successfully");
+			}
+			else {
+				addMsgToDB(request);
+				message.setMessage("Ack");
+				client.sendToClient(message);
+			}
+		}catch(Exception e) {
+			e.printStackTrace();
+		}
+		/*
 			//we got an empty message, so we will send back an error message with the error details.
 			if (request.isBlank()){
 				message.setMessage("Error! we got an empty message");
@@ -84,7 +139,7 @@ public class SimpleServer extends AbstractServer {
 			}
 		} catch (IOException e1) {
 			e1.printStackTrace();
-		}
+		}*/
 	}
 
 
