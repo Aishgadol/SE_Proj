@@ -162,6 +162,20 @@ public class SimpleServer extends AbstractServer {
 	 	THIS PART WILL BE USEFUL TO ADDRESS AND UPDATE ALL CLIENTS, DATABASE STUFF FOR EXAMPLE
 	 	 */
 
+	public void stopServer(){
+		try {
+			if (session != null) {
+				session.getTransaction().commit();
+				session.close();
+			}
+			if (sessionFactory != null) {
+				sessionFactory.close();
+			}
+		}catch(Exception e){
+			e.printStackTrace();
+		}
+	}
+
 	public void sendToAllClients(Message message) {
 		try {
 			for (SubscribedClient SubscribedClient : SubscribersList) {
