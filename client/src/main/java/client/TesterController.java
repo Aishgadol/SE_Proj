@@ -9,6 +9,8 @@ import javafx.scene.control.TextField;
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 
+import java.io.IOException;
+
 
 public class TesterController {
     private int msgId;
@@ -23,15 +25,35 @@ public class TesterController {
     private TextField textField;
 
     @FXML
-    void sendToDB(ActionEvent event) {
-        Message message = new Message(msgId++, textField.getText());
-        textField.clear();
+    void sendToDb(ActionEvent event) {
+        try {
+            Message message = new Message(msgId++, textField.getText());
+            textField.clear();
+            SimpleClient.getClient().sendToServer(message);
+
+        }
+        catch(IOException e){
+            e.printStackTrace();
+        }
     }
+
+    @Subscribe
+	public void setDataFromServerTF(Message msg) {
+        board.setText(msg.getData());
+	}
+
 
     @FXML
     void initialize(){
         EventBus.getDefault().register(this);
 		textField.clear();
         msgId=0;
+        try {
+			Message message = new Message(msgId, "add client");
+			SimpleClient.getClient().sendToServer(message);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
     }
 }

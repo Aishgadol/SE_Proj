@@ -11,6 +11,7 @@ public class Msg {
     @Column(name="Item_Text")
     private String text;
 
+
     public Msg(){
     }
 

@@ -47,6 +47,7 @@ public class PrimaryController {
 			Message message = new Message(msgId++, MessageTF.getText());
 			MessageTF.clear();
 			SimpleClient.getClient().sendToServer(message);
+
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

@@ -1,5 +1,6 @@
 package server;
 
+
 import entities.Message;
 import ocsf.AbstractServer;
 import ocsf.ConnectionToClient;
@@ -35,6 +36,8 @@ public class SimpleServer extends AbstractServer {
 		Msg m=new Msg(text);
 		session.save(m);
 		session.flush();
+		session.getTransaction().commit();
+		session.beginTransaction();
 	}
 
 	public SimpleServer(int port) {
@@ -58,10 +61,13 @@ public class SimpleServer extends AbstractServer {
 		List<Msg> msgs=session.createQuery(query).getResultList();
 		return msgs;
 	}
+
 	@Override
 	protected void handleMessageFromClient(Object msg, ConnectionToClient client) {
 		Message message = (Message) msg;
+		System.out.println("Got message: "+message.getMessage());
 		String request = message.getMessage();
+
 		try {
 			if (request.startsWith("add client")){
 				SubscribedClient connection = new SubscribedClient(client);
@@ -70,7 +76,12 @@ public class SimpleServer extends AbstractServer {
 			}
 			else {
 				addMsgToDB(request);
-				message.setMessage("Ack");
+				String s="";
+				List<Msg> msgs=getMsgs();
+				for(Msg msg1 : msgs){
+					s=s+msg1.getText()+"\n";
+				}
+				message.setMessage(s);
 				client.sendToClient(message);
 			}
 		}catch(Exception e) {

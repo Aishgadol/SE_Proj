@@ -8,16 +8,10 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-
-<VBox alignment="CENTER" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="497.0" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1">
+<VBox alignment="CENTER" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="497.0" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="client.TesterController">
    <children>
       <AnchorPane prefHeight="400.0" prefWidth="438.0">
          <children>
-            <Button fx:id="sendBtn" alignment="CENTER" layoutX="197.0" layoutY="114.0" mnemonicParsing="false" onAction="#sendToDB" text="Send to DB" textAlignment="CENTER">
-               <font>
-                  <Font size="16.0" />
-               </font>
-            </Button>
             <TextField fx:id="textField" layoutX="135.0" layoutY="185.0" prefHeight="27.0" prefWidth="226.0" promptText="enter text that will be added to DB" />
             <TextArea fx:id="board" editable="false" layoutX="142.0" layoutY="240.0" prefHeight="122.0" prefWidth="213.0" />
             <Label layoutX="41.0" layoutY="38.0" text="WELCOME TO PROTOTYPE">
@@ -25,6 +19,11 @@
                   <Font size="35.0" />
                </font>
             </Label>
+            <Button fx:id="sendBtn" alignment="CENTER" layoutX="198.0" layoutY="115.0" mnemonicParsing="false" onAction="#sendToDb" text="Send to DB" textAlignment="CENTER">
+               <font>
+                  <Font size="16.0" />
+               </font>
+            </Button>
          </children>
       </AnchorPane>
    </children>
