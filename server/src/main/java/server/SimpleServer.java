@@ -69,19 +69,23 @@ public class SimpleServer extends AbstractServer {
 		String request = message.getMessage();
 
 		try {
-			if (request.startsWith("add client")){
+			if (request.isBlank()) {
+				message.setMessage("EMPTY MESSAGE");
+				client.sendToClient(message);
+			}
+			else if (request.startsWith("add client")){
 				SubscribedClient connection = new SubscribedClient(client);
 				SubscribersList.add(connection);
 				message.setMessage("client added successfully");
 			}
 			else {
 				addMsgToDB(request);
-				String s="";
+				StringBuilder s=new StringBuilder();
 				List<Msg> msgs=getMsgs();
 				for(Msg msg1 : msgs){
-					s=s+msg1.getText()+"\n";
+					s.append(msg1.getText()).append("\n");
 				}
-				message.setMessage(s);
+				message.setMessage(s.toString());
 				client.sendToClient(message);
 			}
 		}catch(Exception e) {

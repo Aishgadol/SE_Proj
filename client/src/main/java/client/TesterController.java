@@ -39,7 +39,7 @@ public class TesterController {
 
     @Subscribe
 	public void setDataFromServerTF(Message msg) {
-        board.setText(msg.getData());
+        board.setText(msg.getMessage());
 	}
 
 
