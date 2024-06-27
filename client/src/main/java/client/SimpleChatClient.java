@@ -53,19 +53,15 @@ public class SimpleChatClient extends Application {
 
     @Subscribe
     public void onMessageEvent(MessageEvent message) {
-        DateTimeFormatter dtf = DateTimeFormatter.ofPattern("HH:mm:ss");
-        Platform.runLater(() -> {
-            Alert alert = new Alert(AlertType.INFORMATION,
-                                     String.format("Message:\nId: %d\nData: %s\nTimestamp: %s\n",
-                                     message.getMessage().getId(),
-                                     message.getMessage().getMessage(),
-                                     message.getMessage().getTimeStamp().format(dtf))
-            );
-            alert.setTitle(message.getMessage().getMessage());
-            alert.setHeaderText("New Message:");
+        if(message.getMessage().getMessage().startsWith("EMPTY MESSAGE")){
+            Platform.runLater(() -> {
+            Alert alert = new Alert(AlertType.ERROR,
+                                     String.format("RECIEVED EMPTY MESSAGE, NOT DOING ANYTHING"));
+            alert.setTitle("EMPTY MESSAGE ALERT");
+            alert.setHeaderText("<WHAT IS THIS>");
             alert.show();
         });
-
+        }
     }
 
 

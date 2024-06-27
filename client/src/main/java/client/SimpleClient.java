@@ -16,6 +16,10 @@ public class SimpleClient extends AbstractClient {
 	@Override
 	protected void handleMessageFromServer(Object msg) {
 		Message message = (Message) msg;
+		if(message.getMessage().startsWith("EMPTY MESSAGE")){
+			EventBus.getDefault().post(new MessageEvent(message));
+			return;
+		}
 		EventBus.getDefault().post(message);
 
 		/*
