@@ -27,7 +27,9 @@ public class SimpleServer extends AbstractServer {
 
 	private static SessionFactory getSessionFactory() throws HibernateException{
 		Configuration configuration=new Configuration();
+
 		configuration.addAnnotatedClass(Msg.class);
+
 		ServiceRegistry serviceRegistry=new StandardServiceRegistryBuilder().applySettings(configuration.getProperties()).build();
 		return configuration.buildSessionFactory(serviceRegistry);
 	}
@@ -54,6 +56,7 @@ public class SimpleServer extends AbstractServer {
 		}
 		
 	}
+
 	private List<Msg> getMsgs(){
 		CriteriaBuilder builder=session.getCriteriaBuilder();
 		CriteriaQuery<Msg> query=builder.createQuery(Msg.class);
