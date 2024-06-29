@@ -12,7 +12,7 @@ import org.greenrobot.eventbus.Subscribe;
 import java.io.IOException;
 
 
-public class TesterController {
+public class CinemaController {
     private int msgId;
 
     @FXML
