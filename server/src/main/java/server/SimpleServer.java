@@ -7,8 +7,10 @@ import ocsf.ConnectionToClient;
 import ocsf.SubscribedClient;
 
 import java.io.IOException;
+import java.sql.SQLException;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
+import java.util.Scanner;
 
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
@@ -25,13 +27,41 @@ public class SimpleServer extends AbstractServer {
 	private static Session session;
 	private static SessionFactory sessionFactory;
 
-	private static SessionFactory getSessionFactory() throws HibernateException{
-		Configuration configuration=new Configuration();
+	private static SessionFactory getSessionFactory() throws HibernateException {
+			// variables for login to DB
+			int attempts = 0;
+			boolean correct = false;
 
-		configuration.addAnnotatedClass(Msg.class);
+			while(attempts < 3 && !correct){
+				// Ask server for password to DB
+				Scanner scanner = new Scanner(System.in);
+				System.out.print("Enter database password: ");
+				String password = scanner.next();
 
-		ServiceRegistry serviceRegistry=new StandardServiceRegistryBuilder().applySettings(configuration.getProperties()).build();
-		return configuration.buildSessionFactory(serviceRegistry);
+				try{
+				Configuration configuration = new Configuration();
+				configuration.addAnnotatedClass(Msg.class);
+
+				// Set the password in the configuration
+				configuration.setProperty("hibernate.connection.password", password);
+
+				ServiceRegistry serviceRegistry = new StandardServiceRegistryBuilder().applySettings(configuration.getProperties()).build();
+				sessionFactory = configuration.buildSessionFactory(serviceRegistry);
+
+				// if no exception, break from the loop
+				correct = true;
+				} catch(HibernateException e){
+					// This exception happens when the password entered is incorrect
+					System.err.println("Failed to connect: " + e.getMessage());
+					System.out.println("Incorrect password or configuration," + (3 - attempts) + " remaining attempts.");
+					attempts++;
+					if (attempts >= 3) {
+						System.out.println("Maximum attempts reached. Shutting down.");
+						System.exit(1);
+					}
+				}
+			}
+		return sessionFactory;
 	}
 
 	public static void addMsgToDB(String text) throws Exception{
