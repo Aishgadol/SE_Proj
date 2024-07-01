@@ -10,14 +10,17 @@ import javafx.scene.control.TextField;
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 
-import java.io.IOException;
 
-public class OpeningController {
+import java.io.IOException;
+public class OpeningController{
     private int msgId;
+
 
     @FXML
     private VBox cinema;
 
+    @FXML
+    private Button updateButton;
     /*
     @FXML
     void sendToDb(ActionEvent event) {
@@ -38,8 +41,13 @@ public class OpeningController {
 	}
 
 */
+    @Subscribe
+    public void eventBusFiller(Message message){
+        return;
+    }
     @FXML
     void initialize(){
+        EventBus.getDefault().register(this);
         msgId=0;
         try {
 			Message message = new Message(msgId, "add client");

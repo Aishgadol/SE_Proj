@@ -3,27 +3,36 @@ package client;
 import entities.MovieInfo;
 import entities.Message;
 import javafx.application.Platform;
-import javafx.application.Application;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Node;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.layout.VBox;
-import javafx.scene.control.TextArea;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
-import javafx.scene.control.TextField;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
+import javafx.stage.Stage;
+import java.io.IOException;
+
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
-
-import java.io.IOException;
+import org.hibernate.sql.Update;
 
 
 public class CinemaController {
     private int msgId;
     private MovieInfo movieInfo;
+    private SimpleChatClient chatclient;
+    private Stage stage;
+    private Scene scene;
+    private Parent root;
 
+    @FXML
+    private Button updateButton;
     @FXML
     private ImageView automobiles_img;
     @FXML
@@ -42,13 +51,14 @@ public class CinemaController {
     private ImageView the_boys_img;
 
 
+
+
     private MovieInfo getMovieInfo(String title){
         return null;//placeholder
     }
     private void askServer(String title){
         return;//placeholder
     }
-
     private void popInformation(MovieInfo movieInfo){
         //Platform.runLater();
     }
@@ -67,6 +77,8 @@ public class CinemaController {
             alert.show();
         });
     }
+
+
 
     @FXML
     void clickedHouse(MouseEvent event) {
@@ -173,6 +185,17 @@ public class CinemaController {
 	}
 
 */
+    @FXML
+    void changeToUpdateScreen(ActionEvent event) throws IOException {
+        EventBus.getDefault().unregister(this);
+        Parent root=FXMLLoader.load(getClass().getResource("/update.fxml"));
+        stage=(Stage)((Node)event.getSource()).getScene().getWindow();
+        scene=new Scene(root,1280,800);
+        stage.setScene(scene);
+        stage.setResizable(false);
+        stage.show();
+    }
+
     @FXML
     void initialize(){
         EventBus.getDefault().register(this);

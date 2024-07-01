@@ -9,10 +9,8 @@ import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 import javafx.stage.Stage;
-
 import java.io.IOException;
 import java.time.format.DateTimeFormatter;
-
 import javafx.util.Duration;
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
@@ -24,30 +22,31 @@ public class SimpleChatClient extends Application {
 
     private static Scene scene;
     private SimpleClient client;
+    private static SimpleChatClient selfi;
     private Stage primaryStage;
 
-    private void switchToScene(String fxml, int width, int height) throws IOException {
-        Parent root = loadFXML(fxml);
-        primaryStage.setScene(new Scene(root, width, height));
+    public void switchToScene(String fxml) throws IOException {
+        try {
+            Parent root = loadFXML(fxml);
+            scene = new Scene(root);
+            primaryStage.setScene(scene);
+            primaryStage.show();
+        }catch(IOException e){
+            e.printStackTrace();
+        }
+        /*
+
+        System.out.println("go fk urself, "+fxml);
+        scene=new Scene(loadFXML(fxml),1280,800);
         primaryStage.setResizable(false);
-        primaryStage.show();
-    }
-    private void switchToScene(String sceneName){
-        PauseTransition delay=new PauseTransition(Duration.seconds(4));
-        delay.setOnFinished(event ->{
-            try{
-                switchToScene(sceneName,1280,800);
-            } catch (IOException e){
-                e.printStackTrace();
-            }
-        });
-        delay.play();
+        primaryStage.show();*/
     }
 
 
     @Override
     public void start(Stage stage) throws IOException {
     	EventBus.getDefault().register(this);
+        selfi=this;
     	client = SimpleClient.getClient();
     	client.openConnection();
         primaryStage=stage;
@@ -59,11 +58,24 @@ public class SimpleChatClient extends Application {
         stage.setResizable(false);
         stage.show();
         */
-        scene=new Scene(loadFXML("opening"),600,600);
+        scene=new Scene(loadFXML("opening"),1280,800);
         primaryStage.setScene(scene);
+        primaryStage.setResizable(false);
         primaryStage.show();
-        switchToScene("cinema");
+        PauseTransition delay=new PauseTransition(Duration.seconds(2));
+        delay.setOnFinished(event ->{
+            try{
+                scene=new Scene(loadFXML("cinema"),1280,800);
+                primaryStage.setScene(scene);
+                primaryStage.setResizable(false);
+                primaryStage.show();
+            } catch (IOException e){
+                e.printStackTrace();
+            }
+        });
+        delay.play();
         primaryStage.setTitle("Cinema");
+
     }
 
 
@@ -73,6 +85,7 @@ public class SimpleChatClient extends Application {
 
     private static Parent loadFXML(String fxml) throws IOException {
         FXMLLoader fxmlLoader = new FXMLLoader(SimpleChatClient.class.getResource("/"+fxml + ".fxml"));
+
         return fxmlLoader.load();
     }
 
@@ -84,7 +97,6 @@ public class SimpleChatClient extends Application {
 		super.stop();
 	}
 
-    /*
     @Subscribe
     public void onMessageEvent(MessageEvent message) {
         if(message.getMessage().getMessage().startsWith("EMPTY MESSAGE")){
@@ -97,7 +109,7 @@ public class SimpleChatClient extends Application {
         });
         }
     }
-*/
+
 
 	public static void main(String[] args) {
         launch();
