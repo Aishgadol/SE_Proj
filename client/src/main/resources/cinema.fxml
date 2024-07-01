@@ -12,7 +12,7 @@
    <children>
       <AnchorPane maxWidth="1270.0" prefHeight="800.0" prefWidth="1270.0">
          <children>
-            <ImageView fx:id="background" fitHeight="800.0" fitWidth="1280.0" opacity="0.2" pickOnBounds="true">
+            <ImageView fx:id="background" fitHeight="800.0" fitWidth="1280.0" opacity="0.35" pickOnBounds="true">
                <image>
                   <Image url="@namalcamp.jpg" />
                </image>
