@@ -43,15 +43,21 @@ public class CinemaController {
 
 
     private MovieInfo getMovieInfo(String title){
-
+        return null;//placeholder
     }
     private void askServer(String title){
+        return;//placeholder
+    }
 
+    private void popInformation(MovieInfo movieInfo){
+        //Platform.runLater();
     }
     @FXML
     void clickedMargol(MouseEvent event) {
         //askServer("Margol");
         //MovieInfo margolInfo=getMovieInfo("Margol");
+
+        popInformation(null);
         //this approach is useful cuz Platform.runLater blocks the window untill closed so u cant fuck around while reading movie info
         Platform.runLater(()->{
             Alert alert = new Alert(AlertType.INFORMATION);
@@ -143,7 +149,10 @@ public class CinemaController {
     }
 
     @Subscribe
-    public MovieInfo getMovieInfoFromDb()
+    public void getMovieInfoFromDb(MovieInfo movieInfo){
+      this.movieInfo=movieInfo;
+    }
+
     /*
     @FXML
     void sendToDb(ActionEvent event) {

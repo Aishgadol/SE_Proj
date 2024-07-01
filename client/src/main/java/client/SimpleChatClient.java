@@ -84,7 +84,7 @@ public class SimpleChatClient extends Application {
 		super.stop();
 	}
 
-
+    /*
     @Subscribe
     public void onMessageEvent(MessageEvent message) {
         if(message.getMessage().getMessage().startsWith("EMPTY MESSAGE")){
@@ -97,7 +97,7 @@ public class SimpleChatClient extends Application {
         });
         }
     }
-
+*/
 
 	public static void main(String[] args) {
         launch();
