@@ -12,12 +12,15 @@ public class Movie {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
+    private MovieInfo movieInfo;
     public Movie(){
         /*dont use this*/
     }
 
-    public Movie(String name, String picture_link ){
+    public Movie(MovieInfo movieInfo){
         //use this, update paramteres
+        this.movieInfo=movieInfo;
+
     }
 
 }

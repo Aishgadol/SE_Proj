@@ -13,17 +13,12 @@ import org.greenrobot.eventbus.Subscribe;
 import java.io.IOException;
 
 
-public class CinemaController {
+public class OpeningController {
     private int msgId;
 
     @FXML
     private VBox cinema;
 
-
-    @Subscribe
-    public void doNothing(Message msg){
-        System.out.println("Message got was: "+msg.getMessage());
-    }
     /*
     @FXML
     void sendToDb(ActionEvent event) {
@@ -46,7 +41,6 @@ public class CinemaController {
 */
     @FXML
     void initialize(){
-        EventBus.getDefault().register(this);
         msgId=0;
         try {
 			Message message = new Message(msgId, "add client");

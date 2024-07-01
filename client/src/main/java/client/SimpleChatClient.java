@@ -1,5 +1,6 @@
 package client;
 
+import javafx.animation.PauseTransition;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
@@ -12,6 +13,7 @@ import javafx.stage.Stage;
 import java.io.IOException;
 import java.time.format.DateTimeFormatter;
 
+import javafx.util.Duration;
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 
@@ -22,14 +24,39 @@ public class SimpleChatClient extends Application {
 
     private static Scene scene;
     private SimpleClient client;
+    private Stage primaryStage;
+
+    private void switchToScene(String fxml, int width, int height) throws IOException {
+        Parent root = loadFXML(fxml);
+        primaryStage.setScene(new Scene(root, width, height));
+        primaryStage.setResizable(false);
+        primaryStage.show();
+    }
+    private void switchToScene(String sceneName){
+        PauseTransition delay=new PauseTransition(Duration.seconds(1));
+        delay.setOnFinished(event ->{
+            try{
+                switchToScene(sceneName,1280,800);
+            } catch (IOException e){
+                e.printStackTrace();
+            }
+        });
+        delay.play();
+    }
+
 
     @Override
     public void start(Stage stage) throws IOException {
     	EventBus.getDefault().register(this);
     	client = SimpleClient.getClient();
     	client.openConnection();
-        scene = new Scene(loadFXML("cinema"), 640, 480);
+        primaryStage=stage;
+
+        //initial scene setup
+
+        scene=new Scene(loadFXML("opening"),600,400);
         stage.setScene(scene);
+        stage.setResizable(false);
         stage.show();
     }
 
