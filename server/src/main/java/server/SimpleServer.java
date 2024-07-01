@@ -1,6 +1,7 @@
 package server;
 
 
+import entities.DisplayTime;
 import entities.Message;
 import ocsf.AbstractServer;
 import ocsf.ConnectionToClient;
@@ -35,6 +36,32 @@ public class SimpleServer extends AbstractServer {
 		return configuration.buildSessionFactory(serviceRegistry);
 	}
 
+
+	/* only use this function if protoype database gets deleted, it should not happen.
+	public static void generateMovies() throws Exception {
+			Movie movie1=new Movie("Margol","1973");
+			movie1.getMovieInfo().setDisplayTimes(new ArrayList<DisplayTime>());
+			session.save(movie1);
+			Movie movie2=new Movie("The Boys","2018");
+			movie2.getMovieInfo().setDisplayTimes(new ArrayList<DisplayTime>());
+			session.save(movie2);
+			Movie movie3=new Movie("Scary Movie 5","2012");
+			movie3.getMovieInfo().setDisplayTimes(new ArrayList<DisplayTime>());
+			session.save(movie3);
+			Movie movie4=new Movie("House of Cards","2006");
+			movie4.getMovieInfo().setDisplayTimes(new ArrayList<DisplayTime>());
+			session.save(movie4);
+			Movie movie5=new Movie("Pulp Fiction","1969");
+			movie5.getMovieInfo().setDisplayTimes(new ArrayList<DisplayTime>());
+			session.save(movie5);
+			Movie movie6=new Movie("Automobiles","2024");
+			movie6.getMovieInfo().setDisplayTimes(new ArrayList<DisplayTime>());
+			session.save(movie6);
+            session.flush();
+        }
+*/
+
+
 	public static void addMsgToDB(String text) throws Exception{
 		Msg m=new Msg(text);
 		session.save(m);
@@ -49,14 +76,22 @@ public class SimpleServer extends AbstractServer {
 			sessionFactory=getSessionFactory();
 			session=sessionFactory.openSession();
 			session.beginTransaction();
+
 		} catch(Exception e) {
 			if(session!=null){
 				session.getTransaction().rollback();
 			}
 			e.printStackTrace();
+		}/*
+		try{
+			generateMovies();
+		}catch(Exception e) {
+			e.printStackTrace();
 		}
-		
+		session.getTransaction().commit();
+		session.beginTransaction();*/
 	}
+
 
 	private List<Msg> getMsgs(){
 		CriteriaBuilder builder=session.getCriteriaBuilder();

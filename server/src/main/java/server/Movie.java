@@ -1,7 +1,10 @@
 package server;
 
 import javax.persistence.*;
+
+import entities.DisplayTime;
 import entities.MovieInfo;
+import java.util.List;
 
 
 @Entity
@@ -18,6 +21,7 @@ public class Movie {
     @Column
     private String releaseDate;
 
+
     private MovieInfo movieInfo;
 
 
@@ -28,7 +32,14 @@ public class Movie {
     public Movie(MovieInfo movieInfo){
         //use this, update paramteres
         this.movieInfo=movieInfo;
+        this.name=movieInfo.getName();
+        this.releaseDate=movieInfo.getReleasedate();
+    }
 
+    public Movie(String name, String releaseDate){
+        this.name=name;
+        this.releaseDate=releaseDate;
+        movieInfo=new MovieInfo(name,releaseDate);
     }
 
     public void setName(String name){
@@ -45,4 +56,6 @@ public class Movie {
         return this.releaseDate;
     }
 
+    public void setMovieInfo(MovieInfo movieInfo){this.movieInfo=movieInfo;}
+    public MovieInfo getMovieInfo(){return this.movieInfo;}
 }

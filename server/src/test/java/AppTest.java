@@ -1,4 +1,4 @@
-package il.cshaifasweng.server;
+package server;
 
 import static org.junit.Assert.assertTrue;
 

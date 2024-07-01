@@ -147,8 +147,9 @@ public class CinemaController {
     }
 
     @Subscribe
-    public void doNothing(Message msg){
-        System.out.println("Message got was: "+msg.getMessage());
+    public void catchMovieInfo(MovieInfo movieInfo){
+        this.movieInfo=movieInfo;
+
     }
 
     void askDB(String title){

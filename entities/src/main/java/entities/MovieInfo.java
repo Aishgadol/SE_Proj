@@ -13,7 +13,6 @@ public class MovieInfo implements Serializable {
     public MovieInfo(String name, String releaseDate){
         this.name=name;
         this.releaseDate=releaseDate;
-
     }
 
     public void setName(String name){
