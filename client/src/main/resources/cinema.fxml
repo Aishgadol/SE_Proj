@@ -1,7 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.scene.control.Label?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.Pane?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
@@ -9,11 +12,70 @@
    <children>
       <AnchorPane maxWidth="1270.0" prefHeight="800.0" prefWidth="1270.0">
          <children>
-            <Label alignment="CENTER" layoutX="168.0" layoutY="327.0" mouseTransparent="true" text="WELCOME TO CINEMA" textAlignment="CENTER">
+            <ImageView fx:id="background" fitHeight="800.0" fitWidth="1280.0" opacity="0.2" pickOnBounds="true">
+               <image>
+                  <Image url="@namalcamp.jpg" />
+               </image>
+            </ImageView>
+            <Label alignment="CENTER" layoutX="189.0" layoutY="39.0" mouseTransparent="true" text="WELCOME TO CINEMA" textAlignment="CENTER">
                <font>
                   <Font size="90.0" />
                </font>
             </Label>
+            <Pane layoutX="130.0" layoutY="181.0" prefHeight="284.0" prefWidth="283.0" style="-fx-border-color: black; -fx-border-width: 10;">
+               <children>
+                  <ImageView fx:id="margol_img" fitHeight="263.0" fitWidth="267.0" layoutX="11.0" layoutY="9.0" nodeOrientation="INHERIT" onMouseClicked="#clickedMargol" pickOnBounds="true" preserveRatio="true">
+                     <image>
+                        <Image url="@margol.jpg" />
+                     </image>
+                  </ImageView>
+               </children>
+            </Pane>
+            <Pane layoutX="530.0" layoutY="181.0" prefHeight="284.0" prefWidth="283.0" style="-fx-border-color: black; -fx-border-width: 10;">
+               <children>
+                  <ImageView fx:id="the_boys_img" fitHeight="263.0" fitWidth="267.0" layoutX="11.0" layoutY="9.0" nodeOrientation="INHERIT" onMouseClicked="#clickedTheBoys" pickOnBounds="true">
+                     <image>
+                        <Image url="@the_boys.jpg" />
+                     </image>
+                  </ImageView>
+               </children>
+            </Pane>
+            <Pane layoutX="930.0" layoutY="181.0" prefHeight="284.0" prefWidth="283.0" style="-fx-border-color: black; -fx-border-width: 10;">
+               <children>
+                  <ImageView fx:id="scary_movie_img" fitHeight="266.0" fitWidth="267.0" layoutX="8.0" layoutY="8.0" nodeOrientation="INHERIT" onMouseClicked="#clickedScaryMovie" pickOnBounds="true">
+                     <image>
+                        <Image url="@scary_movie_5.jpg" />
+                     </image>
+                  </ImageView>
+               </children>
+            </Pane>
+            <Pane layoutX="130.0" layoutY="486.0" prefHeight="284.0" prefWidth="283.0" style="-fx-border-color: black; -fx-border-width: 10;">
+               <children>
+                  <ImageView fx:id="house_of_cards_img" fitHeight="263.0" fitWidth="267.0" layoutX="11.0" layoutY="9.0" nodeOrientation="INHERIT" onMouseClicked="#clickedHouse" pickOnBounds="true">
+                     <image>
+                        <Image url="@Knesset_House_of_lies.jpg" />
+                     </image>
+                  </ImageView>
+               </children>
+            </Pane>
+            <Pane layoutX="530.0" layoutY="486.0" prefHeight="284.0" prefWidth="283.0" style="-fx-border-color: black; -fx-border-width: 10;">
+               <children>
+                  <ImageView fx:id="pulp_fiction_img" fitHeight="263.0" fitWidth="267.0" layoutX="11.0" layoutY="9.0" nodeOrientation="INHERIT" onMouseClicked="#clickedPulpFiction" pickOnBounds="true">
+                     <image>
+                        <Image url="@pulp_fiction.jpg" />
+                     </image>
+                  </ImageView>
+               </children>
+            </Pane>
+            <Pane layoutX="930.0" layoutY="486.0" prefHeight="284.0" prefWidth="283.0" style="-fx-border-color: black; -fx-border-width: 10;">
+               <children>
+                  <ImageView fx:id="automobiles_img" fitHeight="263.0" fitWidth="267.0" layoutX="11.0" layoutY="9.0" nodeOrientation="INHERIT" onMouseClicked="#clickedAutomobiles" pickOnBounds="true">
+                     <image>
+                        <Image url="@automobiles(cars%20parody).jpg" />
+                     </image>
+                  </ImageView>
+               </children>
+            </Pane>
          </children>
       </AnchorPane>
    </children>

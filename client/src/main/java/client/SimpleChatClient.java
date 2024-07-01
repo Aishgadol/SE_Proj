@@ -33,7 +33,7 @@ public class SimpleChatClient extends Application {
         primaryStage.show();
     }
     private void switchToScene(String sceneName){
-        PauseTransition delay=new PauseTransition(Duration.seconds(1));
+        PauseTransition delay=new PauseTransition(Duration.seconds(4));
         delay.setOnFinished(event ->{
             try{
                 switchToScene(sceneName,1280,800);
@@ -53,12 +53,19 @@ public class SimpleChatClient extends Application {
         primaryStage=stage;
 
         //initial scene setup
-
+        /*
         scene=new Scene(loadFXML("opening"),600,400);
         stage.setScene(scene);
         stage.setResizable(false);
         stage.show();
+        */
+        scene=new Scene(loadFXML("opening"),600,600);
+        primaryStage.setScene(scene);
+        primaryStage.show();
+        switchToScene("cinema");
+        primaryStage.setTitle("Cinema");
     }
+
 
     static void setRoot(String fxml) throws IOException {
         scene.setRoot(loadFXML(fxml));
