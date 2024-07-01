@@ -12,7 +12,6 @@ import org.greenrobot.eventbus.Subscribe;
 
 import java.io.IOException;
 
-
 public class OpeningController {
     private int msgId;
 
