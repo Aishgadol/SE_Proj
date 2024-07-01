@@ -12,7 +12,15 @@ public class Movie {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
+    @Column
+    private String name;
+
+    @Column
+    private String releaseDate;
+
     private MovieInfo movieInfo;
+
+
     public Movie(){
         /*dont use this*/
     }
@@ -21,6 +29,20 @@ public class Movie {
         //use this, update paramteres
         this.movieInfo=movieInfo;
 
+    }
+
+    public void setName(String name){
+        this.name=name;
+    }
+    public String getName(){
+        return this.name;
+    }
+
+    public void setReleaseDate(String releaseDate){
+        this.releaseDate= this.releaseDate;
+    }
+    public String getReleasedate(){
+        return this.releaseDate;
     }
 
 }
