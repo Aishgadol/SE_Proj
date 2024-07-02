@@ -8,6 +8,7 @@ public class Message implements Serializable {
     LocalDateTime timeStamp;
     String message;
     String data;
+    MovieInfo movieInfo;
 
     public Message(int id, LocalDateTime timeStamp, String message) {
         this.id = id;
@@ -59,5 +60,12 @@ public class Message implements Serializable {
 
     public void setData(String data) {
         this.data = data;
+    }
+
+    public MovieInfo getMovieInfo() {
+        return movieInfo;
+    }
+    public void setMovieInfo(MovieInfo m){
+        this.movieInfo=m;
     }
 }

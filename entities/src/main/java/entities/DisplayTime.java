@@ -1,6 +1,8 @@
 package entities;
 
-public class DisplayTime {
+import java.io.Serializable;
+
+public class DisplayTime implements Serializable {
     private String day;
     private String month;
     private String year;

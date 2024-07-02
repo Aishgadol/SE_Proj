@@ -6,9 +6,9 @@ import java.util.*;
 public class MovieInfo implements Serializable {
 
 
-    private String name;
-    private String releaseDate;
-    private List<DisplayTime> displayTimes;
+     String name;
+     String releaseDate;
+     List<DisplayTime> displayTimes;
 
     public MovieInfo(String name, String releaseDate){
         this.name=name;

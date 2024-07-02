@@ -22,7 +22,7 @@
 	<dependencyManagement>
 		<dependencies>
 			<dependency>
-				<groupId>il.cshaifasweng.OCSFMediatorExample</groupId>
+				<groupId>il.cshaifasweng.MainProject</groupId>
 				<artifactId>entities</artifactId>
 				<version>${project.version}</version>
 			</dependency>

@@ -2,7 +2,6 @@ package server;
 
 import javax.persistence.*;
 
-import entities.DisplayTime;
 import entities.MovieInfo;
 import java.util.List;
 
@@ -13,16 +12,16 @@ public class Movie {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int id;
+    int id;
 
     @Column
-    private String name;
+    String name;
 
     @Column
-    private String releaseDate;
+    String releaseDate;
 
 
-    private MovieInfo movieInfo;
+    MovieInfo movieInfo;
 
 
     public Movie(){

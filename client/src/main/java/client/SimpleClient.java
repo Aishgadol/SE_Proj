@@ -21,9 +21,10 @@ public class SimpleClient extends AbstractClient {
 			EventBus.getDefault().post(new MessageEvent(message));
 			return;
 		}
-		MovieInfo movieInfo=(MovieInfo)msg;
-
-		EventBus.getDefault().post(message);
+		else if(message.getMessage().startsWith("MovieInfo")) {
+			EventBus.getDefault().post(new MovieInfo(message.getMovieInfo()));
+			return;
+		}
 
 		/*
 		if(message.getMessage().equals("update submitters IDs")){

@@ -60,8 +60,8 @@ public class SimpleServer extends AbstractServer {
 			movie6.getMovieInfo().setDisplayTimes(new ArrayList<DisplayTime>());
 			session.save(movie6);
             session.flush();
-        }
-*/
+        }*/
+
 
 
 	public static void addMsgToDB(String text) throws Exception{
@@ -84,7 +84,7 @@ public class SimpleServer extends AbstractServer {
 				session.getTransaction().rollback();
 			}
 			e.printStackTrace();
-		}/*
+		}/*uncomment this section when running server for the first time
 		try{
 			generateMovies();
 		}catch(Exception e) {
@@ -95,21 +95,22 @@ public class SimpleServer extends AbstractServer {
 	}
 
 	private Movie getMovieByTitle(String title){
-		CriteriaBuilder builder=session.getCriteriaBuilder();
-		CriteriaQuery<Movie> query=builder.createQuery(Movie.class);
-		Root<Movie> root= query.from(Movie.class);
-		query.select(root).where(builder.equal(root.get("name"),title));
-		List<Movie>result=session.createQuery(query).getResultList();
-		return result.isEmpty() ? null : result.get(0);
+		List<Movie> movies=getMovies();
+		for(Movie movie : movies){
+			if (movie.getName().startsWith(title)){
+				return movie;
+			}
+		}
+		return null;
 	}
 
 	private List<Movie> getMovies(){
 		CriteriaBuilder builder=session.getCriteriaBuilder();
 		CriteriaQuery<Movie> query=builder.createQuery(Movie.class);
 		query.from(Movie.class);
-		List<Movie> movies=session.createQuery(query).getResultList();
-		return movies;
+		return session.createQuery(query).getResultList();
 	}
+
 	private List<Msg> getMsgs(){
 		CriteriaBuilder builder=session.getCriteriaBuilder();
 		CriteriaQuery<Msg> query=builder.createQuery(Msg.class);
@@ -134,15 +135,13 @@ public class SimpleServer extends AbstractServer {
 				SubscribersList.add(connection);
 				message.setMessage("client added successfully");
 			}
-			else if(request.startsWith("automobiles")){
-				Movie movie=getMovieByTitle("Automobiles");
+			else if(request.startsWith("getMovieInfo")){
+				String[] splitted=request.split(" ",-1);
+				Movie movie=getMovieByTitle(splitted[1]);
 				MovieInfo movieInfo=movie.getMovieInfo();
-				System.out.println("I have the movie "+movieInfo.getName()+" ,will try to send to client now");
-				try {
-					client.sendToClient(movieInfo);
-				}catch(Exception e){
-					e.printStackTrace();
-				}
+				message.setMessage("MovieInfo");
+				message.setMovieInfo(movieInfo);
+				client.sendToClient(message);
 			}
 			else {
 				addMsgToDB(request);
