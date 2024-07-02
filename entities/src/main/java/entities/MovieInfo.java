@@ -15,6 +15,12 @@ public class MovieInfo implements Serializable {
         this.releaseDate=releaseDate;
     }
 
+    public MovieInfo(MovieInfo m){
+        this.name=m.getName();
+        this.releaseDate=m.getReleasedate();
+        this.displayTimes=m.getDisplayTimes();
+    }
+
     public void setName(String name){
         this.name=name;
     }

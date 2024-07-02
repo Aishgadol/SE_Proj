@@ -3,6 +3,7 @@ package server;
 
 import entities.DisplayTime;
 import entities.Message;
+import entities.MovieInfo;
 import ocsf.AbstractServer;
 import ocsf.ConnectionToClient;
 import ocsf.SubscribedClient;
@@ -13,6 +14,8 @@ import java.util.*;
 
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Root;
+
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
@@ -92,7 +95,22 @@ public class SimpleServer extends AbstractServer {
 		session.beginTransaction();*/
 	}
 
+	private Movie getMovieByTitle(String title){
+		CriteriaBuilder builder=session.getCriteriaBuilder();
+		CriteriaQuery<Movie> query=builder.createQuery(Movie.class);
+		Root<Movie> root= query.from(Movie.class);
+		query.select(root).where(builder.equal(root.get("name"),title));
+		List<Movie>result=session.createQuery(query).getResultList();
+		return result.isEmpty() ? null : result.get(0);
+	}
 
+	private List<Movie> getMovies(){
+		CriteriaBuilder builder=session.getCriteriaBuilder();
+		CriteriaQuery<Movie> query=builder.createQuery(Movie.class);
+		query.from(Movie.class);
+		List<Movie> movies=session.createQuery(query).getResultList();
+		return movies;
+	}
 	private List<Msg> getMsgs(){
 		CriteriaBuilder builder=session.getCriteriaBuilder();
 		CriteriaQuery<Msg> query=builder.createQuery(Msg.class);
@@ -116,6 +134,16 @@ public class SimpleServer extends AbstractServer {
 				SubscribedClient connection = new SubscribedClient(client);
 				SubscribersList.add(connection);
 				message.setMessage("client added successfully");
+			}
+			else if(request.startsWith("automobiles")){
+				Movie movie=getMovieByTitle("Automobiles");
+				MovieInfo movieInfo=movie.getMovieInfo();
+				System.out.println("I have the movie "+movieInfo.getName()+" ,will try to send to client now");
+				try {
+					client.sendToClient(movieInfo);
+				}catch(Exception e){
+					e.printStackTrace();
+				}
 			}
 			else {
 				addMsgToDB(request);
@@ -196,10 +224,18 @@ public class SimpleServer extends AbstractServer {
 		}*/
 	}
 
+	private String getAllDisplayTimes(List<DisplayTime> displayTimes){
+        StringBuilder sb=new StringBuilder();
+        for (DisplayTime displayTime : displayTimes) {
+            sb.append(displayTime.toString());
+        }
+        return sb.toString();
+    }
 
 	 	/*
 	 	THIS PART WILL BE USEFUL TO ADDRESS AND UPDATE ALL CLIENTS, DATABASE STUFF FOR EXAMPLE
 	 	 */
+
 
 	public void stopServer(){
 		try {

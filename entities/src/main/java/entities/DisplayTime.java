@@ -8,7 +8,7 @@ public class DisplayTime {
     private String minute;
 
     public DisplayTime(String full_time){
-        // assume the format is HH/MM, DD/MM/YYYY
+        // assume the format is HH:MM, DD/MM/YYYY
         this.hour=full_time.substring(0,2);
         this.minute=full_time.substring(3,5);
         this.day=full_time.substring(7,9);
@@ -54,7 +54,7 @@ public class DisplayTime {
         return this.minute;
     }
     public String toString(){
-        String s=this.hour+"/"+this.minute+", "+this.day+"/"+this.month+"/"+this.year;
+        String s=this.hour+":"+this.minute+", "+this.day+"/"+this.month+"/"+this.year+"\n";
         return s;
     }
 }

@@ -1,5 +1,6 @@
 package client;
 
+import entities.DisplayTime;
 import entities.MovieInfo;
 import entities.Message;
 import javafx.application.Platform;
@@ -17,6 +18,7 @@ import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 import javafx.stage.Stage;
 import java.io.IOException;
+import java.util.List;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
@@ -135,20 +137,37 @@ public class CinemaController {
 
     @FXML
     void clickedAutomobiles(MouseEvent event){
-
+        askDB("automobiles");
         //this approach is useful cuz Platform.runLater blocks the window untill closed so u cant fuck around while reading movie info
-        Platform.runLater(()->{
+        /*Platform.runLater(()->{
             Alert alert = new Alert(AlertType.INFORMATION);
             alert.setTitle("Information on Automobiles(Cars parody)");
-            alert.setHeaderText("This is header text");
-            alert.setContentText("This is the content text");
+            alert.setHeaderText("This is information about the movie "+movieInfo.getName()+"\n " +
+                    "Released at: "+movieInfo.getReleasedate());
+            alert.setContentText("Showtimes: "+getAllDisplayTimes(movieInfo.getDisplayTimes()));
             alert.show();
-        });
+        });*/
+    }
+
+    private String getAllDisplayTimes(List<DisplayTime> displayTimes){
+        StringBuilder sb=new StringBuilder();
+        for (DisplayTime displayTime : displayTimes) {
+            sb.append(displayTime.toString());
+        }
+        return sb.toString();
     }
 
     @Subscribe
     public void catchMovieInfo(MovieInfo movieInfo){
         this.movieInfo=movieInfo;
+        Platform.runLater(()->{
+            Alert alert = new Alert(AlertType.INFORMATION);
+            alert.setTitle("Information on "+this.movieInfo.getName());
+            alert.setHeaderText("This is information about the movie "+this.movieInfo.getName()+"\n " +
+                    "Released at: "+this.movieInfo.getReleasedate());
+            alert.setContentText("Showtimes: "+getAllDisplayTimes(this.movieInfo.getDisplayTimes()));
+            alert.show();
+        });
 
     }
 

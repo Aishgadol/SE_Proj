@@ -1,6 +1,7 @@
 package client;
 
 import entities.Message;
+import entities.MovieInfo;
 import org.greenrobot.eventbus.EventBus;
 
 import ocsf.AbstractClient;
@@ -20,6 +21,8 @@ public class SimpleClient extends AbstractClient {
 			EventBus.getDefault().post(new MessageEvent(message));
 			return;
 		}
+		MovieInfo movieInfo=(MovieInfo)msg;
+
 		EventBus.getDefault().post(message);
 
 		/*
