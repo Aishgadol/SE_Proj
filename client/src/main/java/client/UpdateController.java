@@ -15,11 +15,17 @@ import javafx.scene.control.Label;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.VBox;
+import javafx.scene.control.DatePicker;
 import javafx.stage.Stage;
+import java.time.LocalDate;
+import javafx.util.Callback;
+import javafx.scene.control.DateCell;
 import javafx.scene.Parent;
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import java.io.IOException;
+import java.time.LocalTime;
+import java.util.ArrayList;
 import java.util.List;
 
 public class UpdateController{
@@ -34,11 +40,11 @@ public class UpdateController{
     private List<MovieInfo> movieInfos;
     private boolean isMovieSelected=false;
 
-
-
     @FXML
     private Button backButton;
 
+    @FXML
+    private DatePicker datePicker;
     @FXML
     private ImageView background;
 
@@ -49,31 +55,13 @@ public class UpdateController{
     private ListView<String> myListView;
 
     @FXML
-    private VBox cinema;
-
-    @FXML
     private Button addTimeButton;
 
     @FXML
     private Label addLabel;
 
     @FXML
-    private ComboBox<String> availableDayComboBox;
-
-    @FXML
-    private ComboBox<String> availableHourComboBox;
-
-    @FXML
-    private ComboBox<String> availableMinuteComboBox;
-
-    @FXML
-    private ComboBox<String> availableMonthComboBox;
-
-    @FXML
     private ComboBox<String> availableTimesComboBox;
-
-    @FXML
-    private ComboBox<String> availableYearComboBox;
 
     @FXML
     private Button removeTimeButton;
@@ -82,33 +70,10 @@ public class UpdateController{
     private Label removeLabel;
 
     @FXML
+    private ComboBox<String> timePicker;
+
+    @FXML
     void addTime(ActionEvent event){
-
-    }
-
-
-    @FXML
-    void selectedDay(ActionEvent event) {
-
-    }
-
-    @FXML
-    void selectedHour(ActionEvent event) {
-
-    }
-
-    @FXML
-    void selectedMinute(ActionEvent event) {
-
-    }
-
-    @FXML
-    void selectedMonth(ActionEvent event) {
-
-    }
-
-    @FXML
-    void selectedYear(ActionEvent event){
 
     }
 
@@ -116,8 +81,6 @@ public class UpdateController{
     void selectedTimeToRemove(ActionEvent event){
 
     }
-
-
 
     @Subscribe
     public void getMovieInfoFromDB(MovieInfo movieInfo){
@@ -148,11 +111,8 @@ public class UpdateController{
             isMovieSelected=true;
             addLabel.setVisible(true);
             addTimeButton.setVisible(true);
-            availableDayComboBox.setVisible(true);
-            availableMonthComboBox.setVisible(true);
-            availableYearComboBox.setVisible(true);
-            availableHourComboBox.setVisible(true);
-            availableMinuteComboBox.setVisible(true);
+            datePicker.setVisible(true);
+            timePicker.setVisible(true);
             myListView.setVisible(true);
             removeTimeButton.setVisible(true);
             removeLabel.setVisible(true);
@@ -179,11 +139,47 @@ public class UpdateController{
         stage.setResizable(false);
         stage.show();
     }
+    @FXML
+    void choseDate(ActionEvent event){
+
+    }
+
+
+    private List<String> generateTimeSlots(){
+        List<String> times=new ArrayList<>();
+        LocalTime startTime= LocalTime.of(10,0);
+        LocalTime endTime=LocalTime.of(1,0);
+        while(!startTime.equals(endTime)){
+            times.add(startTime.toString());
+            startTime=startTime.plusMinutes(30);
+        }
+        return times;
+    }
 
     @FXML
     void initialize(){
         EventBus.getDefault().register(this);
         msgId=0;
+        LocalDate minDate=LocalDate.now();
+        LocalDate maxDate=minDate.plusYears(1);
+        datePicker.setDayCellFactory(new Callback<DatePicker, DateCell>() {
+            @Override
+            public DateCell call(DatePicker datePicker) {
+                return new DateCell(){
+                    @Override
+                    public void updateItem(LocalDate item,boolean empty){
+                        super.updateItem(item,empty);
+                        if(item.isBefore(minDate) || item.isAfter(maxDate)){
+                            setDisable(true);
+                            setStyle("-fx-background-color: #ffc0cb;");
+                        }
+                    }
+                };
+            }
+        });
+        datePicker.setValue(minDate);
+        List<String> times=generateTimeSlots();
+        timePicker.getItems().addAll(times);
         askDB("getTitles");
         try {
 			Message message = new Message(msgId, "add client");
