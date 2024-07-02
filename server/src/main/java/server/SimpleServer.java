@@ -14,6 +14,7 @@ import java.util.*;
 
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
 
 import org.hibernate.HibernateException;
@@ -95,13 +96,12 @@ public class SimpleServer extends AbstractServer {
 	}
 
 	private Movie getMovieByTitle(String title){
-		List<Movie> movies=getMovies();
-		for(Movie movie : movies){
-			if (movie.getName().startsWith(title)){
-				return movie;
-			}
-		}
-		return null;
+		CriteriaBuilder builder=session.getCriteriaBuilder();
+		CriteriaQuery<Movie> query=builder.createQuery(Movie.class);
+		Root<Movie> root=query.from(Movie.class);
+		Predicate titlePredicate=builder.equal(root.get("name"),title);
+		query.where(titlePredicate);
+		return session.createQuery(query).getSingleResult();
 	}
 
 	private List<Movie> getMovies(){
@@ -136,7 +136,7 @@ public class SimpleServer extends AbstractServer {
 				message.setMessage("client added successfully");
 			}
 			else if(request.startsWith("getMovieInfo")){
-				String[] splitted=request.split(" ",-1);
+				String[] splitted=request.split(" ",2);
 				Movie movie=getMovieByTitle(splitted[1]);
 				MovieInfo movieInfo=movie.getMovieInfo();
 				message.setMessage("MovieInfo");

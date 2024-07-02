@@ -1,30 +1,27 @@
 package client;
 
 import entities.*;
+import javafx.application.Platform;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
-import javafx.scene.control.ListView;
+import javafx.scene.control.*;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
-import javafx.scene.control.ComboBox;
-import javafx.scene.control.Label;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.VBox;
-import javafx.scene.control.DatePicker;
 import javafx.stage.Stage;
 import java.time.LocalDate;
 import javafx.util.Callback;
-import javafx.scene.control.DateCell;
 import javafx.scene.Parent;
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import java.io.IOException;
 import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -38,6 +35,8 @@ public class UpdateController{
     private Parent root;
     private MovieInfo movieInfo;
     private List<MovieInfo> movieInfos;
+    private List<DisplayTime> displayTimes;
+
     private boolean isMovieSelected=false;
 
     @FXML
@@ -72,26 +71,63 @@ public class UpdateController{
     @FXML
     private ComboBox<String> timePicker;
 
+
     @FXML
-    void addTime(ActionEvent event){
+    void timeToAddWasChosen(){
+
+    }
+    @FXML
+    void dateToAddWasChosen(){
+
+    }
+    @FXML
+    void removeTimeButtonPressed(ActionEvent event){
 
     }
 
     @FXML
-    void selectedTimeToRemove(ActionEvent event){
-
+    void addTimeButtonPressed(ActionEvent event){
+        String hour=timePicker.getValue();
+        String date=datePicker.getValue().format(DateTimeFormatter.ofPattern("dd/MM/yyyy"));
+        DisplayTime displayTime=new DisplayTime(hour+", "+date);
+        askDB("addtime "+displayTime.toString());
     }
-
     @Subscribe
+    public void timeTaken(TimeTakenEvent event){
+        Platform.runLater(()->{
+            Alert alert = new Alert(Alert.AlertType.INFORMATION);
+            alert.setTitle("Time already in use");
+            alert.setHeaderText("The date and time you're trying to add are already taken by this movie");
+            alert.show();
+        });
+    }
+
+    @FXML
+    void timeToRemoveSelected(ActionEvent event){
+
+    }
+
+    @Subscribe // this will probably never happen
     public void getMovieInfoFromDB(MovieInfo movieInfo){
         this.movieInfo=movieInfo;
+        this.displayTimes=movieInfo.getDisplayTimes();
+        datePicker.setValue(LocalDate.now());
+        timePicker.setValue("10:00");
 
     }
+
+    void resetAll(){
+        datePicker.setValue(LocalDate.now());
+        timePicker.setValue("10:00");
+        myListView.getItems().clear();
+    }
+
 
     @Subscribe
     public void getMoviesFromDB(MessageEvent event){
         Message message=event.getMessage();
         List<MovieInfo> movieInfos=(List<MovieInfo>)message.getList();
+        movieInfo=message.getMovieInfo();
         this.movieInfos=movieInfos;
         for(MovieInfo movieInfo: movieInfos){
             titlesComboBox.getItems().add(movieInfo.getName());
@@ -101,6 +137,7 @@ public class UpdateController{
     void askDB(String title){
         try{
             Message message=new Message(msgId++,title);
+            message.setMovieInfo(movieInfo);
             SimpleClient.getClient().sendToServer(message);
         }catch (IOException e){
             e.printStackTrace();
@@ -120,16 +157,27 @@ public class UpdateController{
     }
 
     @FXML
-    void selectedMovie(){
+    void MovieHasBeenSelected(){
         String title=titlesComboBox.getValue();
         askDB(title);
         if(!isMovieSelected){
             showThings();
         }
+
+        resetAll();
+        //this area updates the screen that shows list of times for that movie
+        List<String> someList=new ArrayList<String>();
+        if(displayTimes!=null){
+            for(DisplayTime d : displayTimes) {
+                someList.add(d.toString());
+            }
+        }
+        myListView.getItems().setAll(someList);
+        availableTimesComboBox.getItems().setAll(someList);
     }
 
     @FXML
-    void goBack(ActionEvent event) throws IOException {
+    void goBackButton(ActionEvent event) throws IOException {
         EventBus.getDefault().unregister(this);
         Parent root=FXMLLoader.load(getClass().getResource("/cinema.fxml"));
         stage=(Stage)((Node)event.getSource()).getScene().getWindow();
@@ -160,6 +208,8 @@ public class UpdateController{
     void initialize(){
         EventBus.getDefault().register(this);
         msgId=0;
+
+        //initialization of datepicker
         LocalDate minDate=LocalDate.now();
         LocalDate maxDate=minDate.plusYears(1);
         datePicker.setDayCellFactory(new Callback<DatePicker, DateCell>() {
@@ -178,8 +228,12 @@ public class UpdateController{
             }
         });
         datePicker.setValue(minDate);
-        List<String> times=generateTimeSlots();
+
+        List<String> times=generateTimeSlots();//initialization of timeslots
         timePicker.getItems().addAll(times);
+
+
+
         askDB("getTitles");
         try {
 			Message message = new Message(msgId, "add client");

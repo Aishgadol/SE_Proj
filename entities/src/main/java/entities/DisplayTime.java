@@ -1,6 +1,7 @@
 package entities;
 
 import java.io.Serializable;
+import java.util.List;
 
 public class DisplayTime implements Serializable {
     private String day;
@@ -58,7 +59,7 @@ public class DisplayTime implements Serializable {
         return this.minute;
     }
     public String toString(){
-        String s=this.hour+":"+this.minute+", "+this.day+"/"+this.month+"/"+this.year+"\n";
+        String s=this.hour+":"+this.minute+", "+this.day+"/"+this.month+"/"+this.year;
         return s;
     }
 }

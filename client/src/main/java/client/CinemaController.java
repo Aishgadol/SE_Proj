@@ -100,6 +100,7 @@ public class CinemaController {
 
     @Subscribe
     public void catchMovieInfo(MovieInfo movieInfo){
+        System.out.println("I've been invoked 1");
         this.movieInfo=movieInfo;
         Platform.runLater(()->{
             Alert alert = new Alert(AlertType.INFORMATION);
@@ -110,6 +111,11 @@ public class CinemaController {
             alert.show();
         });
 
+    }
+
+    @Subscribe
+    public void catchSomethingElse(MovieInfo movieInfo){
+        System.out.println("I've been invoked 2");
     }
 
     void askDB(String title){
