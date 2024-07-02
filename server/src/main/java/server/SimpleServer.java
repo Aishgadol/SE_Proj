@@ -143,6 +143,16 @@ public class SimpleServer extends AbstractServer {
 				message.setMovieInfo(movieInfo);
 				client.sendToClient(message);
 			}
+			else if(request.startsWith("getTitles")){
+				List<Movie> movies=getMovies();
+				List<MovieInfo> movieInfos=new ArrayList<MovieInfo>();
+				for(Movie m: movies){
+					movieInfos.add(new MovieInfo(m.getMovieInfo()));
+				}
+				message.setList(movieInfos);
+				message.setMessage("ListOfMovies");
+				client.sendToClient(message);
+			}
 			else {
 				addMsgToDB(request);
 				StringBuilder s=new StringBuilder();

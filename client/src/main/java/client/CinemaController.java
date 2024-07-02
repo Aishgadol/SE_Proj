@@ -121,10 +121,6 @@ public class CinemaController {
         }
     }
 
-    @Subscribe
-    public void getMovieInfoFromDb(MovieInfo movieInfo){
-      this.movieInfo=movieInfo;
-    }
 
     /*
     @FXML

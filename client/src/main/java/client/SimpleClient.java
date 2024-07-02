@@ -6,6 +6,9 @@ import org.greenrobot.eventbus.EventBus;
 
 import ocsf.AbstractClient;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class SimpleClient extends AbstractClient {
 	
 	private static SimpleClient client = null;
@@ -23,6 +26,10 @@ public class SimpleClient extends AbstractClient {
 		}
 		else if(message.getMessage().startsWith("MovieInfo")) {
 			EventBus.getDefault().post(new MovieInfo(message.getMovieInfo()));
+			return;
+		}
+		else if(message.getMessage().startsWith("ListOfMovies")){
+			EventBus.getDefault().post(new MessageEvent(message));
 			return;
 		}
 

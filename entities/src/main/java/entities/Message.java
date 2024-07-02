@@ -2,13 +2,14 @@ package entities;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
-
+import java.util.List;
 public class Message implements Serializable {
     int id;
     LocalDateTime timeStamp;
     String message;
     String data;
     MovieInfo movieInfo;
+    List<MovieInfo> list;
 
     public Message(int id, LocalDateTime timeStamp, String message) {
         this.id = id;
@@ -67,5 +68,12 @@ public class Message implements Serializable {
     }
     public void setMovieInfo(MovieInfo m){
         this.movieInfo=m;
+    }
+
+    public List<MovieInfo> getList(){
+        return this.list;
+    }
+    public void setList(List<MovieInfo> list){
+        this.list=list;
     }
 }
