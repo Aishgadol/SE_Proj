@@ -9,12 +9,14 @@ public class DisplayTime {
 
     public DisplayTime(String full_time){
         // assume the format is HH:MM, DD/MM/YYYY
+
         this.hour=full_time.substring(0,2);
         this.minute=full_time.substring(3,5);
         this.day=full_time.substring(7,9);
         this.month=full_time.substring(10,12);
         this.year=full_time.substring(13);
     }
+
     public DisplayTime(String hour,String minute, String day, String month, String year){
         this.hour=hour;
         this.minute=minute;

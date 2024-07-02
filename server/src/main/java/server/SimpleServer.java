@@ -34,7 +34,6 @@ public class SimpleServer extends AbstractServer {
 
 		configuration.addAnnotatedClass(Msg.class);
 		configuration.addAnnotatedClass(Movie.class);
-
 		ServiceRegistry serviceRegistry=new StandardServiceRegistryBuilder().applySettings(configuration.getProperties()).build();
 		return configuration.buildSessionFactory(serviceRegistry);
 	}
