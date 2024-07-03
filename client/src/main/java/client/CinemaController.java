@@ -18,6 +18,7 @@ import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 import javafx.stage.Stage;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.greenrobot.eventbus.EventBus;
@@ -90,33 +91,27 @@ public class CinemaController {
         askDB("getMovieInfo Automobiles");
     }
 
-    private String getAllDisplayTimes(List<DisplayTime> displayTimes){
-        StringBuilder sb=new StringBuilder();
-        for (DisplayTime displayTime : displayTimes) {
-            sb.append(displayTime.toString());
-        }
-        return sb.toString();
-    }
+
 
     @Subscribe
     public void catchMovieInfo(MovieInfo movieInfo){
-        System.out.println("I've been invoked 1");
         this.movieInfo=movieInfo;
         Platform.runLater(()->{
             Alert alert = new Alert(AlertType.INFORMATION);
             alert.setTitle("Information on "+this.movieInfo.getName());
             alert.setHeaderText("This is information about the movie: "+this.movieInfo.getName()+"\n " +
                     "Released at: "+this.movieInfo.getReleasedate());
-            alert.setContentText("Showtimes: "+getAllDisplayTimes(this.movieInfo.getDisplayTimes()));
+            StringBuilder sb=new StringBuilder();
+            for(String s : this.movieInfo.getDisplayTimes()){
+                sb.append(s);
+                sb.append("\n");
+            }
+            alert.setContentText("Showtimes: "+sb.toString());
             alert.show();
         });
-
     }
 
-    @Subscribe
-    public void catchSomethingElse(MovieInfo movieInfo){
-        System.out.println("I've been invoked 2");
-    }
+
 
     void askDB(String title){
         try{

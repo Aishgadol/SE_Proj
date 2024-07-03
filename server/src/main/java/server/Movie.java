@@ -3,6 +3,8 @@ package server;
 import javax.persistence.*;
 
 import entities.MovieInfo;
+
+import java.util.ArrayList;
 import java.util.List;
 
 
@@ -20,6 +22,8 @@ public class Movie {
     @Column
     String releaseDate;
 
+    @ManyToMany(mappedBy="movies")
+    private List<DisplayTime> displayTimes=new ArrayList<>();
 
     MovieInfo movieInfo;
 
@@ -57,4 +61,7 @@ public class Movie {
 
     public void setMovieInfo(MovieInfo movieInfo){this.movieInfo=movieInfo;}
     public MovieInfo getMovieInfo(){return this.movieInfo;}
+
+    public void setDisplayTimes(List<DisplayTime> displayTimes){this.displayTimes=displayTimes;}
+    public List<DisplayTime> getDisplayTimes(){return this.displayTimes;}
 }

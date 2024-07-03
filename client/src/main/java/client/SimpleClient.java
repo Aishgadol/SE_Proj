@@ -29,8 +29,14 @@ public class SimpleClient extends AbstractClient {
 			return;
 		}
 		else if(message.getMessage().startsWith("ListOfMovies")){
-			EventBus.getDefault().post(new MessageEvent(message));
+			EventBus.getDefault().post(new MovieInfoListEvent(message));
 			return;
+		}
+		else if(message.getMessage().startsWith("updatedTimes")){
+			EventBus.getDefault().post(new TimeUpdateEvent(message));
+		}
+		else if(message.getMessage().startsWith("timealreadytaken")){
+			EventBus.getDefault().post(new TimeTakenEvent(message));
 		}
 
 		/*

@@ -1,9 +1,9 @@
 package server;
 
 
-import entities.DisplayTime;
 import entities.Message;
 import entities.MovieInfo;
+import javassist.bytecode.ExceptionTable;
 import ocsf.AbstractServer;
 import ocsf.ConnectionToClient;
 import ocsf.SubscribedClient;
@@ -29,40 +29,66 @@ public class SimpleServer extends AbstractServer {
 	private static ArrayList<SubscribedClient> SubscribersList = new ArrayList<>();
 	private static Session session;
 	private static SessionFactory sessionFactory;
+	private MovieInfo currMovieInfo;
 
 	private static SessionFactory getSessionFactory() throws HibernateException{
 		Configuration configuration=new Configuration();
 
 		configuration.addAnnotatedClass(Msg.class);
 		configuration.addAnnotatedClass(Movie.class);
+		configuration.addAnnotatedClass(DisplayTime.class);
+
 		ServiceRegistry serviceRegistry=new StandardServiceRegistryBuilder().applySettings(configuration.getProperties()).build();
 		return configuration.buildSessionFactory(serviceRegistry);
 	}
 
 
-	/* only use this function if protoype database gets deleted, it should not happen.
+	//only use this function if protoype database gets deleted, it should not happen.
 	public static void generateMovies() throws Exception {
 			Movie movie1=new Movie("Margol","1973");
-			movie1.getMovieInfo().setDisplayTimes(new ArrayList<DisplayTime>());
 			session.save(movie1);
 			Movie movie2=new Movie("The Boys","2018");
-			movie2.getMovieInfo().setDisplayTimes(new ArrayList<DisplayTime>());
 			session.save(movie2);
 			Movie movie3=new Movie("Scary Movie 5","2012");
-			movie3.getMovieInfo().setDisplayTimes(new ArrayList<DisplayTime>());
 			session.save(movie3);
 			Movie movie4=new Movie("House of Cards","2006");
-			movie4.getMovieInfo().setDisplayTimes(new ArrayList<DisplayTime>());
 			session.save(movie4);
 			Movie movie5=new Movie("Pulp Fiction","1969");
-			movie5.getMovieInfo().setDisplayTimes(new ArrayList<DisplayTime>());
 			session.save(movie5);
 			Movie movie6=new Movie("Automobiles","2024");
-			movie6.getMovieInfo().setDisplayTimes(new ArrayList<DisplayTime>());
 			session.save(movie6);
             session.flush();
-        }*/
+        }
 
+
+	boolean checkIfTimeAlreadyExists(List<String> displayTimes,String time){
+		for(String d : displayTimes){
+			if(d.equals(time)){
+				return true;
+			}
+		}
+		return false;
+	}
+	boolean addTimeToCurrentMovieInfo(String time){
+		List<String> displayTimes=this.currMovieInfo.getDisplayTimes();
+		if(checkIfTimeAlreadyExists(displayTimes,time)){
+			//case time already exists
+			return false;
+		}
+		displayTimes.add(time);
+		this.currMovieInfo.setDisplayTimes(displayTimes);
+		try{
+			Movie movie=getMovieByTitle(this.currMovieInfo.getName());
+			movie.setMovieInfo(this.currMovieInfo);
+			session.update(movie);
+			session.flush();
+			session.getTransaction().commit();
+			session.beginTransaction();
+		}catch(Exception e){
+			e.printStackTrace();
+		}
+		return true;
+	}
 
 
 	public static void addMsgToDB(String text) throws Exception{
@@ -73,27 +99,7 @@ public class SimpleServer extends AbstractServer {
 		session.beginTransaction();
 	}
 
-	public SimpleServer(int port) {
-		super(port);
-		try{
-			sessionFactory=getSessionFactory();
-			session=sessionFactory.openSession();
-			session.beginTransaction();
 
-		} catch(Exception e) {
-			if(session!=null){
-				session.getTransaction().rollback();
-			}
-			e.printStackTrace();
-		}/*uncomment this section when running server for the first time
-		try{
-			generateMovies();
-		}catch(Exception e) {
-			e.printStackTrace();
-		}
-		session.getTransaction().commit();
-		session.beginTransaction();*/
-	}
 
 	private Movie getMovieByTitle(String title){
 		CriteriaBuilder builder=session.getCriteriaBuilder();
@@ -101,7 +107,9 @@ public class SimpleServer extends AbstractServer {
 		Root<Movie> root=query.from(Movie.class);
 		Predicate titlePredicate=builder.equal(root.get("name"),title);
 		query.where(titlePredicate);
-		return session.createQuery(query).getSingleResult();
+		Movie movie=session.createQuery(query).getSingleResult();
+		this.currMovieInfo=movie.getMovieInfo();
+		return movie;
 	}
 
 	private List<Movie> getMovies(){
@@ -138,9 +146,8 @@ public class SimpleServer extends AbstractServer {
 			else if(request.startsWith("getMovieInfo")){
 				String[] splitted=request.split(" ",2);
 				Movie movie=getMovieByTitle(splitted[1]);
-				MovieInfo movieInfo=movie.getMovieInfo();
 				message.setMessage("MovieInfo");
-				message.setMovieInfo(movieInfo);
+				message.setMovieInfo(this.currMovieInfo);
 				client.sendToClient(message);
 			}
 			else if(request.startsWith("getTitles")){
@@ -153,11 +160,22 @@ public class SimpleServer extends AbstractServer {
 				message.setMessage("ListOfMovies");
 				client.sendToClient(message);
 			}
+			else if (request.startsWith("addtime")) {
+				boolean addSuccesful=addTimeToCurrentMovieInfo(request.substring(8));
+				message.setMovieInfo(this.currMovieInfo);
+				if(!addSuccesful){
+					message.setMessage("timealreadytaken");
+				}
+				else{
+					message.setMessage("updatedTimes");
+				}
+				client.sendToClient(message);
+			}
 			else {
 				addMsgToDB(request);
-				StringBuilder s=new StringBuilder();
-				List<Msg> msgs=getMsgs();
-				for(Msg msg1 : msgs){
+				StringBuilder s = new StringBuilder();
+				List<Msg> msgs = getMsgs();
+				for (Msg msg1 : msgs) {
 					s.append(msg1.getText()).append("\n");
 				}
 				message.setMessage(s.toString());
@@ -232,14 +250,6 @@ public class SimpleServer extends AbstractServer {
 		}*/
 	}
 
-	private String getAllDisplayTimes(List<DisplayTime> displayTimes){
-        StringBuilder sb=new StringBuilder();
-        for (DisplayTime displayTime : displayTimes) {
-            sb.append(displayTime.toString());
-        }
-        return sb.toString();
-    }
-
 	 	/*
 	 	THIS PART WILL BE USEFUL TO ADDRESS AND UPDATE ALL CLIENTS, DATABASE STUFF FOR EXAMPLE
 	 	 */
@@ -257,6 +267,29 @@ public class SimpleServer extends AbstractServer {
 		}catch(Exception e){
 			e.printStackTrace();
 		}
+	}
+
+
+	public SimpleServer(int port) {
+		super(port);
+		try{
+			sessionFactory=getSessionFactory();
+			session=sessionFactory.openSession();
+			session.beginTransaction();
+
+		} catch(Exception e) {
+			if(session!=null){
+				session.getTransaction().rollback();
+			}
+			e.printStackTrace();
+		}//uncomment this section when running server for the first time
+		try{
+			generateMovies();
+		}catch(Exception e) {
+			e.printStackTrace();
+		}
+		session.getTransaction().commit();
+		session.beginTransaction();
 	}
 
 	public void sendToAllClients(Message message) {

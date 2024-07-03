@@ -8,11 +8,12 @@ public class MovieInfo implements Serializable {
 
      String name;
      String releaseDate;
-     List<DisplayTime> displayTimes;
+     List<String> displayTimes;
 
     public MovieInfo(String name, String releaseDate){
         this.name=name;
         this.releaseDate=releaseDate;
+        this.displayTimes=new ArrayList<>();
     }
 
     public MovieInfo(MovieInfo m){
@@ -35,7 +36,7 @@ public class MovieInfo implements Serializable {
         return this.releaseDate;
     }
 
-    public void setDisplayTimes(List<DisplayTime> displayTimes){this.displayTimes=displayTimes;}
-    public List<DisplayTime> getDisplayTimes(){return this.displayTimes;}
+    public void setDisplayTimes(List<String> displayTimes){this.displayTimes=displayTimes;}
+    public List<String> getDisplayTimes(){return this.displayTimes;}
 
 }
