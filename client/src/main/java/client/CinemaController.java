@@ -1,6 +1,5 @@
 package client;
 
-import entities.DisplayTime;
 import entities.MovieInfo;
 import entities.Message;
 import javafx.application.Platform;
@@ -94,8 +93,8 @@ public class CinemaController {
 
 
     @Subscribe
-    public void catchMovieInfo(MovieInfo movieInfo){
-        this.movieInfo=movieInfo;
+    public void catchMovieInfo(MovieInfoEvent event){
+        this.movieInfo=event.getMessage().getMovieInfo();
         Platform.runLater(()->{
             Alert alert = new Alert(AlertType.INFORMATION);
             alert.setTitle("Information on "+this.movieInfo.getName());

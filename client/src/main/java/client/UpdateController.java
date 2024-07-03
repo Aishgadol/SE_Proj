@@ -1,6 +1,7 @@
 package client;
 
-import entities.*;
+import entities.MovieInfo;
+import entities.Message;
 import javafx.application.Platform;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -8,15 +9,19 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.control.*;
+import javafx.scene.Scene;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Alert.AlertType;
 import java.time.LocalDate;
 import javafx.util.Callback;
 import javafx.scene.Parent;
+import javafx.scene.control.Button;
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import java.io.IOException;
@@ -219,7 +224,13 @@ public class UpdateController{
     void initialize(){
         EventBus.getDefault().register(this);
         msgId=0;
-
+        try {
+			Message message = new Message(msgId, "add client");
+			SimpleClient.getClient().sendToServer(message);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
         //initialization of datepicker
         LocalDate minDate=LocalDate.now();
         LocalDate maxDate=minDate.plusYears(1);
@@ -246,14 +257,6 @@ public class UpdateController{
 
 
         askDB("getTitles");
-        try {
-			Message message = new Message(msgId, "add client");
-			SimpleClient.getClient().sendToServer(message);
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-
     }
 }
 

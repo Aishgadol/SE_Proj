@@ -25,7 +25,7 @@ public class SimpleClient extends AbstractClient {
 			return;
 		}
 		else if(message.getMessage().startsWith("MovieInfo")) {
-			EventBus.getDefault().post(new MovieInfo(message.getMovieInfo()));
+			EventBus.getDefault().post(new MovieInfoEvent(message));
 			return;
 		}
 		else if(message.getMessage().startsWith("ListOfMovies")){

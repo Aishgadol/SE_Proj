@@ -25,23 +25,6 @@ public class SimpleChatClient extends Application {
     private static SimpleChatClient selfi;
     private Stage primaryStage;
 
-    public void switchToScene(String fxml) throws IOException {
-        try {
-            Parent root = loadFXML(fxml);
-            scene = new Scene(root);
-            primaryStage.setScene(scene);
-            primaryStage.show();
-        }catch(IOException e){
-            e.printStackTrace();
-        }
-        /*
-
-        System.out.println("go fk urself, "+fxml);
-        scene=new Scene(loadFXML(fxml),1280,800);
-        primaryStage.setResizable(false);
-        primaryStage.show();*/
-    }
-
 
     @Override
     public void start(Stage stage) throws IOException {
@@ -55,7 +38,7 @@ public class SimpleChatClient extends Application {
         primaryStage.setScene(scene);
         primaryStage.setResizable(false);
         primaryStage.show();
-        PauseTransition delay=new PauseTransition(Duration.seconds(2));
+        PauseTransition delay=new PauseTransition(Duration.millis(1500.0));
         delay.setOnFinished(event ->{
             try{
                 scene=new Scene(loadFXML("cinema"),1280,800);
