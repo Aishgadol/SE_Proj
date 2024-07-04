@@ -102,7 +102,7 @@ public class CinemaController {
                 sb.append(s);
                 sb.append("\n");
             }
-            alert.setContentText("Showtimes: "+sb.toString());
+            alert.setContentText("Showtimes: \n"+sb.toString());
             alert.show();
         });
     }
