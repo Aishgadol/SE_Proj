@@ -301,8 +301,7 @@ public class SimpleServer extends AbstractServer {
 	 	/*
 	 	THIS PART WILL BE USEFUL TO ADDRESS AND UPDATE ALL CLIENTS, DATABASE STUFF FOR EXAMPLE
 	 	 */
-
-
+	
 	public void stopServer(){
 		try {
 			if (session != null) {
@@ -316,7 +315,7 @@ public class SimpleServer extends AbstractServer {
 			e.printStackTrace();
 		}
 	}
-	
+
 	public SimpleServer(int port) {
 		super(port);
 		try{
