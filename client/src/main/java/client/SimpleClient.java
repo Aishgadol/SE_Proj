@@ -33,8 +33,6 @@ public class SimpleClient extends AbstractClient {
 			return;
 		}
 		else if(message.getMessage().startsWith("updatedtimes")){
-			System.out.println("SimpleClient here, I'm dealing with movie: "+message.getMovieInfo().getName()+" With display times: ");
-			System.out.println(message.getMovieInfo().getDisplayTimes().toString());
 			EventBus.getDefault().post(new TimeUpdateEvent(message));
 		}
 

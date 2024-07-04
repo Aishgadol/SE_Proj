@@ -17,12 +17,9 @@ import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 import javafx.stage.Stage;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
-import org.hibernate.sql.Update;
 
 
 public class CinemaController {
@@ -99,7 +96,7 @@ public class CinemaController {
             Alert alert = new Alert(AlertType.INFORMATION);
             alert.setTitle("Information on "+this.movieInfo.getName());
             alert.setHeaderText("This is information about the movie: "+this.movieInfo.getName()+"\n " +
-                    "Released at: "+this.movieInfo.getReleasedate());
+                    "Released at: "+this.movieInfo.getReleaseDate());
             StringBuilder sb=new StringBuilder();
             for(String s : this.movieInfo.getDisplayTimes()){
                 sb.append(s);

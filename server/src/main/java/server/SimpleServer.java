@@ -118,6 +118,49 @@ public class SimpleServer extends AbstractServer {
 		}
 	}
 
+	void removeDisplayTimeFromMovieFromDB(String displayTime) {
+		this.currMovie = getMovieByTitleFromDB(this.currMovie.getName());
+		this.currMovieInfo = this.currMovie.getMovieInfo();
+		this.currDisplayTimes = getDisplayTimesFromDB();
+		boolean found = false;
+		boolean found2 = false; // if displaytime is in table of displaytimes
+		DisplayTime d0=null;
+		try {
+			for (DisplayTime d : this.currDisplayTimes) {
+				if (d.getDisplayTime().equals(displayTime)) {
+					found2 = true;
+					break;
+				}
+			}
+			//we found the displayDate to remove in all of displaydates in table
+			//now check if our movie has it too
+			for (DisplayTime d1 : this.currMovie.getDisplayTimes()) {
+				//check if one of movie's displaytime is the one we look for
+				if (d1.getDisplayTime().equals(displayTime)) {
+					found = true; // if movie's displaytime has the displaytime
+					d0 = d1;
+					break;
+				}
+			}
+			if (found && d0!=null) { //movie has it
+				this.currMovie.removeDisplayTime(d0);
+				this.currMovieInfo = this.currMovie.getMovieInfo();
+				d0.removeMovie(this.currMovie);
+				if (found2 && d0.getMovies().isEmpty()) {
+					removeObjectWithName(currDisplayTimes, d0.getDisplayTime());
+				}
+			}
+			session.saveOrUpdate(this.currDisplayTimes);
+			session.saveOrUpdate(this.currMovie);
+			session.flush();
+			session.getTransaction().commit();
+			session.beginTransaction();
+
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+
 	public static void addMsgToDB(String text) throws Exception{
 		Msg m=new Msg(text);
 		session.save(m);
@@ -203,18 +246,15 @@ public class SimpleServer extends AbstractServer {
 				client.sendToClient(message);
 			}
 			else if (request.startsWith("addtime")) {
-				System.out.println("Im adding the time: "+request.substring(8)+" for movie: "+currMovie.getName());
 				addDisplayTimeToDB(request.substring(8));
 				//addTimeToCurrentMovie(request.substring(8));
 				//this.currMovie.getDisplayTimes()=getDisplayTimesFromDB(); //this line may be moved to somewhere else
-				System.out.println("Current display times I have: ");
-				for(DisplayTime d : this.currMovie.getDisplayTimes()){
-					System.out.println(d.getDisplayTime());
-				}
-
-				System.out.println("Before sending:\nThe movie i have right now is: "+this.currMovie.getName());
-				System.out.println("The movieInfo i have right now is: "+this.currMovieInfo.getName());
-				System.out.println("I'm about to send the movieinfo with following times:\n"+this.currMovie.getMovieInfo().getDisplayTimes().toString());
+				message.setMovieInfo(this.currMovie.getMovieInfo());
+				message.setMessage("updatedtimes");
+				client.sendToClient(message);
+			}
+			else if(request.startsWith("removetime")){
+				removeDisplayTimeFromMovieFromDB(request.substring(11));
 				message.setMovieInfo(this.currMovie.getMovieInfo());
 				message.setMessage("updatedtimes");
 				client.sendToClient(message);
@@ -348,4 +388,13 @@ public class SimpleServer extends AbstractServer {
 		}
 	}
 
+	private void removeObjectWithName(List<DisplayTime> list, String nameToRemove) {
+		Iterator<DisplayTime> iterator = list.iterator();
+		while (iterator.hasNext()) {
+			DisplayTime obj = iterator.next();
+			if (obj.getDisplayTime().equals(nameToRemove)) {
+				iterator.remove();
+			}
+		}
+	}
 }
