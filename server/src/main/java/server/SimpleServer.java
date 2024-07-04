@@ -301,6 +301,7 @@ public class SimpleServer extends AbstractServer {
 	 	/*
 	 	THIS PART WILL BE USEFUL TO ADDRESS AND UPDATE ALL CLIENTS, DATABASE STUFF FOR EXAMPLE
 	 	 */
+
 	
 	public void stopServer(){
 		try {
