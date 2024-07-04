@@ -94,7 +94,9 @@ public class Movie implements Serializable {
         }
         if(found) {
             this.displayTimes.remove(displayTime);
-            this.movieInfo.removeDisplayTime(displayTime.getDisplayTime());
+            List<String> stfu=this.movieInfo.getDisplayTimes();
+            stfu.remove(displayTime.getDisplayTime());
+            this.movieInfo.setDisplayTimes(stfu);
         }
     }
 }

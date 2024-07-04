@@ -124,11 +124,13 @@ public class SimpleServer extends AbstractServer {
 		this.currDisplayTimes = getDisplayTimesFromDB();
 		boolean found = false;
 		boolean found2 = false; // if displaytime is in table of displaytimes
-		DisplayTime d0=null;
+		DisplayTime d_movie=null;
+		DisplayTime d_table=null;
 		try {
 			for (DisplayTime d : this.currDisplayTimes) {
 				if (d.getDisplayTime().equals(displayTime)) {
 					found2 = true;
+					d_table=d;
 					break;
 				}
 			}
@@ -138,19 +140,26 @@ public class SimpleServer extends AbstractServer {
 				//check if one of movie's displaytime is the one we look for
 				if (d1.getDisplayTime().equals(displayTime)) {
 					found = true; // if movie's displaytime has the displaytime
-					d0 = d1;
+					d_movie = d1;
 					break;
 				}
 			}
-			if (found && d0!=null) { //movie has it
-				this.currMovie.removeDisplayTime(d0);
+			if (found && d_movie!=null) { //movie has it
+				this.currMovie.removeDisplayTime(d_movie);
 				this.currMovieInfo = this.currMovie.getMovieInfo();
-				d0.removeMovie(this.currMovie);
-				if (found2 && d0.getMovies().isEmpty()) {
-					removeObjectWithName(currDisplayTimes, d0.getDisplayTime());
+				d_movie.removeMovie(this.currMovie);
+				if (found2){
+					if(d_table.getMovies().isEmpty()){
+						removeObjectWithName(currDisplayTimes, d_table.getDisplayTime());
+						session.delete(d_table);
+					}
+					else{
+						session.saveOrUpdate(d_table);
+					}
+					session.flush();
 				}
+
 			}
-			session.saveOrUpdate(this.currDisplayTimes);
 			session.saveOrUpdate(this.currMovie);
 			session.flush();
 			session.getTransaction().commit();

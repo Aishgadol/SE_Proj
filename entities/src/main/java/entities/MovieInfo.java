@@ -46,16 +46,7 @@ public class MovieInfo implements Serializable {
         this.displayTimes.add(displayTime);
     }
     public void removeDisplayTime(String displayTime){
-        boolean found=false;
-        for(String d: this.displayTimes){
-            if(d.equals(displayTime)){
-                found=true;
-                break;
-            }
-        }
-        if(found){
-            this.displayTimes.remove(displayTime);
-        }
+        this.displayTimes.remove(displayTime);
     }
 
 }
