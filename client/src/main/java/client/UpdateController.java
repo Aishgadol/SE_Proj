@@ -39,8 +39,8 @@ public class UpdateController{
     private Scene scene;
     private Parent root;
     private MovieInfo movieInfo;
-    private List<MovieInfo> movieInfos;
-    private List<String> displayTimes;
+    private List<MovieInfo> movieInfos=new ArrayList<>();
+    private List<String> displayTimes=new ArrayList<>();
 
     private boolean isMovieSelected=false;
 
@@ -87,7 +87,7 @@ public class UpdateController{
     }
     @FXML
     void removeTimeButtonPressed(ActionEvent event){
-
+        System.out.println(availableTimesComboBox.getValue());
     }
 
     @FXML
@@ -96,10 +96,9 @@ public class UpdateController{
         String date=datePicker.getValue().format(DateTimeFormatter.ofPattern("dd/MM/yyyy"));
         askDB("addtime "+hour+", "+date);
         resetAll();
-
-
+        updateAll();
     }
-    @Subscribe
+    @Subscribe // no use for this function for now
     public void timeTaken(TimeTakenEvent event){
         Platform.runLater(()->{
             Alert alert = new Alert(Alert.AlertType.INFORMATION);
@@ -114,44 +113,52 @@ public class UpdateController{
 
     }
 
-    @Subscribe // this will probably never happen
+    @FXML
+    @Subscribe
     public void getMovieInfoFromDB(MovieInfoEvent event){
         this.movieInfo=event.getMessage().getMovieInfo();
         this.displayTimes=this.movieInfo.getDisplayTimes();
+        resetAll(); //already runs in platform.runlater();
+        updateAll(); //same
+    }
+
+    @FXML
+    void resetAll() {
+        Platform.runLater(() -> {
+            datePicker.setValue(LocalDate.now());
+            timePicker.setValue("10:00");
+            //availableTimesComboBox.getItems().clear();
+            //myListView.getItems().clear();
+        });
+    }
+    @FXML
+    void updateAll() {
+        Platform.runLater(() -> {
+            myListView.getItems().setAll(this.displayTimes);
+            availableTimesComboBox.getItems().setAll(this.displayTimes);
+        });
+    }
+
+    @FXML
+    @Subscribe
+    public void getMoviesFromDB(MovieInfoListEvent event) {
+        Message message = event.getMessage();
+        this.movieInfos = message.getList();
+        Platform.runLater(() -> {
+            for (MovieInfo movieInfo : movieInfos) {
+                titlesComboBox.getItems().add(movieInfo.getName());
+            }
+        });
+    }
+
+    @FXML
+    @Subscribe
+    public void timeUpdateRecieved(TimeUpdateEvent event) {
+        System.out.println("Got time update, for movie: "+event.getMessage().getMovieInfo().getName()+"\ncurrent times are: \n"+event.getMessage().getMovieInfo().getDisplayTimes().toString());
+        this.movieInfo = event.getMessage().getMovieInfo();
+        this.displayTimes = this.movieInfo.getDisplayTimes();
         resetAll();
-        for(String d : this.displayTimes){
-            availableTimesComboBox.getItems().add(d);
-            myListView.getItems().add(d);
-        }
-    }
-
-    void resetAll(){
-        datePicker.setValue(LocalDate.now());
-        timePicker.setValue("10:00");
-        availableTimesComboBox.getItems().clear();
-        myListView.getItems().clear();
-    }
-
-
-    @Subscribe
-    public void getMoviesFromDB(MovieInfoListEvent event){
-        Message message=event.getMessage();
-        List<MovieInfo> movieInfos=(List<MovieInfo>)message.getList();
-        this.movieInfos=movieInfos;
-        for(MovieInfo movieInfo: movieInfos){
-            titlesComboBox.getItems().add(movieInfo.getName());
-        }
-
-    }
-
-    @Subscribe
-    public void timeUpdateRecieved(TimeUpdateEvent event){
-        this.movieInfo=event.getMessage().getMovieInfo();
-        this.displayTimes=this.movieInfo.getDisplayTimes();
-        for(String d : this.displayTimes){
-            myListView.getItems().add((d));
-            availableTimesComboBox.getItems().add(d);
-        }
+        updateAll();
     }
 
     void askDB(String title){
@@ -164,8 +171,10 @@ public class UpdateController{
         }
     }
 
-    void showThings(){
-            isMovieSelected=true;
+    @FXML
+    void showThings() {
+        Platform.runLater(() -> {
+            isMovieSelected = true;
             addLabel.setVisible(true);
             addTimeButton.setVisible(true);
             datePicker.setVisible(true);
@@ -174,22 +183,17 @@ public class UpdateController{
             removeTimeButton.setVisible(true);
             removeLabel.setVisible(true);
             availableTimesComboBox.setVisible(true);
+        });
     }
 
     @FXML
-    void MovieHasBeenSelected(){
-        String title=titlesComboBox.getValue();
-        askDB("getMovieInfo "+title);
-        if(!isMovieSelected){
+    void MovieHasBeenSelected() {
+        askDB("getMovieInfo " + titlesComboBox.getValue());
+        if (!isMovieSelected) {
             showThings();
         }
-
         resetAll();
-        //this area updates the screen that shows list of times for that movie
-        for(String d : displayTimes){
-            myListView.getItems().setAll(displayTimes);
-            availableTimesComboBox.getItems().setAll(displayTimes);
-        }
+        updateAll();
     }
 
     @FXML
@@ -202,10 +206,6 @@ public class UpdateController{
         stage.setTitle("Cinema");
         stage.setResizable(false);
         stage.show();
-    }
-    @FXML
-    void choseDate(ActionEvent event){
-
     }
 
 

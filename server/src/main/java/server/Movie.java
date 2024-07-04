@@ -4,28 +4,37 @@ import javax.persistence.*;
 
 import entities.MovieInfo;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
 
 @Entity
 @Table(name="Movies")
-public class Movie {
+public class Movie implements Serializable {
+
+    private static final long serialVersionUID = 1L;
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     int id;
 
-    @Column
+    @Column(name="name", unique=true,nullable = false)
     String name;
 
     @Column
     String releaseDate;
 
-    @ManyToMany(mappedBy="movies")
+    @ManyToMany
+    @JoinTable(
+        name = "movie_display_times",
+        joinColumns = @JoinColumn(name = "Movie_name", referencedColumnName = "name"),
+        inverseJoinColumns = @JoinColumn(name = "Display_Time_And_Date", referencedColumnName = "Display_Time_And_Date")
+    )
     private List<DisplayTime> displayTimes=new ArrayList<>();
 
-    MovieInfo movieInfo;
+    @Transient
+    private MovieInfo movieInfo;
 
 
     public Movie(){
@@ -64,4 +73,23 @@ public class Movie {
 
     public void setDisplayTimes(List<DisplayTime> displayTimes){this.displayTimes=displayTimes;}
     public List<DisplayTime> getDisplayTimes(){return this.displayTimes;}
+
+
+    public void addDisplayTime(DisplayTime displayTime){
+        for(DisplayTime d : this.displayTimes){
+            if (d.getDisplayTime().equals(displayTime.getDisplayTime())) {
+                return;
+            }
+        }
+        this.displayTimes.add(displayTime);
+        this.movieInfo.addDisplayTime(displayTime.getDisplayTime());
+    }
+    public void removeDisplayTime(DisplayTime displayTime){
+        for(DisplayTime d : this.displayTimes){
+            if (d.getDisplayTime().equals(displayTime.getDisplayTime())) {
+                this.displayTimes.remove(displayTime);
+                this.movieInfo.removeDisplayTime(displayTime.getDisplayTime());
+            }
+        }
+    }
 }

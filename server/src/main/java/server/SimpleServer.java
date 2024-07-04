@@ -30,6 +30,8 @@ public class SimpleServer extends AbstractServer {
 	private static Session session;
 	private static SessionFactory sessionFactory;
 	private MovieInfo currMovieInfo;
+	private Movie currMovie;
+	private List<DisplayTime> currDisplayTimes=new ArrayList<>();
 
 	private static SessionFactory getSessionFactory() throws HibernateException{
 		Configuration configuration=new Configuration();
@@ -43,7 +45,7 @@ public class SimpleServer extends AbstractServer {
 	}
 
 
-	//only use this function if protoype database gets deleted, it should not happen.
+	//only use these functions if protoype database gets deleted, it should not happen.
 	public static void generateMovies() throws Exception {
 			Movie movie1=new Movie("Margol","1973");
 			session.save(movie1);
@@ -58,38 +60,63 @@ public class SimpleServer extends AbstractServer {
 			Movie movie6=new Movie("Automobiles","2024");
 			session.save(movie6);
             session.flush();
-        }
-
-
-	boolean checkIfTimeAlreadyExists(List<String> displayTimes,String time){
-		for(String d : displayTimes){
-			if(d.equals(time)){
-				return true;
-			}
-		}
-		return false;
 	}
-	boolean addTimeToCurrentMovieInfo(String time){
-		List<String> displayTimes=this.currMovieInfo.getDisplayTimes();
-		if(checkIfTimeAlreadyExists(displayTimes,time)){
-			//case time already exists
-			return false;
+
+
+	void addTimeToCurrentMovie(String time) {
+		//check if the displaytime already exists, if yes add the movie to it's list, else, create a new displaytime and set the movie
+		try {
+
+			session.saveOrUpdate(this.currMovie);
+
+			session.flush();
+
+			session.getTransaction().commit();
+			session.beginTransaction();
+		} catch (Exception e) {
+			e.printStackTrace();
 		}
-		displayTimes.add(time);
-		this.currMovieInfo.setDisplayTimes(displayTimes);
-		try{
-			Movie movie=getMovieByTitle(this.currMovieInfo.getName());
-			movie.setMovieInfo(this.currMovieInfo);
-			session.update(movie);
+	}
+
+	public void addDisplayTimeToDB(String time){
+		this.currMovie=getMovieByTitleFromDB(this.currMovie.getName());
+		this.currMovieInfo=this.currMovie.getMovieInfo();
+		try {
+			for(DisplayTime d : this.currMovie.getDisplayTimes()){
+				if(time.equals(d.getDisplayTime())){
+					//displaytime exists in movie so it also exists in db, nothing to do.
+					return;
+				}
+			}
+			List<DisplayTime> mylist = getDisplayTimesFromDB();
+			for (DisplayTime d : mylist) {
+				if (time.equals(d.getDisplayTime())) {
+
+					//displaytime exists in DB but not in movie, so only add to movie
+
+					d.addMovie(this.currMovie);
+					this.currMovie.addDisplayTime(d);
+					session.saveOrUpdate(d);
+					session.saveOrUpdate(this.currMovie);
+					session.flush();
+					session.getTransaction().commit();
+					session.beginTransaction();
+					return;
+				}
+
+			}
+			DisplayTime dis = new DisplayTime(time);
+			dis.addMovie(this.currMovie);
+			this.currMovie.addDisplayTime(dis);
+			session.save(dis);
+			session.saveOrUpdate(this.currMovie);
 			session.flush();
 			session.getTransaction().commit();
 			session.beginTransaction();
 		}catch(Exception e){
 			e.printStackTrace();
 		}
-		return true;
 	}
-
 
 	public static void addMsgToDB(String text) throws Exception{
 		Msg m=new Msg(text);
@@ -101,22 +128,20 @@ public class SimpleServer extends AbstractServer {
 
 
 
-	private Movie getMovieByTitle(String title){
+	private Movie getMovieByTitleFromDB(String title){
 		CriteriaBuilder builder=session.getCriteriaBuilder();
 		CriteriaQuery<Movie> query=builder.createQuery(Movie.class);
 		Root<Movie> root=query.from(Movie.class);
 		Predicate titlePredicate=builder.equal(root.get("name"),title);
 		query.where(titlePredicate);
-		Movie movie=session.createQuery(query).getSingleResult();
-		this.currMovieInfo=movie.getMovieInfo();
-		return movie;
+		return session.createQuery(query).getSingleResult();
 	}
 
-	private List<Movie> getMovies(){
+	private List<Movie> getMoviesFromDB(){
 		CriteriaBuilder builder=session.getCriteriaBuilder();
 		CriteriaQuery<Movie> query=builder.createQuery(Movie.class);
 		query.from(Movie.class);
-		return session.createQuery(query).getResultList();
+        return session.createQuery(query).getResultList();
 	}
 
 	private List<Msg> getMsgs(){
@@ -125,6 +150,22 @@ public class SimpleServer extends AbstractServer {
 		query.from(Msg.class);
 		List<Msg> msgs=session.createQuery(query).getResultList();
 		return msgs;
+	}
+
+	private DisplayTime getDisplayTimeFromDB(String displayTimeString){
+		CriteriaBuilder builder=session.getCriteriaBuilder();
+		CriteriaQuery<DisplayTime> query=builder.createQuery(DisplayTime.class);
+		Root<DisplayTime> root=query.from(DisplayTime.class);
+		Predicate titlePredicate=builder.equal(root.get("Display_Time_And_Date"),displayTimeString);
+		query.where(titlePredicate);
+		return session.createQuery(query).getSingleResult();
+	}
+
+	private List<DisplayTime> getDisplayTimesFromDB(){
+		CriteriaBuilder builder=session.getCriteriaBuilder();
+		CriteriaQuery<DisplayTime> query=builder.createQuery(DisplayTime.class);
+		query.from(DisplayTime.class);
+		return session.createQuery(query).getResultList();
 	}
 
 	@Override
@@ -145,30 +186,37 @@ public class SimpleServer extends AbstractServer {
 			}
 			else if(request.startsWith("getMovieInfo")){
 				String[] splitted=request.split(" ",2);
-				Movie movie=getMovieByTitle(splitted[1]);
+				this.currMovie=getMovieByTitleFromDB(splitted[1]);
+				this.currMovieInfo=this.currMovie.getMovieInfo();
 				message.setMessage("MovieInfo");
-				message.setMovieInfo(this.currMovieInfo);
+				message.setMovieInfo(this.currMovie.getMovieInfo());
 				client.sendToClient(message);
 			}
 			else if(request.startsWith("getTitles")){
-				List<Movie> movies=getMovies();
+				List<Movie> movies=getMoviesFromDB();
 				List<MovieInfo> movieInfos=new ArrayList<MovieInfo>();
 				for(Movie m: movies){
-					movieInfos.add(new MovieInfo(m.getMovieInfo()));
+					movieInfos.add(m.getMovieInfo());
 				}
 				message.setList(movieInfos);
-				message.setMessage("ListOfMovies");
+				message.setMessage("ListOfMovieInfos");
 				client.sendToClient(message);
 			}
 			else if (request.startsWith("addtime")) {
-				boolean addSuccesful=addTimeToCurrentMovieInfo(request.substring(8));
-				message.setMovieInfo(this.currMovieInfo);
-				if(!addSuccesful){
-					message.setMessage("timealreadytaken");
+				System.out.println("Im adding the time: "+request.substring(8)+" for movie: "+currMovie.getName());
+				addDisplayTimeToDB(request.substring(8));
+				//addTimeToCurrentMovie(request.substring(8));
+				//this.currMovie.getDisplayTimes()=getDisplayTimesFromDB(); //this line may be moved to somewhere else
+				System.out.println("Current display times I have: ");
+				for(DisplayTime d : this.currMovie.getDisplayTimes()){
+					System.out.println(d.getDisplayTime());
 				}
-				else{
-					message.setMessage("updatedTimes");
-				}
+
+				System.out.println("Before sending:\nThe movie i have right now is: "+this.currMovie.getName());
+				System.out.println("The movieInfo i have right now is: "+this.currMovieInfo.getName());
+				System.out.println("I'm about to send the movieinfo with following times:\n"+this.currMovie.getMovieInfo().getDisplayTimes().toString());
+				message.setMovieInfo(this.currMovie.getMovieInfo());
+				message.setMessage("updatedtimes");
 				client.sendToClient(message);
 			}
 			else {

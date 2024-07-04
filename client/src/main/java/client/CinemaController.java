@@ -77,7 +77,7 @@ public class CinemaController {
     @FXML
     void clickedScaryMovie(MouseEvent event) {
 
-        askDB("getMovieInfo Scary Movie");
+        askDB("getMovieInfo Scary Movie 5");
     }
 
     @FXML
