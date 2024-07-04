@@ -316,8 +316,7 @@ public class SimpleServer extends AbstractServer {
 			e.printStackTrace();
 		}
 	}
-
-
+	
 	public SimpleServer(int port) {
 		super(port);
 		try{
