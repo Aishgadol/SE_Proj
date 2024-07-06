@@ -8,17 +8,16 @@ public class MovieInfo implements Serializable {
 
      String name;
      String releaseDate;
-     List<String> displayTimes;
+     List<String> displayTimes=new ArrayList<>();
 
     public MovieInfo(String name, String releaseDate){
         this.name=name;
         this.releaseDate=releaseDate;
-        this.displayTimes=new ArrayList<>();
     }
 
     public MovieInfo(MovieInfo m){
         this.name=m.getName();
-        this.releaseDate=m.getReleasedate();
+        this.releaseDate=m.getReleaseDate();
         this.displayTimes=m.getDisplayTimes();
     }
 
@@ -32,26 +31,22 @@ public class MovieInfo implements Serializable {
     public void setReleaseDate(String releaseDate){
         this.releaseDate= this.releaseDate;
     }
-    public String getReleasedate(){
+    public String getReleaseDate(){
         return this.releaseDate;
     }
 
     public void setDisplayTimes(List<String> displayTimes){this.displayTimes=displayTimes;}
     public List<String> getDisplayTimes(){return this.displayTimes;}
     public void addDisplayTime(String displayTime){
-        for(String d : displayTimes){
+        for(String d : this.displayTimes){
             if (d.equals(displayTime)) {
                 return;
             }
         }
-        displayTimes.add(displayTime);
+        this.displayTimes.add(displayTime);
     }
     public void removeDisplayTime(String displayTime){
-        for(String d: displayTimes){
-            if(d.equals(displayTime)){
-                displayTimes.remove(displayTime);
-            }
-        }
+        this.displayTimes.remove(displayTime);
     }
 
 }

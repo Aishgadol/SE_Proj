@@ -57,10 +57,15 @@ public class DisplayTime implements Serializable {
     }
 
     public void removeMovie(Movie movie){
+        boolean found=false;
         for(Movie m:this.movies){
             if(m.getName().equals(movie.getName())){
-                this.movies.remove(movie);
+                found=true;
+                break;
             }
+        }
+        if(found){
+            this.movies.remove(movie);
         }
     }
 

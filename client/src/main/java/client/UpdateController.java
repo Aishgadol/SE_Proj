@@ -87,8 +87,13 @@ public class UpdateController{
     }
     @FXML
     void removeTimeButtonPressed(ActionEvent event){
-        System.out.println(availableTimesComboBox.getValue());
+
+        String displayDateToRemove=availableTimesComboBox.getValue();
+        askDB("removetime "+displayDateToRemove);
+        resetAll();
+        updateAll();
     }
+
 
     @FXML
     void addTimeButtonPressed(ActionEvent event){

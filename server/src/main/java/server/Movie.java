@@ -45,7 +45,7 @@ public class Movie implements Serializable {
         //use this, update paramteres
         this.movieInfo=movieInfo;
         this.name=movieInfo.getName();
-        this.releaseDate=movieInfo.getReleasedate();
+        this.releaseDate=movieInfo.getReleaseDate();
     }
 
     public Movie(String name, String releaseDate){
@@ -85,11 +85,18 @@ public class Movie implements Serializable {
         this.movieInfo.addDisplayTime(displayTime.getDisplayTime());
     }
     public void removeDisplayTime(DisplayTime displayTime){
+        boolean found=false;
         for(DisplayTime d : this.displayTimes){
             if (d.getDisplayTime().equals(displayTime.getDisplayTime())) {
-                this.displayTimes.remove(displayTime);
-                this.movieInfo.removeDisplayTime(displayTime.getDisplayTime());
+                found=true;
+                break;
             }
+        }
+        if(found) {
+            this.displayTimes.remove(displayTime);
+            List<String> stfu=this.movieInfo.getDisplayTimes();
+            stfu.remove(displayTime.getDisplayTime());
+            this.movieInfo.setDisplayTimes(stfu);
         }
     }
 }
