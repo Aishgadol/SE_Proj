@@ -18,7 +18,7 @@
             </Label>
             <ImageView fitHeight="236.0" fitWidth="270.0" layoutX="511.0" layoutY="72.0" pickOnBounds="true">
                <image>
-                  <Image url="@x7.jpg" />
+                  <Image url="@cinemapicture.jpg" />
                </image>
             </ImageView>
          </children>
