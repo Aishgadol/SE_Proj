@@ -159,7 +159,11 @@ public class UpdateController{
     @FXML
     @Subscribe
     public void timeUpdateRecieved(TimeUpdateEvent event) {
-        System.out.println("Got time update, for movie: "+event.getMessage().getMovieInfo().getName()+"\ncurrent times are: \n"+event.getMessage().getMovieInfo().getDisplayTimes().toString());
+        if(!this.movieInfo.getName().equals(event.getMessage().getMovieInfo().getName())){
+            resetAll();
+            updateAll();
+            return;
+        }
         this.movieInfo = event.getMessage().getMovieInfo();
         this.displayTimes = this.movieInfo.getDisplayTimes();
         resetAll();
