@@ -46,7 +46,7 @@ public class SimpleServer extends AbstractServer {
 
 
 	//only use these functions if protoype database gets deleted, it should not happen.
-	public static void generateMovies() throws Exception {
+	/*public static void generateMovies() throws Exception {
 			Movie movie1=new Movie("Margol","1973");
 			session.save(movie1);
 			Movie movie2=new Movie("The Boys","2018");
@@ -60,7 +60,7 @@ public class SimpleServer extends AbstractServer {
 			Movie movie6=new Movie("Automobiles","2024");
 			session.save(movie6);
             session.flush();
-	}
+	}*/
 
 
 	void addTimeToCurrentMovie(String time) {
@@ -260,13 +260,13 @@ public class SimpleServer extends AbstractServer {
 				//this.currMovie.getDisplayTimes()=getDisplayTimesFromDB(); //this line may be moved to somewhere else
 				message.setMovieInfo(this.currMovie.getMovieInfo());
 				message.setMessage("updatedtimes");
-				client.sendToClient(message);
+				sendToAllClients(message);
 			}
 			else if(request.startsWith("removetime")){
 				removeDisplayTimeFromMovieFromDB(request.substring(11));
 				message.setMovieInfo(this.currMovie.getMovieInfo());
 				message.setMessage("updatedtimes");
-				client.sendToClient(message);
+				sendToAllClients(message);
 			}
 			else {
 				addMsgToDB(request);
@@ -377,14 +377,14 @@ public class SimpleServer extends AbstractServer {
 				session.getTransaction().rollback();
 			}
 			e.printStackTrace();
-		}//uncomment this section when running server for the first time
+		}/*//uncomment this section when running server for the first time
 		try{
 			generateMovies();
 		}catch(Exception e) {
 			e.printStackTrace();
 		}
 		session.getTransaction().commit();
-		session.beginTransaction();
+		session.beginTransaction();*/
 	}
 
 	public void sendToAllClients(Message message) {
