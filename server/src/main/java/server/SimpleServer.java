@@ -44,9 +44,9 @@ public class SimpleServer extends AbstractServer {
 		return configuration.buildSessionFactory(serviceRegistry);
 	}
 
-
 	//only use these functions if protoype database gets deleted, it should not happen.
-	/*public static void generateMovies() throws Exception {
+
+	public static void generateMovies() throws Exception {
 			Movie movie1=new Movie("Margol","1973");
 			session.save(movie1);
 			Movie movie2=new Movie("The Boys","2018");
@@ -60,8 +60,22 @@ public class SimpleServer extends AbstractServer {
 			Movie movie6=new Movie("Automobiles","2024");
 			session.save(movie6);
             session.flush();
-	}*/
+	}
 
+	private Movie getMovieByTitleFromDB(String title){
+		CriteriaBuilder builder=session.getCriteriaBuilder();
+		CriteriaQuery<Movie> query=builder.createQuery(Movie.class);
+		Root<Movie> root=query.from(Movie.class);
+		Predicate titlePredicate=builder.equal(root.get("name"),title);
+		query.where(titlePredicate);
+		List<Movie> movies=session.createQuery(query).getResultList();
+		if(movies!=null && !movies.isEmpty()){
+			this.currMovie=movies.get(0);
+			this.currMovieInfo=this.currMovie.getMovieInfo();
+			return this.currMovie;
+		}
+		return null;
+	}
 
 	void addTimeToCurrentMovie(String time) {
 		//check if the displaytime already exists, if yes add the movie to it's list, else, create a new displaytime and set the movie
@@ -180,14 +194,6 @@ public class SimpleServer extends AbstractServer {
 
 
 
-	private Movie getMovieByTitleFromDB(String title){
-		CriteriaBuilder builder=session.getCriteriaBuilder();
-		CriteriaQuery<Movie> query=builder.createQuery(Movie.class);
-		Root<Movie> root=query.from(Movie.class);
-		Predicate titlePredicate=builder.equal(root.get("name"),title);
-		query.where(titlePredicate);
-		return session.createQuery(query).getSingleResult();
-	}
 
 	private List<Movie> getMoviesFromDB(){
 		CriteriaBuilder builder=session.getCriteriaBuilder();
@@ -238,9 +244,9 @@ public class SimpleServer extends AbstractServer {
 			}
 			else if(request.startsWith("getMovieInfo")){
 				String[] splitted=request.split(" ",2);
-				Movie movie=getMovieByTitleFromDB(splitted[1]);
-				this.currMovie=movie;
+				this.currMovie=getMovieByTitleFromDB(splitted[1]);
 				this.currMovieInfo=this.currMovie.getMovieInfo();
+
 				message.setMessage("MovieInfo");
 				message.setMovieInfo(this.currMovie.getMovieInfo());
 				client.sendToClient(message);
@@ -262,12 +268,14 @@ public class SimpleServer extends AbstractServer {
 				message.setMovieInfo(this.currMovie.getMovieInfo());
 				message.setMessage("updatedtimes");
 				sendToAllClients(message);
+				//client.sendToClient(message);
 			}
 			else if(request.startsWith("removetime")){
 				removeDisplayTimeFromMovieFromDB(request.substring(11));
 				message.setMovieInfo(this.currMovie.getMovieInfo());
 				message.setMessage("updatedtimes");
 				sendToAllClients(message);
+				//client.sendToClient(message);
 			}
 			else {
 				addMsgToDB(request);
@@ -378,14 +386,14 @@ public class SimpleServer extends AbstractServer {
 				session.getTransaction().rollback();
 			}
 			e.printStackTrace();
-		}/*//uncomment this section when running server for the first time
+		}//uncomment this section when running server for the first time
 		try{
 			generateMovies();
 		}catch(Exception e) {
 			e.printStackTrace();
 		}
 		session.getTransaction().commit();
-		session.beginTransaction();*/
+		session.beginTransaction();
 	}
 
 	public void sendToAllClients(Message message) {

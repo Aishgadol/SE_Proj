@@ -8,7 +8,7 @@ public class MovieInfo implements Serializable {
 
      String name;
      String releaseDate;
-     List<String> displayTimes=new ArrayList<>();
+     List<String> displayTimes=new ArrayList<>(5000);
 
     public MovieInfo(String name, String releaseDate){
         this.name=name;
