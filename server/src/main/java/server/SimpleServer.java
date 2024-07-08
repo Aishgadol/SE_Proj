@@ -242,6 +242,11 @@ public class SimpleServer extends AbstractServer {
 				SubscribersList.add(connection);
 				message.setMessage("client added successfully");
 			}
+			else if(request.startsWith("remove client")){
+				SubscribedClient x=new SubscribedClient(client);
+				SubscribersList.remove(x);
+				message.setMessage("client removed succesfully");
+			}
 			else if(request.startsWith("getMovieInfo")){
 				String[] splitted=request.split(" ",2);
 				this.currMovie=getMovieByTitleFromDB(splitted[1]);

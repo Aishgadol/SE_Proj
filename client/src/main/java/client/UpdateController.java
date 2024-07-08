@@ -208,13 +208,18 @@ public class UpdateController{
     @FXML
     void goBackButton(ActionEvent event) throws IOException {
         EventBus.getDefault().unregister(this);
-        Parent root=FXMLLoader.load(getClass().getResource("/cinema.fxml"));
-        stage=(Stage)((Node)event.getSource()).getScene().getWindow();
-        scene=new Scene(root,1280,800);
-        stage.setScene(scene);
-        stage.setTitle("Cinema");
-        stage.setResizable(false);
-        stage.show();
+        try {
+            askDB("remove client");
+            Parent root = FXMLLoader.load(getClass().getResource("/cinema.fxml"));
+            stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
+            scene = new Scene(root, 1280, 800);
+            stage.setScene(scene);
+            stage.setTitle("Cinema");
+            stage.setResizable(false);
+            stage.show();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
 

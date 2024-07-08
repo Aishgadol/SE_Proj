@@ -142,13 +142,19 @@ public class CinemaController {
     @FXML
     void changeToUpdateScreen(ActionEvent event) throws IOException {
         EventBus.getDefault().unregister(this);
-        Parent root=FXMLLoader.load(getClass().getResource("/update.fxml"));
-        stage=(Stage)((Node)event.getSource()).getScene().getWindow();
-        scene=new Scene(root,1280,800);
-        stage.setScene(scene);
-        stage.setResizable(false);
-        stage.setTitle("Update Screen");
-        stage.show();
+        try {
+            askDB("remove client");
+            Parent root = FXMLLoader.load(getClass().getResource("/update.fxml"));
+            stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
+            scene = new Scene(root, 1280, 800);
+            stage.setScene(scene);
+            stage.setResizable(false);
+            stage.setTitle("Update Screen");
+            stage.show();
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
     }
 
     @FXML
