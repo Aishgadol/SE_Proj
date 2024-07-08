@@ -238,7 +238,8 @@ public class SimpleServer extends AbstractServer {
 			}
 			else if(request.startsWith("getMovieInfo")){
 				String[] splitted=request.split(" ",2);
-				this.currMovie=getMovieByTitleFromDB(splitted[1]);
+				Movie movie=getMovieByTitleFromDB(splitted[1]);
+				this.currMovie=movie;
 				this.currMovieInfo=this.currMovie.getMovieInfo();
 				message.setMessage("MovieInfo");
 				message.setMovieInfo(this.currMovie.getMovieInfo());
