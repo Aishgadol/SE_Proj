@@ -272,8 +272,6 @@ public class SimpleServer extends AbstractServer {
 			}
 			else if (request.startsWith("addtime")) {
 				addDisplayTimeToDB(request.substring(8));
-				//addTimeToCurrentMovie(request.substring(8));
-				//this.currMovie.getDisplayTimes()=getDisplayTimesFromDB(); //this line may be moved to somewhere else
 				message.setMovieInfo(getMovieInfoByTitle(this.currMovie.getName()));
 				message.setMessage("updatedtimes");
 				sendToAllClients(message);

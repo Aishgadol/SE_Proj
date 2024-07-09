@@ -132,8 +132,6 @@ public class UpdateController{
         Platform.runLater(() -> {
             datePicker.setValue(LocalDate.now());
             timePicker.setValue("10:00");
-            //availableTimesComboBox.getItems().clear();
-            //myListView.getItems().clear();
         });
     }
     @FXML
