@@ -34,8 +34,7 @@ public class Movie implements Serializable {
 
     private List<DisplayTime> displayTimes=new ArrayList<>(5000);
 
-    @Column(name="MovieInfo")
-    private MovieInfo movieInfo;
+    //private MovieInfo movieInfo;
 
 
     public Movie(){
@@ -44,7 +43,7 @@ public class Movie implements Serializable {
 
     public Movie(MovieInfo movieInfo){
         //use this, update paramteres
-        this.movieInfo=movieInfo;
+        //this.movieInfo=movieInfo;
         this.name=movieInfo.getName();
         this.releaseDate=movieInfo.getReleaseDate();
     }
@@ -52,7 +51,7 @@ public class Movie implements Serializable {
     public Movie(String name, String releaseDate){
         this.name=name;
         this.releaseDate=releaseDate;
-        movieInfo=new MovieInfo(name,releaseDate);
+       // movieInfo=new MovieInfo(name,releaseDate);
     }
 
     public void setName(String name){
@@ -69,8 +68,8 @@ public class Movie implements Serializable {
         return this.releaseDate;
     }
 
-    public void setMovieInfo(MovieInfo movieInfo){this.movieInfo=movieInfo;}
-    public MovieInfo getMovieInfo(){return this.movieInfo;}
+    //public void setMovieInfo(MovieInfo movieInfo){this.movieInfo=movieInfo;}
+    //public MovieInfo getMovieInfo(){return this.movieInfo;}
 
     public void setDisplayTimes(List<DisplayTime> displayTimes){this.displayTimes=displayTimes;}
     public List<DisplayTime> getDisplayTimes(){return this.displayTimes;}
@@ -83,7 +82,7 @@ public class Movie implements Serializable {
             }
         }
         this.displayTimes.add(displayTime);
-        this.movieInfo.addDisplayTime(displayTime.getDisplayTime());
+        //this.movieInfo.addDisplayTime(displayTime.getDisplayTime());
     }
     public void removeDisplayTime(DisplayTime displayTime){
         boolean found=false;
@@ -95,9 +94,9 @@ public class Movie implements Serializable {
         }
         if(found) {
             this.displayTimes.remove(displayTime);
-            List<String> stfu=this.movieInfo.getDisplayTimes();
-            stfu.remove(displayTime.getDisplayTime());
-            this.movieInfo.setDisplayTimes(stfu);
+            //List<String> stfu=this.movieInfo.getDisplayTimes();
+            //stfu.remove(displayTime.getDisplayTime());
+            //this.movieInfo.setDisplayTimes(stfu);
         }
     }
 }

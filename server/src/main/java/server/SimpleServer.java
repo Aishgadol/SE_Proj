@@ -31,6 +31,7 @@ public class SimpleServer extends AbstractServer {
 	private static SessionFactory sessionFactory;
 	private MovieInfo currMovieInfo;
 	private Movie currMovie;
+	private List<MovieInfo> movieInfos=new ArrayList<>();
 	private List<DisplayTime> currDisplayTimes=new ArrayList<>();
 
 	private static SessionFactory getSessionFactory() throws HibernateException{
@@ -45,7 +46,7 @@ public class SimpleServer extends AbstractServer {
 	}
 
 	//only use these functions if protoype database gets deleted, it should not happen.
-
+	/*
 	public static void generateMovies() throws Exception {
 			Movie movie1=new Movie("Margol","1973");
 			session.save(movie1);
@@ -60,6 +61,13 @@ public class SimpleServer extends AbstractServer {
 			Movie movie6=new Movie("Automobiles","2024");
 			session.save(movie6);
             session.flush();
+	}*/
+
+	private List<Movie> getMoviesFromDB(){
+		CriteriaBuilder builder=session.getCriteriaBuilder();
+		CriteriaQuery<Movie> query=builder.createQuery(Movie.class);
+		query.from(Movie.class);
+        return session.createQuery(query).getResultList();
 	}
 
 	private Movie getMovieByTitleFromDB(String title){
@@ -71,30 +79,30 @@ public class SimpleServer extends AbstractServer {
 		List<Movie> movies=session.createQuery(query).getResultList();
 		if(movies!=null && !movies.isEmpty()){
 			this.currMovie=movies.get(0);
-			this.currMovieInfo=this.currMovie.getMovieInfo();
+			this.currMovieInfo=getMovieInfoByTitle(this.currMovie.getName());
 			return this.currMovie;
 		}
 		return null;
 	}
 
-	void addTimeToCurrentMovie(String time) {
-		//check if the displaytime already exists, if yes add the movie to it's list, else, create a new displaytime and set the movie
-		try {
-
-			session.saveOrUpdate(this.currMovie);
-
-			session.flush();
-
-			session.getTransaction().commit();
-			session.beginTransaction();
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
+	private List<DisplayTime> getDisplayTimesFromDB(){
+		CriteriaBuilder builder=session.getCriteriaBuilder();
+		CriteriaQuery<DisplayTime> query=builder.createQuery(DisplayTime.class);
+		query.from(DisplayTime.class);
+		return session.createQuery(query).getResultList();
 	}
 
+	private MovieInfo getMovieInfoByTitle(String title){
+		for(MovieInfo m : movieInfos){
+			if(m.getName().equals(title)){
+				return m;
+			}
+		}
+		return null;
+	}
 	public void addDisplayTimeToDB(String time){
 		this.currMovie=getMovieByTitleFromDB(this.currMovie.getName());
-		this.currMovieInfo=this.currMovie.getMovieInfo();
+		this.currMovieInfo=getMovieInfoByTitle(this.currMovie.getName());
 		try {
 			for(DisplayTime d : this.currMovie.getDisplayTimes()){
 				if(time.equals(d.getDisplayTime())){
@@ -110,6 +118,7 @@ public class SimpleServer extends AbstractServer {
 
 					d.addMovie(this.currMovie);
 					this.currMovie.addDisplayTime(d);
+					this.currMovieInfo.addDisplayTime(d.getDisplayTime());
 					session.saveOrUpdate(d);
 					session.saveOrUpdate(this.currMovie);
 					session.flush();
@@ -119,9 +128,11 @@ public class SimpleServer extends AbstractServer {
 				}
 
 			}
+			//we got here so the displaytime doesnt exist in db or in movie, add both
 			DisplayTime dis = new DisplayTime(time);
 			dis.addMovie(this.currMovie);
 			this.currMovie.addDisplayTime(dis);
+			this.currMovieInfo.addDisplayTime(dis.getDisplayTime());
 			session.save(dis);
 			session.saveOrUpdate(this.currMovie);
 			session.flush();
@@ -134,7 +145,7 @@ public class SimpleServer extends AbstractServer {
 
 	void removeDisplayTimeFromMovieFromDB(String displayTime) {
 		this.currMovie = getMovieByTitleFromDB(this.currMovie.getName());
-		this.currMovieInfo = this.currMovie.getMovieInfo();
+		this.currMovieInfo = getMovieInfoByTitle(this.currMovie.getName());
 		this.currDisplayTimes = getDisplayTimesFromDB();
 		boolean found = false;
 		boolean found2 = false; // if displaytime is in table of displaytimes
@@ -160,8 +171,9 @@ public class SimpleServer extends AbstractServer {
 			}
 			if (found && d_movie!=null) { //movie has it
 				this.currMovie.removeDisplayTime(d_movie);
-				this.currMovieInfo = this.currMovie.getMovieInfo();
+				this.currMovieInfo = getMovieInfoByTitle(this.currMovie.getName());
 				d_movie.removeMovie(this.currMovie);
+				this.currMovieInfo.removeDisplayTime(d_movie.getDisplayTime());
 				if (found2){
 					if(d_table.getMovies().isEmpty()){
 						removeObjectWithName(currDisplayTimes, d_table.getDisplayTime());
@@ -170,9 +182,7 @@ public class SimpleServer extends AbstractServer {
 					else{
 						session.saveOrUpdate(d_table);
 					}
-					session.flush();
 				}
-
 			}
 			session.saveOrUpdate(this.currMovie);
 			session.flush();
@@ -192,16 +202,6 @@ public class SimpleServer extends AbstractServer {
 		session.beginTransaction();
 	}
 
-
-
-
-	private List<Movie> getMoviesFromDB(){
-		CriteriaBuilder builder=session.getCriteriaBuilder();
-		CriteriaQuery<Movie> query=builder.createQuery(Movie.class);
-		query.from(Movie.class);
-        return session.createQuery(query).getResultList();
-	}
-
 	private List<Msg> getMsgs(){
 		CriteriaBuilder builder=session.getCriteriaBuilder();
 		CriteriaQuery<Msg> query=builder.createQuery(Msg.class);
@@ -216,15 +216,24 @@ public class SimpleServer extends AbstractServer {
 		Root<DisplayTime> root=query.from(DisplayTime.class);
 		Predicate titlePredicate=builder.equal(root.get("Display_Time_And_Date"),displayTimeString);
 		query.where(titlePredicate);
-		return session.createQuery(query).getSingleResult();
+		List<DisplayTime> dis=session.createQuery(query).getResultList();
+		if(dis!=null && !dis.isEmpty()){
+			return dis.get(0);
+		}
+		return null;
 	}
 
-	private List<DisplayTime> getDisplayTimesFromDB(){
-		CriteriaBuilder builder=session.getCriteriaBuilder();
-		CriteriaQuery<DisplayTime> query=builder.createQuery(DisplayTime.class);
-		query.from(DisplayTime.class);
-		return session.createQuery(query).getResultList();
+	private void setMovieInfos(){
+		List<Movie> movies=getMoviesFromDB();
+		for(Movie m: movies){
+			MovieInfo mi=new MovieInfo(m.getName(),m.getReleasedate());
+			for(DisplayTime d: m.getDisplayTimes()){
+				mi.addDisplayTime(d.getDisplayTime());
+			}
+			this.movieInfos.add(mi);
+		}
 	}
+
 
 	@Override
 	protected void handleMessageFromClient(Object msg, ConnectionToClient client) {
@@ -250,19 +259,14 @@ public class SimpleServer extends AbstractServer {
 			else if(request.startsWith("getMovieInfo")){
 				String[] splitted=request.split(" ",2);
 				this.currMovie=getMovieByTitleFromDB(splitted[1]);
-				this.currMovieInfo=this.currMovie.getMovieInfo();
+				this.currMovieInfo=getMovieInfoByTitle(this.currMovie.getName());
 
 				message.setMessage("MovieInfo");
-				message.setMovieInfo(this.currMovie.getMovieInfo());
+				message.setMovieInfo(getMovieInfoByTitle(this.currMovie.getName()));
 				client.sendToClient(message);
 			}
 			else if(request.startsWith("getTitles")){
-				List<Movie> movies=getMoviesFromDB();
-				List<MovieInfo> movieInfos=new ArrayList<MovieInfo>();
-				for(Movie m: movies){
-					movieInfos.add(m.getMovieInfo());
-				}
-				message.setList(movieInfos);
+				message.setList(this.movieInfos);
 				message.setMessage("ListOfMovieInfos");
 				client.sendToClient(message);
 			}
@@ -270,14 +274,14 @@ public class SimpleServer extends AbstractServer {
 				addDisplayTimeToDB(request.substring(8));
 				//addTimeToCurrentMovie(request.substring(8));
 				//this.currMovie.getDisplayTimes()=getDisplayTimesFromDB(); //this line may be moved to somewhere else
-				message.setMovieInfo(this.currMovie.getMovieInfo());
+				message.setMovieInfo(getMovieInfoByTitle(this.currMovie.getName()));
 				message.setMessage("updatedtimes");
 				sendToAllClients(message);
 				//client.sendToClient(message);
 			}
 			else if(request.startsWith("removetime")){
 				removeDisplayTimeFromMovieFromDB(request.substring(11));
-				message.setMovieInfo(this.currMovie.getMovieInfo());
+				message.setMovieInfo(getMovieInfoByTitle(this.currMovie.getName()));
 				message.setMessage("updatedtimes");
 				sendToAllClients(message);
 				//client.sendToClient(message);
@@ -385,20 +389,21 @@ public class SimpleServer extends AbstractServer {
 			sessionFactory=getSessionFactory();
 			session=sessionFactory.openSession();
 			session.beginTransaction();
-
+			setMovieInfos(); //uncomment this when hibernate is on update mode
 		} catch(Exception e) {
 			if(session!=null){
 				session.getTransaction().rollback();
 			}
 			e.printStackTrace();
 		}//uncomment this section when running server for the first time
-		try{
+		/*try{
 			generateMovies();
+			setMovieInfos();
 		}catch(Exception e) {
 			e.printStackTrace();
 		}
 		session.getTransaction().commit();
-		session.beginTransaction();
+		session.beginTransaction();*/
 	}
 
 	public void sendToAllClients(Message message) {
