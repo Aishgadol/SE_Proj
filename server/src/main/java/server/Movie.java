@@ -39,6 +39,7 @@ public class Movie implements Serializable {
 
     public Movie(){
         /*dont use this*/
+        // comment nosaf mitahat
     }
 
     public Movie(MovieInfo movieInfo){
