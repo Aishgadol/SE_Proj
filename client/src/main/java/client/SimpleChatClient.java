@@ -22,14 +22,12 @@ public class SimpleChatClient extends Application {
 
     private static Scene scene;
     private SimpleClient client;
-    private static SimpleChatClient selfi;
     private Stage primaryStage;
 
 
     @Override
     public void start(Stage stage) throws IOException {
     	EventBus.getDefault().register(this);
-        selfi=this;
     	client = SimpleClient.getClient();
     	client.openConnection();
         primaryStage=stage;

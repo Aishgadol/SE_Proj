@@ -21,40 +21,13 @@ public class OpeningController{
 
     @FXML
     private Button updateButton;
-    /*
-    @FXML
-    void sendToDb(ActionEvent event) {
-        try {
-            Message message = new Message(msgId++, textField.getText());
-            textField.clear();
-            SimpleClient.getClient().sendToServer(message);
 
-        }
-        catch(IOException e){
-            e.printStackTrace();
-        }
-    }
-
-    @Subscribe
-	public void setDataFromServerTF(Message msg) {
-        board.setText(msg.getMessage());
-	}
-
-*/
     @Subscribe
     public void eventBusFiller(Message message){
         return;
     }
     @FXML
     void initialize(){
-        EventBus.getDefault().register(this);
-        msgId=0;
-        try {
-			Message message = new Message(msgId, "add client");
-			SimpleClient.getClient().sendToServer(message);
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+
     }
 }

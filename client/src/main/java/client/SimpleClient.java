@@ -35,18 +35,9 @@ public class SimpleClient extends AbstractClient {
 		else if(message.getMessage().startsWith("updatedtimes")){
 			EventBus.getDefault().post(new TimeUpdateEvent(message));
 		}
-
-		/*
-		if(message.getMessage().equals("update submitters IDs")){
-			EventBus.getDefault().post(new UpdateMessageEvent(message));
-		}else if(message.getMessage().equals("client added successfully")){
-			EventBus.getDefault().post(new NewSubscriberEvent(message));
-		}else if(message.getMessage().equals("Error! we got an empty message")){
-			EventBus.getDefault().post(new ErrorEvent(message));
-		}
 		else {
 			EventBus.getDefault().post(new MessageEvent(message));
-		}*/
+		}
 	}
 
 
