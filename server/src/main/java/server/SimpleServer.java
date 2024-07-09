@@ -100,13 +100,15 @@ public class SimpleServer extends AbstractServer {
 		}
 		return null;
 	}
+
+	// updates display time for the current movie selected
 	public void addDisplayTimeToDB(String time){
 		this.currMovie=getMovieByTitleFromDB(this.currMovie.getName());
 		this.currMovieInfo=getMovieInfoByTitle(this.currMovie.getName());
 		try {
 			for(DisplayTime d : this.currMovie.getDisplayTimes()){
 				if(time.equals(d.getDisplayTime())){
-					//displaytime exists in movie so it also exists in db, nothing to do.
+					//display time exists in movie so it also exists in db, nothing to do. 123
 					return;
 				}
 			}
@@ -126,7 +128,6 @@ public class SimpleServer extends AbstractServer {
 					session.beginTransaction();
 					return;
 				}
-
 			}
 			//we got here so the displaytime doesnt exist in db or in movie, add both
 			DisplayTime dis = new DisplayTime(time);
