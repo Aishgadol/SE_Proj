@@ -276,14 +276,12 @@ public class SimpleServer extends AbstractServer {
 				message.setMovieInfo(getMovieInfoByTitle(this.currMovie.getName()));
 				message.setMessage("updatedtimes");
 				sendToAllClients(message);
-				//client.sendToClient(message);
 			}
 			else if(request.startsWith("removetime")){
 				removeDisplayTimeFromMovieFromDB(request.substring(11));
 				message.setMovieInfo(getMovieInfoByTitle(this.currMovie.getName()));
 				message.setMessage("updatedtimes");
 				sendToAllClients(message);
-				//client.sendToClient(message);
 			}
 			else {
 				addMsgToDB(request);
