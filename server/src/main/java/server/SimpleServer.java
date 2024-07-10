@@ -9,6 +9,9 @@ import ocsf.ConnectionToClient;
 import ocsf.SubscribedClient;
 
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 
@@ -224,7 +227,20 @@ public class SimpleServer extends AbstractServer {
 		}
 	}
 
+	//BIG NOTE: TITLE MUST BE ALL LOWERCASE, WITH _ INSTEAD OF SPACES
+	private byte[] getImageByTitleAsByteArray(String title){
+		Path path= Paths.get("src/main/resources/"+title+".jpg");
+		byte[] imageData=null;
+		try {
+			imageData = Files.readAllBytes(path);
+		}catch(Exception e){
+			e.printStackTrace();
+		}
+		return imageData;
+	}
+
 	private void setMovieInfos(){
+		this.movieInfos=new ArrayList<>();
 		List<Movie> movies=getMoviesFromDB();
 		for(Movie m: movies){
 			MovieInfo mi=new MovieInfo(m.getName(),m.getReleasedate());
@@ -267,6 +283,7 @@ public class SimpleServer extends AbstractServer {
 				client.sendToClient(message);
 			}
 			else if(request.startsWith("getTitles")){
+				setMovieInfos();
 				message.setList(this.movieInfos);
 				message.setMessage("ListOfMovieInfos");
 				client.sendToClient(message);
@@ -282,6 +299,16 @@ public class SimpleServer extends AbstractServer {
 				message.setMovieInfo(getMovieInfoByTitle(this.currMovie.getName()));
 				message.setMessage("updatedtimes");
 				sendToAllClients(message);
+			}
+			else if(request.startsWith("getOpeningImage")){
+				message.setImageData(getImageByTitleAsByteArray("cinemapicture"));
+				message.setMessage("opening image");
+				client.sendToClient(message);
+			}
+			else if(request.startsWith("getBackgroundImag")){
+				message.setImageData(getImageByTitleAsByteArray("namal"));
+				message.setMessage("background image");
+				client.sendToClient(message);
 			}
 			else {
 				addMsgToDB(request);

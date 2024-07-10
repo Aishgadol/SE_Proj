@@ -38,7 +38,7 @@ public class SimpleChatClient extends Application {
         PauseTransition delay=new PauseTransition(Duration.millis(1500.0));
         delay.setOnFinished(event ->{
             try{
-                scene=new Scene(loadFXML("cinema"),1280,800);
+                scene=new Scene(loadFXML("mainScreen"),1280,800);
                 primaryStage.setScene(scene);
                 primaryStage.setResizable(false);
                 primaryStage.show();

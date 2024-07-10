@@ -8,7 +8,8 @@ public class MovieInfo implements Serializable {
 
      String name;
      String releaseDate;
-     List<String> displayTimes=new ArrayList<>(5000);
+     byte[] imageData;
+     List<String> displayTimes=new ArrayList<>();
 
     public MovieInfo(String name, String releaseDate){
         this.name=name;
@@ -47,6 +48,14 @@ public class MovieInfo implements Serializable {
     }
     public void removeDisplayTime(String displayTime){
         this.displayTimes.remove(displayTime);
+    }
+
+    public byte[] getImageData() {
+        return imageData;
+    }
+
+    public void setImageData(byte[] imageData) {
+        this.imageData = imageData;
     }
 
 }

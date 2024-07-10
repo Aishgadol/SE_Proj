@@ -32,7 +32,7 @@ public class Movie implements Serializable {
         inverseJoinColumns = @JoinColumn(name = "Display_Time_And_Date", referencedColumnName = "Display_Time_And_Date")
     )
 
-    private List<DisplayTime> displayTimes=new ArrayList<>(5000);
+    private List<DisplayTime> displayTimes=new ArrayList<>();
 
 
 

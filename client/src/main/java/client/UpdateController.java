@@ -99,15 +99,6 @@ public class UpdateController{
         resetAll();
         updateAll();
     }
-    @Subscribe // no use for this function for now
-    public void timeTaken(TimeTakenEvent event){
-        Platform.runLater(()->{
-            Alert alert = new Alert(Alert.AlertType.INFORMATION);
-            alert.setTitle("Time already in use");
-            alert.setHeaderText("The date and time you're trying to add are already taken by this movie");
-            alert.show();
-        });
-    }
 
     @FXML
     void timeToRemoveSelected(ActionEvent event){

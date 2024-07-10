@@ -16,7 +16,7 @@
       <AnchorPane maxWidth="1270.0" prefHeight="800.0" prefWidth="1270.0">
             <ImageView fx:id="background" fitHeight="800.0" fitWidth="1280.0" opacity="0.35" pickOnBounds="true">
                <image>
-                  <Image url="@namalcamp.jpg" />
+                  <Image url="@../../../../server/src/main/resources/namalcamp.jpg" />
                </image>
             </ImageView>
             <Button fx:id="backButton" layoutX="994.0" layoutY="20.0" mnemonicParsing="false" onAction="#goBackButton" prefHeight="193.0" prefWidth="262.0" style="-fx-border-color: black; -fx-background-color: crimson; -fx-border-width: 2;" text="GO BACK">

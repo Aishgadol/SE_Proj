@@ -10,6 +10,7 @@ public class Message implements Serializable {
     String data;
     MovieInfo movieInfo;
     List<MovieInfo> list;
+    byte[] imageData;
 
     public Message(int id, LocalDateTime timeStamp, String message) {
         this.id = id;
@@ -76,4 +77,9 @@ public class Message implements Serializable {
     public void setList(List<MovieInfo> list){
         this.list=list;
     }
+
+    public byte[] getImageData(){
+        return this.imageData;
+    }
+    public void setImageData(byte[] imageData){this.imageData=imageData;}
 }

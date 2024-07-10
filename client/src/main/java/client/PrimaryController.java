@@ -65,7 +65,7 @@ public class PrimaryController {
 		submitterID2.setText(event.getMessage().getData().substring(11,20));
 	}
 
-
+	/*
 	@Subscribe
 	public void getStarterData(NewSubscriberEvent event) {
 		try {
@@ -75,7 +75,7 @@ public class PrimaryController {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-	}
+	}*/
 
 	@Subscribe
 	public void errorEvent(ErrorEvent event){

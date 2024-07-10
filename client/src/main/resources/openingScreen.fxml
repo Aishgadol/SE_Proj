@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.scene.control.Label?>
-<?import javafx.scene.image.Image?>
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.VBox?>
@@ -16,11 +15,7 @@
                   <Font size="35.0" />
                </font>
             </Label>
-            <ImageView fitHeight="236.0" fitWidth="270.0" layoutX="511.0" layoutY="72.0" pickOnBounds="true">
-               <image>
-                  <Image url="@cinemapicture.jpg" />
-               </image>
-            </ImageView>
+            <ImageView fx:id="myImageView" fitHeight="236.0" fitWidth="270.0" layoutX="511.0" layoutY="72.0" pickOnBounds="true" />
          </children>
       </AnchorPane>
    </children>

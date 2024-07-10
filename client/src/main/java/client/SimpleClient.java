@@ -2,6 +2,7 @@ package client;
 
 import entities.Message;
 import entities.MovieInfo;
+import jdk.jfr.Event;
 import org.greenrobot.eventbus.EventBus;
 
 import ocsf.AbstractClient;
@@ -10,11 +11,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class SimpleClient extends AbstractClient {
-	
+
 	private static SimpleClient client = null;
 
 	private SimpleClient(String host, int port) {
-		super("2.tcp.eu.ngrok.io",10892);
+		super("localhost",3000);
 	}
 
 	@Override
@@ -34,6 +35,12 @@ public class SimpleClient extends AbstractClient {
 		}
 		else if(message.getMessage().startsWith("updatedtimes")){
 			EventBus.getDefault().post(new TimeUpdateEvent(message));
+		}
+		else if(message.getMessage().startsWith("opening image")){
+			EventBus.getDefault().post(new OpeningPictureEvent(message));
+		}
+		else if(message.getMessage().startsWith("background image")){
+			EventBus.getDefault().post(new BackgroundImageEvent(message));
 		}
 		else {
 			EventBus.getDefault().post(new MessageEvent(message));
