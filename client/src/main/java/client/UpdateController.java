@@ -3,7 +3,6 @@ package client;
 import entities.MovieInfo;
 import entities.Message;
 import javafx.application.Platform;
-import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -11,16 +10,13 @@ import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.Scene;
 import javafx.scene.Parent;
-import javafx.scene.Scene;
 import javafx.scene.image.ImageView;
-import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import javafx.scene.control.Alert;
-import javafx.scene.control.Alert.AlertType;
+
 import java.time.LocalDate;
 import javafx.util.Callback;
-import javafx.scene.Parent;
 import javafx.scene.control.Button;
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
@@ -208,7 +204,7 @@ public class UpdateController{
         EventBus.getDefault().unregister(this);
         try {
             askDB("remove client");
-            Parent root = FXMLLoader.load(getClass().getResource("/cinema.fxml"));
+            Parent root = FXMLLoader.load(getClass().getResource("/mainScreen.fxml"));
             stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
             scene = new Scene(root, 1280, 800);
             stage.setScene(scene);

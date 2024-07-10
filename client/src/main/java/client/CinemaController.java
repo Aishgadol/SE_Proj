@@ -144,7 +144,7 @@ public class CinemaController {
         EventBus.getDefault().unregister(this);
         try {
             askDB("remove client");
-            Parent root = FXMLLoader.load(getClass().getResource("/update.fxml"));
+            Parent root = FXMLLoader.load(getClass().getResource("/updateTimeScreen.fxml"));
             stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
             scene = new Scene(root, 1280, 800);
             stage.setScene(scene);

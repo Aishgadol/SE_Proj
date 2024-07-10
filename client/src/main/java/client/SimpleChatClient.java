@@ -31,8 +31,7 @@ public class SimpleChatClient extends Application {
     	client = SimpleClient.getClient();
     	client.openConnection();
         primaryStage=stage;
-
-        scene=new Scene(loadFXML("opening"),1280,800);
+        scene=new Scene(loadFXML("openingScreen"),1280,800);
         primaryStage.setScene(scene);
         primaryStage.setResizable(false);
         primaryStage.show();
