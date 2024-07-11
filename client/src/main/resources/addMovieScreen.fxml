@@ -1,10 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ComboBox?>
 <?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Separator?>
+<?import javafx.scene.control.TextField?>
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.VBox?>
+<?import javafx.scene.paint.Color?>
+<?import javafx.scene.paint.LinearGradient?>
+<?import javafx.scene.paint.RadialGradient?>
+<?import javafx.scene.paint.Stop?>
 <?import javafx.scene.text.Font?>
 
 
@@ -13,13 +20,120 @@
       <AnchorPane prefHeight="600.0" prefWidth="600.0">
          <children>
             <ImageView fx:id="backgroundImageView" fitHeight="600.0" fitWidth="600.0" pickOnBounds="true" preserveRatio="true" />
-            <Button layoutX="140.0" layoutY="544.0" mnemonicParsing="false" prefHeight="21.0" prefWidth="320.0" text="Back to Update Screen" />
-            <Button layoutX="247.0" layoutY="452.0" mnemonicParsing="false" prefHeight="60.0" prefWidth="106.0" text="Add Movie" />
-            <Label alignment="CENTER" contentDisplay="CENTER" layoutX="46.0" layoutY="50.0" prefHeight="120.0" prefWidth="507.0" text="ADD MOVIE SCREEN" textAlignment="CENTER" wrapText="true">
+            <Button fx:id="goBackButton" layoutY="-1.0" mnemonicParsing="false" onAction="#goBackButtonPressed" prefHeight="30.0" prefWidth="62.0" text="GO BACK" textAlignment="CENTER">
                <font>
-                  <Font name="Candara Bold" size="36.0" />
+                  <Font size="11.0" />
                </font>
+            </Button>
+            <Button fx:id="addMovieButton" layoutX="246.0" layoutY="518.0" mnemonicParsing="false" onAction="#addMovieButtonPressed" prefHeight="60.0" prefWidth="106.0" text="Add Movie" />
+            <Label alignment="CENTER" contentDisplay="CENTER" layoutX="27.0" layoutY="21.0" prefHeight="120.0" prefWidth="557.0" text="ADD A NEW MOVIE" textAlignment="CENTER" wrapText="true">
+               <font>
+                  <Font name="Candara Bold" size="64.0" />
+               </font>
+               <textFill>
+                  <RadialGradient centerX="0.5088496250388896" centerY="0.39772724382805097" radius="0.5">
+                     <stops>
+                        <Stop>
+                           <color>
+                              <Color red="0.9333333373069763" green="1.0" />
+                           </color>
+                        </Stop>
+                        <Stop offset="1.0">
+                           <color>
+                              <Color red="1.0" />
+                           </color>
+                        </Stop>
+                     </stops>
+                  </RadialGradient>
+               </textFill>
             </Label>
+            <Label layoutX="162.0" layoutY="119.0" text="What's the name of the movie?">
+               <font>
+                  <Font size="20.0" />
+               </font>
+               <textFill>
+                  <LinearGradient endX="1.0" endY="1.0" startX="1.0">
+                     <stops>
+                        <Stop>
+                           <color>
+                              <Color red="0.75" green="0.7894737124443054" />
+                           </color>
+                        </Stop>
+                        <Stop offset="0.006729475100942127">
+                           <color>
+                              <Color red="0.75" green="0.7894737124443054" />
+                           </color>
+                        </Stop>
+                        <Stop offset="1.0">
+                           <color>
+                              <Color />
+                           </color>
+                        </Stop>
+                     </stops>
+                  </LinearGradient>
+               </textFill>
+            </Label>
+            <TextField fx:id="movieNameTextField" alignment="CENTER" layoutX="18.0" layoutY="149.0" prefHeight="26.0" prefWidth="571.0" promptText="Enter a movie name">
+               <font>
+                  <Font size="16.0" />
+               </font>
+            </TextField>
+            <Separator layoutX="90.0" layoutY="178.0" prefHeight="50.0" prefWidth="398.0" />
+            <Label layoutX="183.0" layoutY="211.0" text="What year was it released?">
+               <font>
+                  <Font size="20.0" />
+               </font>
+               <textFill>
+                  <LinearGradient endX="1.0" endY="1.0" startX="1.0">
+                     <stops>
+                        <Stop>
+                           <color>
+                              <Color red="0.75" green="0.7894737124443054" />
+                           </color>
+                        </Stop>
+                        <Stop offset="0.006729475100942127">
+                           <color>
+                              <Color red="0.75" green="0.7894737124443054" />
+                           </color>
+                        </Stop>
+                        <Stop offset="1.0">
+                           <color>
+                              <Color />
+                           </color>
+                        </Stop>
+                     </stops>
+                  </LinearGradient>
+               </textFill>
+            </Label>
+            <ComboBox fx:id="chooseYearComboBox" layoutX="189.0" layoutY="251.0" prefHeight="26.0" prefWidth="234.0" promptText="Year of Release" />
+            <Separator layoutX="90.0" layoutY="264.0" prefHeight="50.0" prefWidth="398.0" />
+            <Button fx:id="uploadPhotoButton" layoutX="196.0" layoutY="300.0" mnemonicParsing="false" onAction="#uploadPhotoButtonPressed" prefHeight="50.0" prefWidth="206.0" text="Upload Poster for Movie">
+               <font>
+                  <Font size="15.0" />
+               </font>
+               <textFill>
+                  <RadialGradient centerY="0.5378787878787878" focusDistance="-1.0" radius="0.27981652688542635">
+                     <stops>
+                        <Stop>
+                           <color>
+                              <Color red="1.0" />
+                           </color>
+                        </Stop>
+                        <Stop offset="0.006729475100942127">
+                           <color>
+                              <Color red="1.0" />
+                           </color>
+                        </Stop>
+                        <Stop offset="1.0">
+                           <color>
+                              <Color />
+                           </color>
+                        </Stop>
+                     </stops>
+                  </RadialGradient>
+               </textFill>
+            </Button>
+            <ImageView fx:id="currImage" fitHeight="150.0" fitWidth="200.0" layoutX="200.0" layoutY="362.0" pickOnBounds="true" preserveRatio="true" />
          </children>
       </AnchorPane>
    </children>

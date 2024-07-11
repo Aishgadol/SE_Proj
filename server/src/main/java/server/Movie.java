@@ -31,7 +31,6 @@ public class Movie implements Serializable {
         joinColumns = @JoinColumn(name = "Movie_name", referencedColumnName = "name"),
         inverseJoinColumns = @JoinColumn(name = "Display_Time_And_Date", referencedColumnName = "Display_Time_And_Date")
     )
-
     private List<DisplayTime> displayTimes=new ArrayList<>();
 
 

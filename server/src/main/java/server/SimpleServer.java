@@ -3,18 +3,20 @@ package server;
 
 import entities.Message;
 import entities.MovieInfo;
-import javassist.bytecode.ExceptionTable;
 import ocsf.AbstractServer;
 import ocsf.ConnectionToClient;
 import ocsf.SubscribedClient;
 
+import java.awt.image.BufferedImage;
+import java.io.ByteArrayInputStream;
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.time.format.DateTimeFormatter;
 import java.util.*;
 
+import javax.imageio.ImageIO;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Predicate;
@@ -124,7 +126,39 @@ public class SimpleServer extends AbstractServer {
 		}
 		return null;
 	}
+	private boolean addMovieToDB(MovieInfo movieInfo){
+		for(MovieInfo m:this.movieInfos){
+			if(m.getName().equals(movieInfo.getName())){
+				return false;
+			}
+		}
+		BufferedImage bi=null;
+		byte[] moviePoster=movieInfo.getImageData();
+		//convert byte[] to BufferedImage so we can save it (we need to save the poster for loading after)
+		try(ByteArrayInputStream bais=new ByteArrayInputStream(moviePoster)){
+			bi= ImageIO.read(bais);
+		}catch(IOException e){
+			e.printStackTrace();
+		}
+		//now we save the file to src/main/resoucres
+		try{
+			File outputFile=new File("src/main/resources/"+movieInfo.getName().replaceAll(" ","_").toLowerCase()+".jpg");
+			ImageIO.write(bi,"jpg",outputFile);
+		}catch(IOException e){
+			e.printStackTrace();
+		}
+		this.movieInfos.add(movieInfo);
+		Movie movie=new Movie(movieInfo);
+		session.save(movie);
+		session.flush();
+		session.getTransaction().commit();
+		session.beginTransaction();
+		return true;
+	}
 
+	private void removeMovieFromDB(String name){
+
+	}
 	// updates display time for the current movie selected
 	public void addDisplayTimeToDB(String time){
 		this.currMovie=getMovieByTitleFromDB(this.currMovie.getName());
@@ -311,6 +345,15 @@ public class SimpleServer extends AbstractServer {
 			else if(request.startsWith("getBackgroundImage")){
 				message.setImageData(getImageByTitleAsByteArray("namal"));
 				message.setMessage("background image");
+				client.sendToClient(message);
+			}
+			else if(request.startsWith("addMovie")){
+				if(addMovieToDB(message.getMovieInfo())){
+					message.setMessage("movie added");
+				}
+				else{
+					message.setMessage("movie exists");
+				}
 				client.sendToClient(message);
 			}
 			else {

@@ -42,6 +42,15 @@ public class SimpleClient extends AbstractClient {
 		else if(message.getMessage().startsWith("background image")){
 			EventBus.getDefault().post(new BackgroundImageEvent(message));
 		}
+		else if(message.getMessage().startsWith("movie added")){
+			EventBus.getDefault().post(new MovieAddedSuccesfullyEvent(message));
+		}
+		else if(message.getMessage().startsWith("movie exists")){
+			EventBus.getDefault().post(new MovieAlreadyExistsEvent(message));
+		}
+		else if(message.getMessage().startsWith("movie removed")){
+			EventBus.getDefault().post(new MovieRemovedSuccesfullyEvent(message));
+		}
 		else {
 			EventBus.getDefault().post(new MessageEvent(message));
 		}
