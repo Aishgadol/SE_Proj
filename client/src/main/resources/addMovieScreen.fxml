@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+
+
+<VBox alignment="CENTER" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="600.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="client.AddMovieController">
+   <children>
+      <AnchorPane prefHeight="600.0" prefWidth="600.0">
+         <children>
+            <ImageView fx:id="backgroundImageView" fitHeight="600.0" fitWidth="600.0" pickOnBounds="true" preserveRatio="true" />
+            <Button layoutX="140.0" layoutY="544.0" mnemonicParsing="false" prefHeight="21.0" prefWidth="320.0" text="Back to Update Screen" />
+            <Button layoutX="247.0" layoutY="452.0" mnemonicParsing="false" prefHeight="60.0" prefWidth="106.0" text="Add Movie" />
+            <Label alignment="CENTER" contentDisplay="CENTER" layoutX="46.0" layoutY="50.0" prefHeight="120.0" prefWidth="507.0" text="ADD MOVIE SCREEN" textAlignment="CENTER" wrapText="true">
+               <font>
+                  <Font name="Candara Bold" size="36.0" />
+               </font>
+            </Label>
+         </children>
+      </AnchorPane>
+   </children>
+</VBox>

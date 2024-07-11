@@ -99,39 +99,7 @@ public class CinemaController {
         }
     }
 
-    /* might trash this later, might now
-    @Subscribe
-    public void movieInfoAndImage(ImageCatchEvent event){
-        byte[] data=event.getMessage().getImageData();
-        ImageView imageView = new ImageView();
 
-        if(data!=null){
-            try{
-                ByteArrayInputStream bis=new ByteArrayInputStream(data);
-                Image image=new Image(bis);
-                imageView.setImage(image);
-                imageView.setFitWidth(200);
-                imageView.setFitHeight(250);
-                imageView.setPreserveRatio(true);
-                Label nameLabel= new Label(this.currMovieInfo.getName());
-                nameLabel.setAlignment(Pos.CENTER);
-
-                VBox imageContainer = new VBox();
-                imageContainer.getChildren().addAll(imageView,nameLabel);
-                imageContainer.setAlignment(Pos.CENTER);
-
-                //add tooltip
-                Tooltip tooltip = new Tooltip(this.currMovieInfo.getName());
-                Tooltip.install(imageView,tooltip);
-
-                imageHBox.getChildren().add(imageContainer);
-                imageHBox.setAlignment(Pos.CENTER);
-
-            }catch(Exception e){
-                e.printStackTrace();
-            }
-        }
-    }*/
 
     @Subscribe
     public void catchMovieInfoList(MovieInfoListEvent event){
@@ -189,8 +157,8 @@ public class CinemaController {
                     imageContainer.getChildren().addAll(imageView, nameLabel);
                     imageContainer.setAlignment(Pos.CENTER);
                     imageContainer.setMaxWidth(220);
-                    imageContainer.setMaxHeight(300);
-                    imageView.setStyle("-fx-border-color: black; -fx-border-width: 3;-fx-padding: 0");
+                    imageContainer.setMaxHeight(260);
+                    imageContainer.setStyle("-fx-border-color: black; -fx-border-width: 3;-fx-padding: 0");
 
 
 
@@ -219,7 +187,6 @@ public class CinemaController {
     void changeToUpdateScreen(ActionEvent event) throws IOException {
         EventBus.getDefault().unregister(this);
         try {
-            askDB("remove client");
             Parent root = FXMLLoader.load(getClass().getResource("/updateTimeScreen.fxml"));
             stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
             scene = new Scene(root, 1280, 800);

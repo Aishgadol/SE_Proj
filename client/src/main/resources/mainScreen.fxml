@@ -18,14 +18,14 @@
                <Font name="Constantia" size="96.0" />
             </font>
          </Label>
-         <Button fx:id="updateButton" alignment="CENTER" layoutX="1141.0" layoutY="51.0" mnemonicParsing="false" onAction="#changeToUpdateScreen" prefHeight="98.0" prefWidth="125.0" style="-fx-border-color: black; -fx-background-color: crimson; -fx-border-width: 2;" text="UPDATE DISPLAY TIMES" textAlignment="CENTER" textFill="WHITE" wrapText="true">
+         <Button fx:id="updateButton" alignment="CENTER" layoutX="1098.0" layoutY="51.0" mnemonicParsing="false" onAction="#changeToUpdateScreen" prefHeight="98.0" prefWidth="169.0" style="-fx-border-color: black; -fx-background-color: crimson; -fx-border-width: 2;" text="UPDATE PAGE" textAlignment="CENTER" textFill="WHITE" wrapText="true">
             <font>
                <Font size="18.0" />
             </font>
          </Button>
-         <ScrollPane fx:id="imageScrollPane" layoutX="80.0" layoutY="292.0" prefHeight="391.0" prefWidth="1134.0" vbarPolicy="NEVER">
+         <ScrollPane fx:id="imageScrollPane" layoutX="80.0" layoutY="292.0" prefHeight="335.0" prefWidth="1134.0" vbarPolicy="NEVER">
             <content>
-               <HBox fx:id="imageHBox" alignment="CENTER" prefHeight="391.0" prefWidth="1134.0" spacing="25.0" />
+               <HBox fx:id="imageHBox" alignment="CENTER" prefHeight="335.0" prefWidth="1134.0" spacing="25.0" />
             </content>
          </ScrollPane>
       </AnchorPane>

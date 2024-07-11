@@ -50,49 +50,39 @@ public class UpdateController{
     private DatePicker datePicker;
     @FXML
     private ImageView background;
-
     @FXML
     private ComboBox<String> titlesComboBox;
-
     @FXML
     private ListView<String> myListView;
-
     @FXML
     private Button addTimeButton;
-
     @FXML
     private Label addLabel;
-
     @FXML
     private ComboBox<String> availableTimesComboBox;
-
     @FXML
     private Button removeTimeButton;
-
     @FXML
     private Label removeLabel;
-
     @FXML
     private ComboBox<String> timePicker;
-
+    @FXML
+    private Button removeMovieButton;
+    @FXML
+    private Button addMovieButton;
 
     @FXML
-    void timeToAddWasChosen(){
-
-    }
+    void timeToAddWasChosen(){}
     @FXML
-    void dateToAddWasChosen(){
+    void dateToAddWasChosen(){}
 
-    }
     @FXML
     void removeTimeButtonPressed(ActionEvent event){
-
         String displayDateToRemove=availableTimesComboBox.getValue();
         askDB("removetime "+displayDateToRemove);
         resetAll();
         updateAll();
     }
-
 
     @FXML
     void addTimeButtonPressed(ActionEvent event){
@@ -104,8 +94,28 @@ public class UpdateController{
     }
 
     @FXML
-    void timeToRemoveSelected(ActionEvent event){
+    void timeToRemoveSelected(ActionEvent event){}
 
+    @FXML
+    private void removeMovieButtonPressed(ActionEvent event){
+
+    }
+
+    @FXML
+    private void addMovieButtonPressed(ActionEvent event){
+        EventBus.getDefault().unregister(this);
+        try {
+            Parent root = FXMLLoader.load(getClass().getResource("/addMovieScreen.fxml"));
+            stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
+            scene = new Scene(root, 600, 600);
+            stage.setScene(scene);
+            stage.setResizable(false);
+            stage.setTitle("Add Movie");
+            stage.show();
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
     }
 
     @FXML
@@ -212,6 +222,7 @@ public class UpdateController{
             }
         }
     }
+
     @Subscribe
     public void catchBackgroundImage(BackgroundImageEvent event){
         byte[] data=event.getMessage().getImageData();
@@ -222,7 +233,6 @@ public class UpdateController{
     void goBackButton(ActionEvent event) throws IOException {
         EventBus.getDefault().unregister(this);
         try {
-            askDB("remove client");
             Parent root = FXMLLoader.load(getClass().getResource("/mainScreen.fxml"));
             stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
             scene = new Scene(root, 1280, 800);
@@ -251,13 +261,7 @@ public class UpdateController{
     void initialize(){
         EventBus.getDefault().register(this);
         msgId=0;
-        try {
-			Message message = new Message(msgId, "add client");
-			SimpleClient.getClient().sendToServer(message);
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+
         //initialization of datepicker
         LocalDate minDate=LocalDate.now();
         LocalDate maxDate=minDate.plusYears(1);

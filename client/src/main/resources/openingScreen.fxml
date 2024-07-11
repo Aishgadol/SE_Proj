@@ -6,16 +6,16 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<VBox fx:id="openingScreen" alignment="CENTER" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="800.0" prefWidth="1280.0" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="client.OpeningController">
+<VBox fx:id="openingScreen" alignment="CENTER" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="client.OpeningController">
    <children>
-      <AnchorPane>
+      <AnchorPane fx:id="myAnchor" prefHeight="600.0" prefWidth="600.0">
          <children>
-            <Label layoutX="467.0" layoutY="-6.0" text="WELCOME TO CINEMA">
+            <Label fx:id="welcomeLabel" layoutX="121.0" layoutY="136.0" text="WELCOME TO CINEMA">
                <font>
                   <Font size="35.0" />
                </font>
             </Label>
-            <ImageView fx:id="myImageView" fitHeight="236.0" fitWidth="270.0" layoutX="511.0" layoutY="72.0" pickOnBounds="true" />
+            <ImageView fx:id="myImageView" fitHeight="313.0" fitWidth="435.0" layoutX="83.0" layoutY="212.0" pickOnBounds="true" />
          </children>
       </AnchorPane>
    </children>
