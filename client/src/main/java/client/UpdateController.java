@@ -10,11 +10,13 @@ import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.Scene;
 import javafx.scene.Parent;
+import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import javafx.scene.control.Alert;
 
+import java.io.ByteArrayInputStream;
 import java.time.LocalDate;
 import javafx.util.Callback;
 import javafx.scene.control.Button;
@@ -42,7 +44,8 @@ public class UpdateController{
 
     @FXML
     private Button backButton;
-
+    @FXML
+    private ImageView backgroundImageView;
     @FXML
     private DatePicker datePicker;
     @FXML
@@ -191,6 +194,31 @@ public class UpdateController{
     }
 
     @FXML
+    private void setBackground(byte[] data){
+        if(data!=null){
+            try{
+                Platform.runLater(()->{
+                ByteArrayInputStream bis = new ByteArrayInputStream(data);
+                Image image=new Image(bis);
+                this.backgroundImageView.setImage(image);
+                this.backgroundImageView.setOpacity(0.2);
+                this.backgroundImageView.setFitWidth(1280);
+                this.backgroundImageView.setFitHeight(800);
+                this.backgroundImageView.setPreserveRatio(false);
+
+                });
+            }catch(Exception e){
+                e.printStackTrace();
+            }
+        }
+    }
+    @Subscribe
+    public void catchBackgroundImage(BackgroundImageEvent event){
+        byte[] data=event.getMessage().getImageData();
+        setBackground(data);
+    }
+
+    @FXML
     void goBackButton(ActionEvent event) throws IOException {
         EventBus.getDefault().unregister(this);
         try {
@@ -253,6 +281,7 @@ public class UpdateController{
         List<String> times=generateTimeSlots();//initialization of timeslots
         timePicker.getItems().addAll(times);
 
+        askDB("getBackgroundImage");
 
 
         askDB("getTitles");

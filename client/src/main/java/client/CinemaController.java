@@ -60,33 +60,16 @@ public class CinemaController {
     @FXML
     private ImageView the_boys_img;
     @FXML
+    private ImageView backgroundImageView;
+    @FXML
     private HBox imageHBox;
 
-
-    @FXML
-    void clickedMargol(MouseEvent event) {askDB("getMovieInfo Margol");}
-
-    @FXML
-    void clickedHouse(MouseEvent event) {askDB("getMovieInfo House of Cards");}
-
-    @FXML
-    void clickedPulpFiction(MouseEvent event) {askDB("getMovieInfo Pulp Fiction");}
-
-    @FXML
-    void clickedScaryMovie(MouseEvent event) {askDB("getMovieInfo Scary Movie 5");}
-
-    @FXML
-    void clickedTheBoys(MouseEvent event) {
-        askDB("getMovieInfo The Boys");
-    }
-
-    @FXML
-    void clickedAutomobiles(MouseEvent event){
-        askDB("getMovieInfo Automobiles");
-    }
-
-
-    private void popMessageWithMovieInfo(){
+    private void popMessageWithMovieInfo(String title){
+        for(MovieInfo m: this.currMovieInfos){
+            if(m.getName().equals(title)){
+                this.currMovieInfo=m;
+            }
+        }
         Platform.runLater(()->{
             Alert alert = new Alert(AlertType.INFORMATION);
             alert.setTitle("Information on "+this.currMovieInfo.getName());
@@ -104,7 +87,6 @@ public class CinemaController {
     @Subscribe
     public void catchMovieInfo(MovieInfoEvent event){
         this.currMovieInfo=event.getMessage().getMovieInfo();
-        popMessageWithMovieInfo();
     }
 
 
@@ -150,53 +132,67 @@ public class CinemaController {
             }
         }
     }*/
+
     @Subscribe
     public void catchMovieInfoList(MovieInfoListEvent event){
         this.currMovieInfos=event.getMessage().getList();
+        displayAllMovies();
     }
 
-    @FXML
     @Subscribe
     public void catchBackgroundImage(BackgroundImageEvent event){
         byte[] data=event.getMessage().getImageData();
+        setBackground(data);
+    }
+
+    @FXML
+    private void setBackground(byte[] data){
         if(data!=null){
             try{
+                Platform.runLater(()->{
                 ByteArrayInputStream bis = new ByteArrayInputStream(data);
                 Image image=new Image(bis);
-                ImageView imageView=new ImageView(image);
-                imageView.setOpacity(0.25);
-                homeScreen.getChildren().add(imageView);
-                AnchorPane.setTopAnchor(imageView,0.0);
-                AnchorPane.setLeftAnchor(imageView,0.0);
-                imageView.setFitWidth(homeScreen.getWidth());
-                imageView.setFitHeight(homeScreen.getHeight());
+                this.backgroundImageView.setImage(image);
+                this.backgroundImageView.setOpacity(0.2);
+                this.backgroundImageView.setFitWidth(1280);
+                this.backgroundImageView.setFitHeight(800);
+                this.backgroundImageView.setPreserveRatio(false);
 
+                });
             }catch(Exception e){
                 e.printStackTrace();
             }
         }
-
     }
-    
+
     @FXML
     private void displayAllMovies() {
         for (MovieInfo movieInfo : this.currMovieInfos) {
             byte[] data = movieInfo.getImageData();
-            ImageView imageView = new ImageView();
             if (data != null) {
                 try {
+                    Platform.runLater(()->{
                     ByteArrayInputStream bis = new ByteArrayInputStream(data);
                     Image image = new Image(bis);
-                    imageView.setImage(image);
+                    ImageView imageView = new ImageView(image);
                     imageView.setFitWidth(200);
                     imageView.setFitHeight(250);
-                    imageView.setPreserveRatio(true);
+                    imageView.setPreserveRatio(false);
+                    imageView.setOnMouseClicked(this::handleImageClick);
+                    imageView.setId(movieInfo.getName());
+
                     Label nameLabel = new Label(movieInfo.getName());
+                    nameLabel.setStyle("-fx-font-family: Constantia; -fx-font-size: 19px; -fx-font-weight: bold;"); // Set font size and make text bold
                     nameLabel.setAlignment(Pos.CENTER);
 
                     VBox imageContainer = new VBox();
                     imageContainer.getChildren().addAll(imageView, nameLabel);
                     imageContainer.setAlignment(Pos.CENTER);
+                    imageContainer.setMaxWidth(220);
+                    imageContainer.setMaxHeight(300);
+                    imageView.setStyle("-fx-border-color: black; -fx-border-width: 3;-fx-padding: 0");
+
+
 
                     //add tooltip
                     Tooltip tooltip = new Tooltip(movieInfo.getName());
@@ -204,12 +200,19 @@ public class CinemaController {
 
                     imageHBox.getChildren().add(imageContainer);
                     imageHBox.setAlignment(Pos.CENTER);
-
+                    });
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
             }
         }
+    }
+
+    @FXML
+    private void handleImageClick(MouseEvent event){
+        ImageView clickedImageView=(ImageView) event.getSource();
+        String title=clickedImageView.getId();
+        popMessageWithMovieInfo(title);
     }
 
     @FXML
@@ -236,6 +239,5 @@ public class CinemaController {
         msgId=0;
         askDB("getBackgroundImage");
         askDB("getTitles");
-        displayAllMovies();
     }
 }

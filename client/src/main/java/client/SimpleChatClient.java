@@ -1,5 +1,6 @@
 package client;
 
+import entities.Message;
 import javafx.animation.PauseTransition;
 import javafx.application.Application;
 import javafx.application.Platform;
@@ -30,6 +31,7 @@ public class SimpleChatClient extends Application {
     	EventBus.getDefault().register(this);
     	client = SimpleClient.getClient();
     	client.openConnection();
+        client.sendToServer(new Message(0,"add client"));
         primaryStage=stage;
         scene=new Scene(loadFXML("openingScreen"),1280,800);
         primaryStage.setScene(scene);

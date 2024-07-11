@@ -244,9 +244,12 @@ public class SimpleServer extends AbstractServer {
 		List<Movie> movies=getMoviesFromDB();
 		for(Movie m: movies){
 			MovieInfo mi=new MovieInfo(m.getName(),m.getReleasedate());
+			//add display times from movie to movieinfo
 			for(DisplayTime d: m.getDisplayTimes()){
 				mi.addDisplayTime(d.getDisplayTime());
 			}
+			//add image from files to movieinfo
+			mi.setImageData(getImageByTitleAsByteArray(m.getName().replaceAll(" ","_").toLowerCase()));
 			this.movieInfos.add(mi);
 		}
 	}
@@ -305,7 +308,7 @@ public class SimpleServer extends AbstractServer {
 				message.setMessage("opening image");
 				client.sendToClient(message);
 			}
-			else if(request.startsWith("getBackgroundImag")){
+			else if(request.startsWith("getBackgroundImage")){
 				message.setImageData(getImageByTitleAsByteArray("namal"));
 				message.setMessage("background image");
 				client.sendToClient(message);
