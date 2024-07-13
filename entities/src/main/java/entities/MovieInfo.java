@@ -1,7 +1,9 @@
 package entities;
 
+import java.awt.*;
 import java.io.Serializable;
 import java.util.*;
+import java.util.List;
 
 public class MovieInfo implements Serializable {
 
@@ -57,5 +59,6 @@ public class MovieInfo implements Serializable {
     public void setImageData(byte[] imageData) {
         this.imageData = imageData;
     }
+
 
 }

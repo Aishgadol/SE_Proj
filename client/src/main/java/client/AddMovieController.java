@@ -220,7 +220,7 @@ public class AddMovieController {
         });
         //listener to allow only normal chars
         this.movieNameTextField.textProperty().addListener((observable, oldValue, newValue) -> {
-            if (!newValue.matches("[a-zA-Z0-9.,' _-]*")) {
+            if (!newValue.matches("[a-zA-Z0-9.,' -]*")) {
                 this.movieNameTextField.setText(oldValue);
             }
         });

@@ -7,6 +7,7 @@ import ocsf.AbstractServer;
 import ocsf.ConnectionToClient;
 import ocsf.SubscribedClient;
 
+import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.File;
@@ -15,6 +16,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
+import java.util.List;
 
 import javax.imageio.ImageIO;
 import javax.persistence.criteria.CriteriaBuilder;
@@ -127,7 +129,9 @@ public class SimpleServer extends AbstractServer {
 		}
 		return null;
 	}
-	private boolean addMovieToDB(MovieInfo movieInfo){
+
+
+	private boolean addMovieToDB(MovieInfo movieInfo) throws IOException {
 		//check if movie is already in movies, no error message sent back cuz not needed
 		for(MovieInfo m:this.movieInfos){
 			if(m.getName().equals(movieInfo.getName())){
@@ -138,7 +142,14 @@ public class SimpleServer extends AbstractServer {
 
 		BufferedImage bi=null;
 		byte[] moviePoster=movieInfo.getImageData();
+		ByteArrayInputStream inputStream=new ByteArrayInputStream(moviePoster);
+		bi=ImageIO.read(inputStream);
+		File outputFile = new File("src/main/resources/"+movieInfo.getName().replaceAll(" ","_").toLowerCase()+".jpg");
+		ImageIO.write(bi,"jpg",outputFile);
+
 		//convert byte[] to BufferedImage so we can save it (we need to save the poster for loading after)
+		/*
+
 		try(ByteArrayInputStream bais=new ByteArrayInputStream(moviePoster)){
 			bi= ImageIO.read(bais);
 		}catch(IOException e){
@@ -150,8 +161,7 @@ public class SimpleServer extends AbstractServer {
 			ImageIO.write(bi,"jpg",outputFile);
 		}catch(IOException e){
 			e.printStackTrace();
-		}
-
+		}*/
 
 
 		this.movieInfos.add(movieInfo);
@@ -288,6 +298,7 @@ public class SimpleServer extends AbstractServer {
 
 	private void setMovieInfos(){
 		this.movieInfos=new ArrayList<>();
+		byte[] movieImageByteArray=null;
 		List<Movie> movies=getMoviesFromDB();
 		for(Movie m: movies){
 			MovieInfo mi=new MovieInfo(m.getName(),m.getReleasedate());
@@ -296,7 +307,8 @@ public class SimpleServer extends AbstractServer {
 				mi.addDisplayTime(d.getDisplayTime());
 			}
 			//add image from files to movieinfo
-			mi.setImageData(getImageByTitleAsByteArray(m.getName().replaceAll(" ","_").toLowerCase()));
+			movieImageByteArray=getImageByTitleAsByteArray(m.getName().replaceAll(" ","_").toLowerCase());
+			mi.setImageData(movieImageByteArray);
 			this.movieInfos.add(mi);
 		}
 	}
