@@ -8,14 +8,14 @@
 
 <VBox fx:id="openingScreen" alignment="CENTER" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="client.OpeningController">
    <children>
-      <AnchorPane fx:id="myAnchor" prefHeight="600.0" prefWidth="600.0">
+      <AnchorPane fx:id="myAnchor" blendMode="SRC_ATOP" prefHeight="600.0" prefWidth="600.0">
          <children>
-            <Label fx:id="welcomeLabel" layoutX="121.0" layoutY="136.0" text="WELCOME TO CINEMA">
+            <ImageView fx:id="myImageView" fitHeight="598.0" fitWidth="597.0" pickOnBounds="true" />
+            <Label fx:id="welcomeLabel" layoutX="27.0" layoutY="64.0" style="-fx-background-color: gold;" text="WELCOME TO CINEMA" textAlignment="CENTER" textFill="#8c3131">
                <font>
-                  <Font size="35.0" />
+                  <Font name="Constantia" size="50.0" />
                </font>
             </Label>
-            <ImageView fx:id="myImageView" fitHeight="313.0" fitWidth="435.0" layoutX="83.0" layoutY="212.0" pickOnBounds="true" />
          </children>
       </AnchorPane>
    </children>

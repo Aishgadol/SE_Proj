@@ -2,14 +2,14 @@ package client;
 
 import entities.Message;
 
-public class OpeningPictureEvent {
+public class OpeningGifEvent {
     private Message message;
 
     public Message getMessage() {
         return message;
     }
 
-    public OpeningPictureEvent(Message message) {
+    public OpeningGifEvent(Message message) {
         this.message = message;
     }
 }

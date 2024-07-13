@@ -33,7 +33,7 @@ public class OpeningController{
     private Label welcomeLabel;
 
     @Subscribe
-    public void catchOpeningPictureAndDisplay(OpeningPictureEvent event){
+    public void catchOpeningGifAndDisplay(OpeningGifEvent event){
         byte[] data=event.getMessage().getImageData();
         if(data!=null){
             try{
@@ -52,7 +52,7 @@ public class OpeningController{
     @FXML
     void initialize(){
         EventBus.getDefault().register(this);
-        Message message=new Message(1,"getOpeningImage");
+        Message message=new Message(1,"getOpeningGif");
         try {
             SimpleClient.getClient().sendToServer(message);
         }catch(Exception e){

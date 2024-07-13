@@ -36,6 +36,7 @@ public class SimpleServer extends AbstractServer {
 	private static SessionFactory sessionFactory;
 	private MovieInfo currMovieInfo;
 	private Movie currMovie;
+	private boolean gifMode=false;
 	private List<MovieInfo> movieInfos=new ArrayList<>();
 	private List<DisplayTime> currDisplayTimes=new ArrayList<>();
 
@@ -127,11 +128,14 @@ public class SimpleServer extends AbstractServer {
 		return null;
 	}
 	private boolean addMovieToDB(MovieInfo movieInfo){
+		//check if movie is already in movies, no error message sent back cuz not needed
 		for(MovieInfo m:this.movieInfos){
 			if(m.getName().equals(movieInfo.getName())){
 				return false;
 			}
 		}
+
+
 		BufferedImage bi=null;
 		byte[] moviePoster=movieInfo.getImageData();
 		//convert byte[] to BufferedImage so we can save it (we need to save the poster for loading after)
@@ -147,6 +151,9 @@ public class SimpleServer extends AbstractServer {
 		}catch(IOException e){
 			e.printStackTrace();
 		}
+
+
+
 		this.movieInfos.add(movieInfo);
 		Movie movie=new Movie(movieInfo);
 		session.save(movie);
@@ -263,7 +270,13 @@ public class SimpleServer extends AbstractServer {
 
 	//BIG NOTE: TITLE MUST BE ALL LOWERCASE, WITH _ INSTEAD OF SPACES
 	private byte[] getImageByTitleAsByteArray(String title){
-		Path path= Paths.get("src/main/resources/"+title+".jpg");
+		Path path;
+		if(gifMode){
+			path=Paths.get("src/main/resources/"+title+".gif");
+		}
+		else {
+			path = Paths.get("src/main/resources/" + title + ".jpg");
+		}
 		byte[] imageData=null;
 		try {
 			imageData = Files.readAllBytes(path);
@@ -345,6 +358,13 @@ public class SimpleServer extends AbstractServer {
 			else if(request.startsWith("getBackgroundImage")){
 				message.setImageData(getImageByTitleAsByteArray("namal"));
 				message.setMessage("background image");
+				client.sendToClient(message);
+			}
+			else if(request.startsWith("getOpeningGif")){
+				gifMode=true;
+				message.setImageData(getImageByTitleAsByteArray("popCorn"));
+				gifMode=false;
+				message.setMessage("opening gif");
 				client.sendToClient(message);
 			}
 			else if(request.startsWith("addMovie")){

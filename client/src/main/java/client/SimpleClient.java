@@ -36,9 +36,6 @@ public class SimpleClient extends AbstractClient {
 		else if(message.getMessage().startsWith("updatedtimes")){
 			EventBus.getDefault().post(new TimeUpdateEvent(message));
 		}
-		else if(message.getMessage().startsWith("opening image")){
-			EventBus.getDefault().post(new OpeningPictureEvent(message));
-		}
 		else if(message.getMessage().startsWith("background image")){
 			EventBus.getDefault().post(new BackgroundImageEvent(message));
 		}
@@ -51,9 +48,13 @@ public class SimpleClient extends AbstractClient {
 		else if(message.getMessage().startsWith("movie removed")){
 			EventBus.getDefault().post(new MovieRemovedSuccesfullyEvent(message));
 		}
+		else if(message.getMessage().startsWith("opening gif")){
+			EventBus.getDefault().post((new OpeningGifEvent(message)));
+		}
 		else {
 			EventBus.getDefault().post(new MessageEvent(message));
 		}
+
 	}
 
 
