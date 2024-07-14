@@ -98,6 +98,19 @@ public class UpdateController{
 
     @FXML
     private void removeMovieButtonPressed(ActionEvent event){
+        EventBus.getDefault().unregister(this);
+        try {
+            Parent root = FXMLLoader.load(getClass().getResource("/removeMovieScreen.fxml"));
+            stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
+            scene = new Scene(root, 600, 600);
+            stage.setScene(scene);
+            stage.setResizable(false);
+            stage.setTitle("Remove Movie");
+            stage.show();
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
 
     }
 

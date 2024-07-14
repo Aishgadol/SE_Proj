@@ -148,7 +148,7 @@ public class SimpleServer extends AbstractServer {
 		return null;
 	}
 
-
+	//this func handles both adding movie object to movie table and movieimage object to movie_images table
 	private boolean addMovieToDB(MovieInfo movieInfo) throws IOException {
 		//check if movie is already in movies, no error message sent back cuz not needed
 		for(MovieInfo m:this.movieInfos){
@@ -167,9 +167,13 @@ public class SimpleServer extends AbstractServer {
 		return true;
 	}
 
+	//this func handles both removing movie object from movie table and movieimage object from movie_images table
 	private void removeMovieFromDB(String name){
 
 	}
+
+
+
 	// updates display time for the current movie selected
 	public void addDisplayTimeToDB(String time){
 		this.currMovie=getMovieByTitleFromDB(this.currMovie.getName());

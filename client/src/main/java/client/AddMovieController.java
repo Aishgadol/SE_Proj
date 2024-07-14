@@ -164,6 +164,7 @@ public class AddMovieController {
         byte[] data=event.getMessage().getImageData();
         setBackground(data);
     }
+
     @Subscribe
     public void catchMovieAdded(MovieAddedSuccesfullyEvent event){
         Platform.runLater(()->{
