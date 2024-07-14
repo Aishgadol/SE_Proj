@@ -7,7 +7,6 @@ import ocsf.AbstractServer;
 import ocsf.ConnectionToClient;
 import ocsf.SubscribedClient;
 
-import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.File;
@@ -48,6 +47,7 @@ public class SimpleServer extends AbstractServer {
 		configuration.addAnnotatedClass(Msg.class);
 		configuration.addAnnotatedClass(Movie.class);
 		configuration.addAnnotatedClass(DisplayTime.class);
+		configuration.addAnnotatedClass(MovieImage.class);
 
 		ServiceRegistry serviceRegistry=new StandardServiceRegistryBuilder().applySettings(configuration.getProperties()).build();
 		return configuration.buildSessionFactory(serviceRegistry);
@@ -55,19 +55,31 @@ public class SimpleServer extends AbstractServer {
 
 	//only use these functions if protoype database gets deleted, it should not happen.
 	/*
-	public static void generateMovies() throws Exception {
+	public void generateMovies() throws Exception {
 			Movie movie1=new Movie("Margol","1973");
+			MovieImage mi1=new MovieImage("Margol",getImageFromFilesByTitleAsByteArray("margol"));
+			session.save(mi1);
 			session.save(movie1);
 			Movie movie2=new Movie("The Boys","2018");
+			MovieImage mi2=new MovieImage("The Boys",getImageFromFilesByTitleAsByteArray("the_boys"));
 			session.save(movie2);
+			session.save(mi2);
 			Movie movie3=new Movie("Scary Movie 5","2012");
+			MovieImage mi3=new MovieImage("Scary Movie 5", getImageFromFilesByTitleAsByteArray("scary_movie_5"));
 			session.save(movie3);
+			session.save(mi3);
 			Movie movie4=new Movie("House of Cards","2006");
+			MovieImage mi4=new MovieImage("House of Cards",getImageFromFilesByTitleAsByteArray("house_of_cards"));
 			session.save(movie4);
+			session.save(mi4);
 			Movie movie5=new Movie("Pulp Fiction","1969");
+			MovieImage mi5=new MovieImage("Pulp Fiction",getImageFromFilesByTitleAsByteArray("pulp_fiction"));
 			session.save(movie5);
+			session.save(mi5);
 			Movie movie6=new Movie("Automobiles","2024");
+			MovieImage mi6=new MovieImage("Automobiles",getImageFromFilesByTitleAsByteArray("automobiles"));
 			session.save(movie6);
+			session.save(mi6);
             session.flush();
 	}*/
 
@@ -75,6 +87,12 @@ public class SimpleServer extends AbstractServer {
 		CriteriaBuilder builder=session.getCriteriaBuilder();
 		CriteriaQuery<Movie> query=builder.createQuery(Movie.class);
 		query.from(Movie.class);
+        return session.createQuery(query).getResultList();
+	}
+	private List<MovieImage> getMovieImagesFromDB(){
+		CriteriaBuilder builder=session.getCriteriaBuilder();
+		CriteriaQuery<MovieImage> query=builder.createQuery(MovieImage.class);
+		query.from(MovieImage.class);
         return session.createQuery(query).getResultList();
 	}
 
@@ -138,34 +156,10 @@ public class SimpleServer extends AbstractServer {
 				return false;
 			}
 		}
-
-
-		BufferedImage bi=null;
-		byte[] moviePoster=movieInfo.getImageData();
-		ByteArrayInputStream inputStream=new ByteArrayInputStream(moviePoster);
-		bi=ImageIO.read(inputStream);
-		File outputFile = new File("src/main/resources/"+movieInfo.getName().replaceAll(" ","_").toLowerCase()+".jpg");
-		ImageIO.write(bi,"jpg",outputFile);
-
-		//convert byte[] to BufferedImage so we can save it (we need to save the poster for loading after)
-		/*
-
-		try(ByteArrayInputStream bais=new ByteArrayInputStream(moviePoster)){
-			bi= ImageIO.read(bais);
-		}catch(IOException e){
-			e.printStackTrace();
-		}
-		//now we save the file to src/main/resoucres
-		try{
-			File outputFile=new File("src/main/resources/"+movieInfo.getName().replaceAll(" ","_").toLowerCase()+".jpg");
-			ImageIO.write(bi,"jpg",outputFile);
-		}catch(IOException e){
-			e.printStackTrace();
-		}*/
-
-
+		MovieImage mi=new MovieImage(movieInfo.getName(),movieInfo.getImageData());
 		this.movieInfos.add(movieInfo);
 		Movie movie=new Movie(movieInfo);
+		session.save(mi);
 		session.save(movie);
 		session.flush();
 		session.getTransaction().commit();
@@ -279,7 +273,7 @@ public class SimpleServer extends AbstractServer {
 	}
 
 	//BIG NOTE: TITLE MUST BE ALL LOWERCASE, WITH _ INSTEAD OF SPACES
-	private byte[] getImageByTitleAsByteArray(String title){
+	private byte[] getImageFromFilesByTitleAsByteArray(String title){
 		Path path;
 		if(gifMode){
 			path=Paths.get("src/main/resources/"+title+".gif");
@@ -300,15 +294,20 @@ public class SimpleServer extends AbstractServer {
 		this.movieInfos=new ArrayList<>();
 		byte[] movieImageByteArray=null;
 		List<Movie> movies=getMoviesFromDB();
+		List<MovieImage> movieImages=getMovieImagesFromDB();
 		for(Movie m: movies){
 			MovieInfo mi=new MovieInfo(m.getName(),m.getReleasedate());
 			//add display times from movie to movieinfo
 			for(DisplayTime d: m.getDisplayTimes()){
 				mi.addDisplayTime(d.getDisplayTime());
 			}
-			//add image from files to movieinfo
-			movieImageByteArray=getImageByTitleAsByteArray(m.getName().replaceAll(" ","_").toLowerCase());
-			mi.setImageData(movieImageByteArray);
+			//add image from list to movieinfo
+			for(MovieImage mx : movieImages){
+				if(mx.getName().equals(m.getName())){
+					mi.setImageData(mx.getImageData());
+					break;
+				}
+			}
 			this.movieInfos.add(mi);
 		}
 	}
@@ -362,19 +361,14 @@ public class SimpleServer extends AbstractServer {
 				message.setMessage("updatedtimes");
 				sendToAllClients(message);
 			}
-			else if(request.startsWith("getOpeningImage")){
-				message.setImageData(getImageByTitleAsByteArray("cinemapicture"));
-				message.setMessage("opening image");
-				client.sendToClient(message);
-			}
 			else if(request.startsWith("getBackgroundImage")){
-				message.setImageData(getImageByTitleAsByteArray("namal"));
+				message.setImageData(getImageFromFilesByTitleAsByteArray("namal"));
 				message.setMessage("background image");
 				client.sendToClient(message);
 			}
 			else if(request.startsWith("getOpeningGif")){
 				gifMode=true;
-				message.setImageData(getImageByTitleAsByteArray("popCorn"));
+				message.setImageData(getImageFromFilesByTitleAsByteArray("popCorn"));
 				gifMode=false;
 				message.setMessage("opening gif");
 				client.sendToClient(message);
