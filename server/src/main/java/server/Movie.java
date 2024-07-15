@@ -6,6 +6,7 @@ import entities.MovieInfo;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 
@@ -77,16 +78,24 @@ public class Movie implements Serializable {
         }
         this.displayTimes.add(displayTime);
     }
-    public void removeDisplayTime(DisplayTime displayTime){
+
+
+    public void removeDisplayTime(DisplayTime d) {
         boolean found=false;
-        for(DisplayTime d : this.displayTimes){
-            if (d.getDisplayTime().equals(displayTime.getDisplayTime())) {
+        for(DisplayTime d1:this.displayTimes){
+            if(d1.getDisplayTime().equals(d.getDisplayTime())){
                 found=true;
                 break;
             }
         }
         if(found) {
-            this.displayTimes.remove(displayTime);
+            Iterator<DisplayTime> iterator = this.displayTimes.iterator();
+            while (iterator.hasNext()) {
+                DisplayTime obj = iterator.next();
+                if (obj.getDisplayTime().equals(d.getDisplayTime())) {
+                    iterator.remove();
+                }
+            }
         }
-    }
+	}
 }

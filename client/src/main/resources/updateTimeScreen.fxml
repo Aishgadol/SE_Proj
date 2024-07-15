@@ -20,30 +20,30 @@
                </font>
             </Button>
             <ComboBox fx:id="titlesComboBox" layoutX="106.0" layoutY="96.0" onAction="#MovieHasBeenSelected" prefHeight="48.0" prefWidth="332.0" promptText="Choose Movie to Change Display Times" />
-         <Button fx:id="removeTimeButton" layoutX="389.0" layoutY="584.0" mnemonicParsing="false" onAction="#removeTimeButtonPressed" prefHeight="92.0" prefWidth="98.0" style="-fx-background-color: yellow; -fx-border-color: black; -fx-border-width: 3;" text="Remove Selected Time" textAlignment="CENTER" wrapText="true">
+         <Button fx:id="removeTimeButton" layoutX="389.0" layoutY="584.0" mnemonicParsing="false" onAction="#removeTimeButtonPressed" prefHeight="92.0" prefWidth="98.0" style="-fx-background-color: yellow; -fx-border-color: black; -fx-border-width: 3;" text="Remove Selected Time" textAlignment="CENTER" visible="false" wrapText="true">
             <font>
                <Font size="15.0" />
             </font>
          </Button>
-         <Label fx:id="removeLabel" layoutX="318.0" layoutY="456.0" prefHeight="30.0" prefWidth="262.0" style="-fx-background-color: yellow; -fx-border-color: black; -fx-border-width: 2;" text="Select Display Time to Remove" textAlignment="JUSTIFY">
+         <Label fx:id="removeLabel" layoutX="318.0" layoutY="456.0" prefHeight="30.0" prefWidth="262.0" style="-fx-background-color: yellow; -fx-border-color: black; -fx-border-width: 2;" text="Select Display Time to Remove" textAlignment="JUSTIFY" visible="false">
             <font>
                <Font size="19.0" />
             </font>
          </Label>
-         <ComboBox fx:id="availableTimesComboBox" layoutX="340.0" layoutY="524.0" onAction="#timeToRemoveSelected" prefHeight="42.0" prefWidth="218.0" promptText="Select Display Time to remove" style="-fx-background-color: pink; -fx-border-color: black; -fx-border-width: 2;" />
-         <Button fx:id="addTimeButton" layoutX="108.0" layoutY="669.0" mnemonicParsing="false" onAction="#addTimeButtonPressed" prefHeight="92.0" prefWidth="98.0" style="-fx-background-color: yellow; -fx-border-color: black; -fx-border-width: 3;" text="Add Chosen Time" textAlignment="CENTER" wrapText="true">
+         <ComboBox fx:id="availableTimesComboBox" layoutX="340.0" layoutY="524.0" onAction="#timeToRemoveSelected" prefHeight="42.0" prefWidth="218.0" promptText="Select Display Time to remove" style="-fx-background-color: pink; -fx-border-color: black; -fx-border-width: 2;" visible="false" />
+         <Button fx:id="addTimeButton" layoutX="108.0" layoutY="669.0" mnemonicParsing="false" onAction="#addTimeButtonPressed" prefHeight="92.0" prefWidth="98.0" style="-fx-background-color: yellow; -fx-border-color: black; -fx-border-width: 3;" text="Add Chosen Time" textAlignment="CENTER" visible="false" wrapText="true">
             <font>
                <Font size="15.0" />
             </font>
          </Button>
-         <Label fx:id="addLabel" layoutX="48.0" layoutY="456.0" prefHeight="36.0" prefWidth="232.0" style="-fx-background-color: yellow; -fx-border-color: black; -fx-border-width: 2;" text="Select Display Time to Add" textAlignment="JUSTIFY">
+         <Label fx:id="addLabel" layoutX="48.0" layoutY="456.0" prefHeight="36.0" prefWidth="232.0" style="-fx-background-color: yellow; -fx-border-color: black; -fx-border-width: 2;" text="Select Display Time to Add" textAlignment="JUSTIFY" visible="false">
             <font>
                <Font size="19.0" />
             </font>
          </Label>
          <ListView fx:id="myListView" layoutX="580.0" layoutY="41.0" prefHeight="414.0" prefWidth="384.0" />
-         <DatePicker fx:id="datePicker" layoutX="48.0" layoutY="602.0" onAction="#dateToAddWasChosen" prefHeight="56.0" prefWidth="217.0" promptText="Choose date" style="-fx-border-color: black; -fx-border-width: 2;" />
-         <ComboBox fx:id="timePicker" layoutX="61.0" layoutY="524.0" onAction="#timeToAddWasChosen" prefHeight="48.0" prefWidth="192.0" style="-fx-border-color: black; -fx-border-width: 2;" />
+         <DatePicker fx:id="datePicker" layoutX="48.0" layoutY="602.0" onAction="#dateToAddWasChosen" prefHeight="56.0" prefWidth="217.0" promptText="Choose date" style="-fx-border-color: black; -fx-border-width: 2;" visible="false" />
+         <ComboBox fx:id="timePicker" layoutX="61.0" layoutY="524.0" onAction="#timeToAddWasChosen" prefHeight="48.0" prefWidth="192.0" style="-fx-border-color: black; -fx-border-width: 2;" visible="false" />
          <Button fx:id="addMovieButton" layoutX="1050.0" layoutY="248.0" mnemonicParsing="false" onAction="#addMovieButtonPressed" prefHeight="134.0" prefWidth="149.0" text="ADD MOVIE">
             <font>
                <Font name="Constantia Bold" size="19.0" />

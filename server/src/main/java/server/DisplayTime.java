@@ -5,6 +5,7 @@ import org.hibernate.annotations.Columns;
 import javax.persistence.*;
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 
@@ -56,7 +57,7 @@ public class DisplayTime implements Serializable {
         movie.addDisplayTime(this);
     }
 
-    public void removeMovie(Movie movie){
+    public void removeMovie(Movie movie) {
         boolean found=false;
         for(Movie m:this.movies){
             if(m.getName().equals(movie.getName())){
@@ -64,9 +65,15 @@ public class DisplayTime implements Serializable {
                 break;
             }
         }
-        if(found){
-            this.movies.remove(movie);
+        if(found) {
+            Iterator<Movie> iterator = this.movies.iterator();
+            while (iterator.hasNext()) {
+                Movie obj = iterator.next();
+                if (obj.getName().equals(movie.getName())) {
+                    iterator.remove();
+                }
+            }
         }
-    }
+	}
 
 }

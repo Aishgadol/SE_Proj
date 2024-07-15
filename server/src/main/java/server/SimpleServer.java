@@ -41,6 +41,7 @@ public class SimpleServer extends AbstractServer {
 	private List<MovieInfo> movieInfos=new ArrayList<>();
 	private List<DisplayTime> currDisplayTimes=new ArrayList<>();
 
+
 	private static SessionFactory getSessionFactory() throws HibernateException{
 		Configuration configuration=new Configuration();
 
@@ -118,6 +119,7 @@ public class SimpleServer extends AbstractServer {
 		return session.createQuery(query).getResultList();
 	}
 
+
 	private MovieInfo getMovieInfoByTitle(String title){
 		for(MovieInfo m : movieInfos){
 			if(m.getName().equals(title)){
@@ -167,10 +169,7 @@ public class SimpleServer extends AbstractServer {
 		return true;
 	}
 
-	//this func handles both removing movie object from movie table and movieimage object from movie_images table
-	private void removeMovieFromDB(String name){
 
-	}
 
 
 
@@ -225,7 +224,51 @@ public class SimpleServer extends AbstractServer {
 		session.beginTransaction();
 	}
 
-	void removeDisplayTimeFromMovieFromDB(String displayTime) {
+	private void removeMovieImageFromDB(String title){
+		List<MovieImage> movieImages=getMovieImagesFromDB();
+		for(MovieImage m:movieImages){
+			if(title.equals(m.getName())){
+				session.delete(m);
+				session.flush();
+				session.getTransaction().commit();
+				session.beginTransaction();
+				return;
+			}
+		}
+	}
+
+
+	//this func handles both removing movie object from movie table and movieimage object from movie_images table
+	private boolean removeMovieFromDB(String name){
+		Movie movieToDelete=getMovieByTitleFromDB(name);
+		try {
+			//make sure all movie's displaytimes know the movie is gone
+			//remove all display times from movie to delete before deletding movie
+			for (DisplayTime d : movieToDelete.getDisplayTimes()) {
+				List<Movie> temp = removeMovieWithName(d.getMovies(), movieToDelete.getName());
+				d.setMovies(temp);
+
+				d.removeMovie(movieToDelete);
+				movieToDelete.removeDisplayTime(d);
+			}
+			this.movieInfos = removeMovieInfoWithName(this.movieInfos, movieToDelete.getName());
+			//delete image of movie from db
+			removeMovieImageFromDB(movieToDelete.getName());
+			session.saveOrUpdate(movieToDelete);
+			session.delete(movieToDelete);
+			session.flush();
+			session.getTransaction().commit();
+			session.beginTransaction();
+			setMovieInfos();
+		}catch(Exception e){
+			e.printStackTrace();
+		}
+			return true;
+
+	}
+
+
+	private void removeDisplayTimeFromMovieFromDB(String displayTime) {
 		this.currMovie = getMovieByTitleFromDB(this.currMovie.getName());
 		this.currMovieInfo = getMovieInfoByTitle(this.currMovie.getName());
 		this.currDisplayTimes = getDisplayTimesFromDB();
@@ -258,7 +301,7 @@ public class SimpleServer extends AbstractServer {
 				this.currMovieInfo.removeDisplayTime(d_movie.getDisplayTime());
 				if (found2){
 					if(d_table.getMovies().isEmpty()){
-						removeObjectWithName(currDisplayTimes, d_table.getDisplayTime());
+						this.currDisplayTimes=removeDisplayTimeWithName(currDisplayTimes, d_table.getDisplayTime());
 						session.delete(d_table);
 					}
 					else{
@@ -275,6 +318,8 @@ public class SimpleServer extends AbstractServer {
 			e.printStackTrace();
 		}
 	}
+
+
 
 	//BIG NOTE: TITLE MUST BE ALL LOWERCASE, WITH _ INSTEAD OF SPACES
 	private byte[] getImageFromFilesByTitleAsByteArray(String title){
@@ -386,6 +431,13 @@ public class SimpleServer extends AbstractServer {
 				}
 				client.sendToClient(message);
 			}
+			else if(request.startsWith("removeMovie")){
+				if(removeMovieFromDB(message.getMovieInfo().getName())){
+					message.setMessage("movie removed succesfully");
+				}
+				sendToAllClients(message);
+
+			}
 			else {
 				addMsgToDB(request);
 				StringBuilder s = new StringBuilder();
@@ -451,7 +503,7 @@ public class SimpleServer extends AbstractServer {
 		}
 	}
 
-	private void removeObjectWithName(List<DisplayTime> list, String nameToRemove) {
+	private List<DisplayTime> removeDisplayTimeWithName(List<DisplayTime> list, String nameToRemove) {
 		Iterator<DisplayTime> iterator = list.iterator();
 		while (iterator.hasNext()) {
 			DisplayTime obj = iterator.next();
@@ -459,5 +511,26 @@ public class SimpleServer extends AbstractServer {
 				iterator.remove();
 			}
 		}
+		return list;
+	}
+	private List<Movie> removeMovieWithName(List<Movie> list, String nameToRemove) {
+		Iterator<Movie> iterator = list.iterator();
+		while (iterator.hasNext()) {
+			Movie obj = iterator.next();
+			if (obj.getName().equals(nameToRemove)) {
+				iterator.remove();
+			}
+		}
+		return list;
+	}
+	private List<MovieInfo> removeMovieInfoWithName(List<MovieInfo> list, String nameToRemove) {
+		Iterator<MovieInfo> iterator = list.iterator();
+		while (iterator.hasNext()) {
+			MovieInfo obj = iterator.next();
+			if (obj.getName().equals(nameToRemove)) {
+				iterator.remove();
+			}
+		}
+	return list;
 	}
 }

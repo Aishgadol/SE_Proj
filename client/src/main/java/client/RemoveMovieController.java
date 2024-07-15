@@ -10,10 +10,7 @@ import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.control.ScrollPane;
-import javafx.scene.control.Tooltip;
+import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
@@ -42,8 +39,6 @@ public class RemoveMovieController {
     @FXML
     private Button cancelSelectionButton;
     @FXML
-    private ImageView movieToRemoveImageView;
-    @FXML
     private Button deleteSelectedMovieButton;
     @FXML
     private ScrollPane imageScrollPane;
@@ -55,6 +50,9 @@ public class RemoveMovieController {
     void askDB(String title){
         try {
             Message message = new Message(msgId++, title);
+            if(title.equals("removeMovie")){
+                message.setMovieInfo(this.movieInfoToDelete);
+            }
             SimpleClient.getClient().sendToServer(message);
         }catch(Exception e){
             e.printStackTrace();
@@ -88,43 +86,55 @@ public class RemoveMovieController {
         }
     }
 
+    @Subscribe
+    public void catchMovieRemovedSuccesfully(MovieRemovedSuccesfullyEvent event){
+        showConfirmationPopup();
+    }
+
+    @FXML
+    private void showConfirmationPopup(){
+        Platform.runLater(()->{
+                Alert alert = new Alert(Alert.AlertType.INFORMATION);
+                alert.setTitle("Movie Removed from database");
+                alert.setHeaderText("A movie has been removed from the database");
+                alert.setContentText("It is done.");
+                alert.show();
+                cancelSelection(new ActionEvent());
+            });
+    }
+
     @FXML
     private void handleImageClick(MouseEvent event){
-        ImageView clickedImageView=(ImageView) event.getSource();
-        String title=clickedImageView.getId();
+        VBox clickedImageImageView=(VBox) event.getSource();
+        String title=clickedImageImageView.getId();
         MovieInfo selectedMovieInfo=null;
         for(MovieInfo m: movieInfos){
             if(m.getName().equals(title)){
                 selectedMovieInfo=m;
             }
         }
-        this.imageHBox.setVisible(false);
-        this.imageScrollPane.setVisible(false);
-        this.selectMovieLabel.setVisible(false);
         cancelSelectionButton.setVisible(true);
-        movieToRemoveImageView.setVisible(true);
         deleteSelectedMovieButton.setVisible(true);
-
-        movieToRemoveImageView.setImage(new Image(new ByteArrayInputStream(selectedMovieInfo.getImageData())));
-
-
+        imageHBox.getChildren().clear();
+        imageHBox.getChildren().add(clickedImageImageView);
+        this.selectMovieLabel.setText("The movie you've selected: ");
+        this.movieInfoToDelete=selectedMovieInfo;
     }
 
     @FXML
     private void cancelSelection(ActionEvent event){
-        movieToRemoveImageView.setImage(null);
-        movieToRemoveImageView.setVisible(false);
         deleteSelectedMovieButton.setVisible(false);
         cancelSelectionButton.setVisible(false);
-        this.imageHBox.setVisible(true);
-        this.imageScrollPane.setVisible(true);
-        this.selectMovieLabel.setVisible(true);
+        this.imageHBox.getChildren().clear();
+        this.selectMovieLabel.setText("Select a movie to delete");
         setMovieInfos();
     }
+
     @FXML
     private void deleteSelectedMovieButtonPressed(ActionEvent event){
-
+        askDB("removeMovie");
     }
+
     @FXML
     private void displayMovies(){
         for (MovieInfo movieInfo : this.movieInfos) {
@@ -138,7 +148,6 @@ public class RemoveMovieController {
                     imageView.setFitWidth(200);
                     imageView.setFitHeight(250);
                     imageView.setPreserveRatio(false);
-                    imageView.setOnMouseClicked(this::handleImageClick);
                     imageView.setId(movieInfo.getName());
 
                     Label nameLabel = new Label(movieInfo.getName());
@@ -150,6 +159,9 @@ public class RemoveMovieController {
                     imageContainer.setAlignment(Pos.CENTER);
                     imageContainer.setMaxWidth(220);
                     imageContainer.setMaxHeight(250);
+                    imageContainer.setId(movieInfo.getName());
+                    imageContainer.setOnMouseClicked(this::handleImageClick);
+
                     imageContainer.setStyle("-fx-border-color: black; -fx-border-width: 3;-fx-padding: 0");
 
 
@@ -200,7 +212,6 @@ public class RemoveMovieController {
         msgId=0;
         askDB("getBackgroundImage");
         cancelSelectionButton.setVisible(false);
-        movieToRemoveImageView.setVisible(false);
         deleteSelectedMovieButton.setVisible(false);
         setMovieInfos();
     }

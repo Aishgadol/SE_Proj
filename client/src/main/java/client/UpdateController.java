@@ -114,6 +114,13 @@ public class UpdateController{
 
     }
 
+    @Subscribe
+    public void catchMovieRemoved(MovieRemovedSuccesfullyEvent event){
+        askDB("getTitles");
+        resetAll();
+        updateAll();
+    }
+
     @FXML
     private void addMovieButtonPressed(ActionEvent event){
         EventBus.getDefault().unregister(this);
@@ -160,6 +167,8 @@ public class UpdateController{
     public void getMoviesFromDB(MovieInfoListEvent event) {
         Message message = event.getMessage();
         this.movieInfos = message.getList();
+        resetAll();
+        updateAll();
         Platform.runLater(() -> {
             for (MovieInfo movieInfo : movieInfos) {
                 titlesComboBox.getItems().add(movieInfo.getName());
