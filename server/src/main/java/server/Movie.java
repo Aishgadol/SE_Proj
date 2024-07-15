@@ -26,6 +26,9 @@ public class Movie implements Serializable {
     @Column
     String releaseDate;
 
+    @Lob
+    byte[] imageData;
+
     @ManyToMany
     @JoinTable(
         name = "movie_display_times",
@@ -69,6 +72,8 @@ public class Movie implements Serializable {
     public void setDisplayTimes(List<DisplayTime> displayTimes){this.displayTimes=displayTimes;}
     public List<DisplayTime> getDisplayTimes(){return this.displayTimes;}
 
+    public void setImageData(byte[] data){this.imageData=data;}
+    public byte[] getImageData(){return this.imageData;}
 
     public void addDisplayTime(DisplayTime displayTime){
         for(DisplayTime d : this.displayTimes){

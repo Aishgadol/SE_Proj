@@ -48,7 +48,6 @@ public class SimpleServer extends AbstractServer {
 		configuration.addAnnotatedClass(Msg.class);
 		configuration.addAnnotatedClass(Movie.class);
 		configuration.addAnnotatedClass(DisplayTime.class);
-		configuration.addAnnotatedClass(MovieImage.class);
 
 		ServiceRegistry serviceRegistry=new StandardServiceRegistryBuilder().applySettings(configuration.getProperties()).build();
 		return configuration.buildSessionFactory(serviceRegistry);
@@ -58,29 +57,23 @@ public class SimpleServer extends AbstractServer {
 	/*
 	public void generateMovies() throws Exception {
 			Movie movie1=new Movie("Margol","1973");
-			MovieImage mi1=new MovieImage("Margol",getImageFromFilesByTitleAsByteArray("margol"));
-			session.save(mi1);
+			movie1.setImageData(getImageFromFilesByTitleAsByteArray("margol"));
 			session.save(movie1);
 			Movie movie2=new Movie("The Boys","2018");
-			MovieImage mi2=new MovieImage("The Boys",getImageFromFilesByTitleAsByteArray("the_boys"));
+			movie2.setImageData(getImageFromFilesByTitleAsByteArray("the_boys"));
 			session.save(movie2);
-			session.save(mi2);
 			Movie movie3=new Movie("Scary Movie 5","2012");
-			MovieImage mi3=new MovieImage("Scary Movie 5", getImageFromFilesByTitleAsByteArray("scary_movie_5"));
+			movie3.setImageData(getImageFromFilesByTitleAsByteArray("scary_movie_5"));
 			session.save(movie3);
-			session.save(mi3);
 			Movie movie4=new Movie("House of Cards","2006");
-			MovieImage mi4=new MovieImage("House of Cards",getImageFromFilesByTitleAsByteArray("house_of_cards"));
+			movie4.setImageData(getImageFromFilesByTitleAsByteArray("house_of_cards"));
 			session.save(movie4);
-			session.save(mi4);
 			Movie movie5=new Movie("Pulp Fiction","1969");
-			MovieImage mi5=new MovieImage("Pulp Fiction",getImageFromFilesByTitleAsByteArray("pulp_fiction"));
+			movie5.setImageData(getImageFromFilesByTitleAsByteArray("pulp_fiction"));
 			session.save(movie5);
-			session.save(mi5);
 			Movie movie6=new Movie("Automobiles","2024");
-			MovieImage mi6=new MovieImage("Automobiles",getImageFromFilesByTitleAsByteArray("automobiles"));
+			movie6.setImageData(getImageFromFilesByTitleAsByteArray("automobiles"));
 			session.save(movie6);
-			session.save(mi6);
             session.flush();
 	}*/
 
@@ -88,12 +81,6 @@ public class SimpleServer extends AbstractServer {
 		CriteriaBuilder builder=session.getCriteriaBuilder();
 		CriteriaQuery<Movie> query=builder.createQuery(Movie.class);
 		query.from(Movie.class);
-        return session.createQuery(query).getResultList();
-	}
-	private List<MovieImage> getMovieImagesFromDB(){
-		CriteriaBuilder builder=session.getCriteriaBuilder();
-		CriteriaQuery<MovieImage> query=builder.createQuery(MovieImage.class);
-		query.from(MovieImage.class);
         return session.createQuery(query).getResultList();
 	}
 
@@ -150,18 +137,18 @@ public class SimpleServer extends AbstractServer {
 		return null;
 	}
 
-	//this func handles both adding movie object to movie table and movieimage object to movie_images table
+	//this func handles adding movie object to movie table
 	private boolean addMovieToDB(MovieInfo movieInfo) throws IOException {
 		//check if movie is already in movies, no error message sent back cuz not needed
 		for(MovieInfo m:this.movieInfos){
 			if(m.getName().equals(movieInfo.getName())){
+				//if the movie already exists in db, just dont do anything
 				return false;
 			}
 		}
-		MovieImage mi=new MovieImage(movieInfo.getName(),movieInfo.getImageData());
 		this.movieInfos.add(movieInfo);
 		Movie movie=new Movie(movieInfo);
-		session.save(mi);
+		movie.setImageData(movieInfo.getImageData());
 		session.save(movie);
 		session.flush();
 		session.getTransaction().commit();
@@ -224,19 +211,6 @@ public class SimpleServer extends AbstractServer {
 		session.beginTransaction();
 	}
 
-	private void removeMovieImageFromDB(String title){
-		List<MovieImage> movieImages=getMovieImagesFromDB();
-		for(MovieImage m:movieImages){
-			if(title.equals(m.getName())){
-				session.delete(m);
-				session.flush();
-				session.getTransaction().commit();
-				session.beginTransaction();
-				return;
-			}
-		}
-	}
-
 
 	//this func handles both removing movie object from movie table and movieimage object from movie_images table
 	private boolean removeMovieFromDB(String name){
@@ -244,16 +218,14 @@ public class SimpleServer extends AbstractServer {
 		try {
 			//make sure all movie's displaytimes know the movie is gone
 			//remove all display times from movie to delete before deletding movie
-			for (DisplayTime d : movieToDelete.getDisplayTimes()) {
-				List<Movie> temp = removeMovieWithName(d.getMovies(), movieToDelete.getName());
-				d.setMovies(temp);
-
-				d.removeMovie(movieToDelete);
-				movieToDelete.removeDisplayTime(d);
+			/*for(DisplayTime d: movieToDelete.getDisplayTimes()){
+				this.currMovie=movieToDelete;
+				removeDisplayTimeFromMovieFromDB(d.getDisplayTime());
+			}*/
+			for(DisplayTime d:getDisplayTimesFromDB()){
+				removeDisplayTimeFromMovieFromDB(d.getDisplayTime());
 			}
 			this.movieInfos = removeMovieInfoWithName(this.movieInfos, movieToDelete.getName());
-			//delete image of movie from db
-			removeMovieImageFromDB(movieToDelete.getName());
 			session.saveOrUpdate(movieToDelete);
 			session.delete(movieToDelete);
 			session.flush();
@@ -269,8 +241,13 @@ public class SimpleServer extends AbstractServer {
 
 
 	private void removeDisplayTimeFromMovieFromDB(String displayTime) {
-		this.currMovie = getMovieByTitleFromDB(this.currMovie.getName());
-		this.currMovieInfo = getMovieInfoByTitle(this.currMovie.getName());
+		if(this.currMovie!=null){
+			this.currMovie = getMovieByTitleFromDB(this.currMovie.getName());
+			this.currMovieInfo = getMovieInfoByTitle(this.currMovie.getName());
+		}
+		else{
+			return;
+		}
 		this.currDisplayTimes = getDisplayTimesFromDB();
 		boolean found = false;
 		boolean found2 = false; // if displaytime is in table of displaytimes
@@ -343,19 +320,12 @@ public class SimpleServer extends AbstractServer {
 		this.movieInfos=new ArrayList<>();
 		byte[] movieImageByteArray=null;
 		List<Movie> movies=getMoviesFromDB();
-		List<MovieImage> movieImages=getMovieImagesFromDB();
 		for(Movie m: movies){
 			MovieInfo mi=new MovieInfo(m.getName(),m.getReleasedate());
+			mi.setImageData(m.getImageData());
 			//add display times from movie to movieinfo
 			for(DisplayTime d: m.getDisplayTimes()){
 				mi.addDisplayTime(d.getDisplayTime());
-			}
-			//add image from list to movieinfo
-			for(MovieImage mx : movieImages){
-				if(mx.getName().equals(m.getName())){
-					mi.setImageData(mx.getImageData());
-					break;
-				}
 			}
 			this.movieInfos.add(mi);
 		}
@@ -386,10 +356,10 @@ public class SimpleServer extends AbstractServer {
 			else if(request.startsWith("getMovieInfo")){
 				String[] splitted=request.split(" ",2);
 				this.currMovie=getMovieByTitleFromDB(splitted[1]);
-				this.currMovieInfo=getMovieInfoByTitle(this.currMovie.getName());
+				this.currMovieInfo=getMovieInfoByTitle(splitted[1]);
 
 				message.setMessage("MovieInfo");
-				message.setMovieInfo(getMovieInfoByTitle(this.currMovie.getName()));
+				message.setMovieInfo(getMovieInfoByTitle(splitted[1]));
 				client.sendToClient(message);
 			}
 			else if(request.startsWith("getTitles")){
@@ -429,7 +399,7 @@ public class SimpleServer extends AbstractServer {
 				else{
 					message.setMessage("movie exists");
 				}
-				client.sendToClient(message);
+				sendToAllClients(message);
 			}
 			else if(request.startsWith("removeMovie")){
 				if(removeMovieFromDB(message.getMovieInfo().getName())){
@@ -490,8 +460,8 @@ public class SimpleServer extends AbstractServer {
 			e.printStackTrace();
 		}
 		session.getTransaction().commit();
-		session.beginTransaction();*/
-	}
+		session.beginTransaction();
+	*/}
 
 	public void sendToAllClients(Message message) {
 		try {

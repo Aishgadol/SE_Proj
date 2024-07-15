@@ -68,6 +68,19 @@ public class RemoveMovieController {
         this.movieInfos=event.getMessage().getList();
         displayMovies();
     }
+    @Subscribe
+    public void catchMovieRemovedSuccesfully(MovieRemovedSuccesfullyEvent event){
+        showConfirmationPopup();
+    }
+    @Subscribe
+    public void catchMovieAddedSuccesfully(MovieAddedSuccesfullyEvent event){
+        setMovieInfos();
+    }
+    @Subscribe
+    public void catchBackgroundImage(BackgroundImageEvent event){
+        byte[] data=event.getMessage().getImageData();
+        setBackground(data);
+    }
 
     @FXML
     private void goBackButtonPressed(ActionEvent event){
@@ -86,10 +99,7 @@ public class RemoveMovieController {
         }
     }
 
-    @Subscribe
-    public void catchMovieRemovedSuccesfully(MovieRemovedSuccesfullyEvent event){
-        showConfirmationPopup();
-    }
+
 
     @FXML
     private void showConfirmationPopup(){
@@ -136,7 +146,15 @@ public class RemoveMovieController {
     }
 
     @FXML
+    private void clearHBox(){
+        Platform.runLater(()->{
+            this.imageHBox.getChildren().clear();
+        });
+    }
+
+    @FXML
     private void displayMovies(){
+        clearHBox();
         for (MovieInfo movieInfo : this.movieInfos) {
             byte[] data = movieInfo.getImageData();
             if (data != null) {
@@ -180,11 +198,6 @@ public class RemoveMovieController {
         }
     }
 
-    @Subscribe
-    public void catchBackgroundImage(BackgroundImageEvent event){
-        byte[] data=event.getMessage().getImageData();
-        setBackground(data);
-    }
 
     @FXML
     private void setBackground(byte[] data){

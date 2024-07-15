@@ -84,11 +84,6 @@ public class CinemaController {
             alert.show();
         });
     }
-    @Subscribe
-    public void catchMovieInfo(MovieInfoEvent event){
-        this.currMovieInfo=event.getMessage().getMovieInfo();
-    }
-
 
     void askDB(String title){
         try{
@@ -99,20 +94,41 @@ public class CinemaController {
         }
     }
 
+    @FXML
+    private void clearDisplay(){
+        try{
+            Platform.runLater(()->{
+                this.imageHBox.getChildren().clear();
 
+            });
+        }catch(Exception e){
+            e.printStackTrace();
+        }
+    }
 
+    @Subscribe
+    public void catchMovieInfo(MovieInfoEvent event){
+        this.currMovieInfo=event.getMessage().getMovieInfo();
+    }
     @Subscribe
     public void catchMovieInfoList(MovieInfoListEvent event){
         this.currMovieInfos=event.getMessage().getList();
+        clearDisplay();
         displayAllMovies();
     }
-
     @Subscribe
     public void catchBackgroundImage(BackgroundImageEvent event){
         byte[] data=event.getMessage().getImageData();
         setBackground(data);
     }
-
+    @Subscribe
+    public void catchMovieAdded(MovieAddedSuccesfullyEvent event){
+        askDB("getTitles");
+    }
+    @Subscribe
+    public void catchMovieRemovedSuccesfully(MovieRemovedSuccesfullyEvent event){
+        askDB("getTitles");
+    }
     @FXML
     private void setBackground(byte[] data){
         if(data!=null){

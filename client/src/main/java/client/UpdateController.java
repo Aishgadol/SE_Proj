@@ -78,6 +78,9 @@ public class UpdateController{
 
     @FXML
     void removeTimeButtonPressed(ActionEvent event){
+        if(availableTimesComboBox.getValue() == null){
+            return;
+        }
         String displayDateToRemove=availableTimesComboBox.getValue();
         askDB("removetime "+displayDateToRemove);
         resetAll();
@@ -114,12 +117,7 @@ public class UpdateController{
 
     }
 
-    @Subscribe
-    public void catchMovieRemoved(MovieRemovedSuccesfullyEvent event){
-        askDB("getTitles");
-        resetAll();
-        updateAll();
-    }
+
 
     @FXML
     private void addMovieButtonPressed(ActionEvent event){
@@ -138,14 +136,7 @@ public class UpdateController{
         }
     }
 
-    @FXML
-    @Subscribe
-    public void getMovieInfoFromDB(MovieInfoEvent event){
-        this.movieInfo=event.getMessage().getMovieInfo();
-        this.displayTimes=this.movieInfo.getDisplayTimes();
-        resetAll(); //already runs in platform.runlater();
-        updateAll(); //same
-    }
+
 
     @FXML
     void resetAll() {
@@ -162,33 +153,7 @@ public class UpdateController{
         });
     }
 
-    @FXML
-    @Subscribe
-    public void getMoviesFromDB(MovieInfoListEvent event) {
-        Message message = event.getMessage();
-        this.movieInfos = message.getList();
-        resetAll();
-        updateAll();
-        Platform.runLater(() -> {
-            for (MovieInfo movieInfo : movieInfos) {
-                titlesComboBox.getItems().add(movieInfo.getName());
-            }
-        });
-    }
 
-    @FXML
-    @Subscribe
-    public void timeUpdateRecieved(TimeUpdateEvent event) {
-        if(!this.movieInfo.getName().equals(event.getMessage().getMovieInfo().getName())){
-            resetAll();
-            updateAll();
-            return;
-        }
-        this.movieInfo = event.getMessage().getMovieInfo();
-        this.displayTimes = this.movieInfo.getDisplayTimes();
-        resetAll();
-        updateAll();
-    }
 
     void askDB(String title){
         try{
@@ -245,11 +210,7 @@ public class UpdateController{
         }
     }
 
-    @Subscribe
-    public void catchBackgroundImage(BackgroundImageEvent event){
-        byte[] data=event.getMessage().getImageData();
-        setBackground(data);
-    }
+
 
     @FXML
     void goBackButton(ActionEvent event) throws IOException {
@@ -267,7 +228,58 @@ public class UpdateController{
         }
     }
 
-
+    @Subscribe
+    public void catchBackgroundImage(BackgroundImageEvent event){
+        byte[] data=event.getMessage().getImageData();
+        setBackground(data);
+    }
+    @FXML
+    @Subscribe
+    public void getMoviesFromDB(MovieInfoListEvent event) {
+        Message message = event.getMessage();
+        this.movieInfos = message.getList();
+        resetAll();
+        updateAll();
+        Platform.runLater(() -> {
+            titlesComboBox.getItems().clear();
+            for (MovieInfo movieInfo : movieInfos) {
+                titlesComboBox.getItems().add(movieInfo.getName());
+            }
+        });
+    }
+     @FXML
+    @Subscribe
+    public void getMovieInfoFromDB(MovieInfoEvent event){
+        this.movieInfo=event.getMessage().getMovieInfo();
+        this.displayTimes=this.movieInfo.getDisplayTimes();
+        resetAll(); //already runs in platform.runlater();
+        updateAll(); //same
+    }
+    @FXML
+    @Subscribe
+    public void timeUpdateRecieved(TimeUpdateEvent event) {
+        if(!this.movieInfo.getName().equals(event.getMessage().getMovieInfo().getName())){
+            resetAll();
+            updateAll();
+            return;
+        }
+        this.movieInfo = event.getMessage().getMovieInfo();
+        this.displayTimes = this.movieInfo.getDisplayTimes();
+        resetAll();
+        updateAll();
+    }
+     @Subscribe
+    public void catchMovieRemoved(MovieRemovedSuccesfullyEvent event){
+        askDB("getTitles");
+        resetAll();
+        updateAll();
+    }
+    @Subscribe
+    public void catchMovieAdded(MovieAddedSuccesfullyEvent event){
+        askDB("getTitles");
+        resetAll();
+        updateAll();
+    }
     private List<String> generateTimeSlots(){
         List<String> times=new ArrayList<>();
         LocalTime startTime= LocalTime.of(10,0);
