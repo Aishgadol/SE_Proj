@@ -167,38 +167,41 @@ public class StartingScreenController {
     private void changeToWorkerScreen(String id,String role,ActionEvent event){
         try {
             EventBus.getDefault().unregister(this);
-            FXMLLoader loader;
+            FXMLLoader loader=null;
             String title="";
             switch(role){
                 case "General Manager":
                     title="General Manager";
                     loader=new FXMLLoader(getClass().getResource("/generalManagerMainScreen.fxml"));
                     root = loader.load();
-                    GeneralManagerMainScreenController controller=controller=loader.getController();
+                    GeneralManagerMainScreenController controller=loader.getController();
+                    controller.setCurrUserId(id);
                     break;
                 case "Cinema Manager":
                     title="Cinema Manager";
                     loader=new FXMLLoader(getClass().getResource("/cinemaManagerMainScreen.fxml"));
                     root = loader.load();
-                    CinemaManagerMainScreenController controller=controller=loader.getController();
+                    CinemaManagerMainScreenController controller1=loader.getController();
+                    controller1.setCurrUserId(id);
                     break;
                 case "Content Manager":
                     title="Content Manager";
                     loader=new FXMLLoader(getClass().getResource("/contentManagerMainScreen.fxml"));
                     root = loader.load();
-                    ContentManagerMainScreenController controller=controller=loader.getController();
+                    ContentManagerMainScreenController controller2=loader.getController();
+                    controller2.setCurrUserId(id);
                     break;
                 case "Customer Complaint Worker":
                     title="Customer Complaint Worker";
                     loader=new FXMLLoader(getClass().getResource("/ccwMainScreen.fxml"));
                     root = loader.load();
-                    CCWMainScreenController controller=loader.getController();
+                    CCWMainScreenController controller3=loader.getController();
+                    controller3.setCurrUserId(id);
                     break;
                 default:
                     System.out.println("Illegal role");
                     break;
             }
-            controller.setCurrUserId(id);
             stage=(Stage) ((Node)event.getSource()).getScene().getWindow();
             scene=new Scene(root,1280,800);
             stage.setScene(scene);
