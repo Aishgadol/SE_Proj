@@ -55,7 +55,8 @@ public class AddMovieController {
     private TextField actorsTextField;
     @FXML
     private TextField producerTextField;
-    @private ComboBox<String> statusComboBox;
+    @FXML
+    private ComboBox<String> statusComboBox;
 
     private void setCurrMovieInfo(){
         this.currMovieInfo=new MovieInfo(this.movieNameTextField.getText(),

@@ -28,7 +28,10 @@ public class startingScreenController {
     private List<UserInfo> userInfoList=new ArrayList<>();
     @FXML
     private ImageView backgroundImageView;
-
+    @FXML
+    private Button upcomingMoviesButton;
+    @FXML
+    private Button availableMoviesButton;
     @FXML
     private Button workerLoginButton;
     @FXML
@@ -50,6 +53,21 @@ public class startingScreenController {
     private Button changeModeButton;
 
 
+    @FXML
+    void showUpcomingMovies(){
+        this.upcomingMoviesButton.setDisable(true);
+        this.availableMoviesButton.setDisable(false);
+        clearDisplay();
+        displayMovies(getUpcomingMovieInfoList());
+
+    }
+    @FXML
+    void showAvailableMovies(){
+        this.upcomingMoviesButton.setDisable(false);
+        this.availableMoviesButton.setDisable(true);
+        clearDisplay();
+        displayMovies(getAvailableMovieInfoList());
+    }
     @FXML
     void changeModeButtonPressed(ActionEvent event){
         if(customerLoginModeEnabled){
@@ -121,8 +139,8 @@ public class startingScreenController {
         popMessageWithMovieInfo(title);
     }
      @FXML
-    private void displayAllMovies() {
-        for (MovieInfo movieInfo : this.movieInfoList) {
+    private void displayMovies(List<MovieInfo> movieInfoList) {
+        for (MovieInfo movieInfo : movieInfoList) {
             byte[] data = movieInfo.getImageData();
             if (data != null) {
                 try {
@@ -192,13 +210,30 @@ public class startingScreenController {
             }
         }
     }
-
+    List<MovieInfo> getAvailableMovieInfoList(){
+        List<MovieInfo> list=new ArrayList<>();
+        for(MovieInfo m: this.movieInfoList){
+            if(m.getStatus().equals("Available")){
+                list.add(m);
+            }
+        }
+        return list;
+    }
+    List<MovieInfo> getUpcomingMovieInfoList(){
+        List<MovieInfo> list=new ArrayList<>();
+        for(MovieInfo m: this.movieInfoList){
+            if(m.getStatus().equals("Upcoming")){
+                list.add(m);
+            }
+        }
+        return list;
+    }
 
     @Subscribe
     public void catchMovieInfoList(MovieInfoListEvent event){
         this.movieInfoList=event.getMessage().getMovieInfoList();
         clearDisplay();
-        displayAllMovies();
+        displayMovies(getAvailableMovieInfoList());
     }
     @Subscribe
     public void catchBackgroundImage(BackgroundImageEvent event){
@@ -244,6 +279,7 @@ public class startingScreenController {
         askDB("getTitles");
         askDB("getUsers");
         this.passwordField.setVisible(false);
+        this.availableMoviesButton.setDisable(true);
         //listener to limit inputID length and allowed characters
         this.idTextField.textProperty().addListener((observable, oldValue, newValue) -> {
             if (newValue.length() > 9) {

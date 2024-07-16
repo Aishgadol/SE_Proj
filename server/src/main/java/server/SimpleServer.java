@@ -59,7 +59,7 @@ public class SimpleServer extends AbstractServer {
 	//only use these functions if protoype database gets deleted, it should not happen.
 
 	public void generateData() throws Exception {
-			Movie movie1=new Movie("Margol","1973","Romance","Zohar Argov","Margalit Tzanany, Eyal Golan, Shimi Tavory","MARGOL!","Available");
+			Movie movie1=new Movie("Margol","1973","Romance","Zohar Argov","Margalit Tzanany, Eyal Golan, Shimi Tavory","MARGOL!","Upcoming");
 			movie1.setImageData(getImageFromFilesByTitleAsByteArray("margol"));
 			session.save(movie1);
 			Movie movie2=new Movie("The Boys","2018","Action","Billy Butcher","God","A bunch of no-good people trying to steal the country, will homelander be able to stop them?","Available");

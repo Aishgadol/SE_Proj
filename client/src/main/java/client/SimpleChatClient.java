@@ -41,7 +41,7 @@ public class SimpleChatClient extends Application {
         delay.setOnFinished(event ->{
             try{
                 //scene=new Scene(loadFXML("mainScreen"),1280,800);
-                scene=new Scene(loadFXML("startingScreen"),1280,800);
+                scene=new Scene(loadFXML("mainScreen"),1280,800);
                 primaryStage.setScene(scene);
                 primaryStage.setResizable(false);
                 primaryStage.show();

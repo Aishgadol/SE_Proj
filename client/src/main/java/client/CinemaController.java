@@ -37,7 +37,7 @@ public class CinemaController {
     private Stage stage;
     private Scene scene;
     private Parent root;
-    private List<MovieInfo> currMovieInfos=new ArrayList<>();
+    private List<MovieInfo> movieInfoList=new ArrayList<>();
 
     @FXML
     private Button updateButton;
@@ -63,10 +63,47 @@ public class CinemaController {
     private ImageView backgroundImageView;
     @FXML
     private HBox imageHBox;
+    @FXML
+    private Button upcomingMoviesButton;
+    @FXML
+    private Button availableMoviesButton;
 
     @FXML
+    void showUpcomingMovies(){
+        this.upcomingMoviesButton.setDisable(true);
+        this.availableMoviesButton.setDisable(false);
+        clearDisplay();
+        displayMovies(getUpcomingMovieInfoList());
+
+    }
+    @FXML
+    void showAvailableMovies(){
+        this.upcomingMoviesButton.setDisable(false);
+        this.availableMoviesButton.setDisable(true);
+        clearDisplay();
+        displayMovies(getAvailableMovieInfoList());
+    }
+    List<MovieInfo> getAvailableMovieInfoList(){
+        List<MovieInfo> list=new ArrayList<>();
+        for(MovieInfo m: this.movieInfoList){
+            if(m.getStatus().equals("Available")){
+                list.add(m);
+            }
+        }
+        return list;
+    }
+    List<MovieInfo> getUpcomingMovieInfoList(){
+        List<MovieInfo> list=new ArrayList<>();
+        for(MovieInfo m: this.movieInfoList){
+            if(m.getStatus().equals("Upcoming")){
+                list.add(m);
+            }
+        }
+        return list;
+    }
+    @FXML
     private void popMessageWithMovieInfo(String title){
-        for(MovieInfo m: this.currMovieInfos){
+        for(MovieInfo m: this.movieInfoList){
             if(m.getName().equals(title)){
                 this.currMovieInfo=m;
             }
@@ -110,9 +147,9 @@ public class CinemaController {
     }
     @Subscribe
     public void catchMovieInfoList(MovieInfoListEvent event){
-        this.currMovieInfos=event.getMessage().getMovieInfoList();
+        this.movieInfoList=event.getMessage().getMovieInfoList();
         clearDisplay();
-        displayAllMovies();
+        displayMovies(getAvailableMovieInfoList());
     }
     @Subscribe
     public void catchBackgroundImage(BackgroundImageEvent event){
@@ -148,8 +185,8 @@ public class CinemaController {
     }
 
     @FXML
-    private void displayAllMovies() {
-        for (MovieInfo movieInfo : this.currMovieInfos) {
+    private void displayMovies(List<MovieInfo> movieInfoList) {
+        for (MovieInfo movieInfo : movieInfoList) {
             byte[] data = movieInfo.getImageData();
             if (data != null) {
                 try {
@@ -220,5 +257,6 @@ public class CinemaController {
         msgId=0;
         askDB("getBackgroundImage");
         askDB("getTitles");
+        availableMoviesButton.setDisable(true);
     }
 }
