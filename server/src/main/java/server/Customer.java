@@ -24,17 +24,23 @@ public class Customer implements Serializable {
     @Column(name="Full_Name")
     String name;
 
+    @Column(name="is_user_connected")
+    int connected;
+
     public Customer(){}
 
     public Customer(String Id,String name){
         this.userID=Id;
         this.role="Customer";
         this.name=name;
+        this.connected=0;
     }
+
     public Customer(Customer c){
         this.userID=c.getId();
         this.role="Customer";
         this.name=c.getName();
+        this.connected=c.getConnected();
     }
 
     public void setId(String id){
@@ -49,5 +55,9 @@ public class Customer implements Serializable {
     public String getName(){
         return this.name;
     }
+    public int getConnected(){
+        return this.connected;
+    }
+    public void setConnected(int c){this.connected=c;}
 
 }

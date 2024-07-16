@@ -27,6 +27,9 @@ public class Worker implements Serializable {
     @Column(name="password")
     String password;
 
+    @Column(name="is_user_connected")
+    int connected;
+
     public Worker(){
     }
 
@@ -35,6 +38,7 @@ public class Worker implements Serializable {
         this.role=role;
         this.name=name;
         this.password=password;
+        this.connected=0;
     }
 
     public Worker(Worker w){
@@ -42,6 +46,7 @@ public class Worker implements Serializable {
         this.role=w.getRole();
         this.name=w.getName();
         this.password=w.getPassword();
+        this.connected=w.getConnected();
     }
 
     public void setId(String id){
@@ -68,4 +73,8 @@ public class Worker implements Serializable {
     public String getPassword(){
         return this.password;
     }
+    public int getConnected(){
+        return this.connected;
+    }
+    public void setConnected(int c){this.connected=c;}
 }

@@ -7,6 +7,7 @@ public class UserInfo implements Serializable {
     String role;
     String name;
     String password;
+    int connected;
 
     public UserInfo(){}
 
@@ -15,12 +16,14 @@ public class UserInfo implements Serializable {
         this.role=role;
         this.name=name;
         this.password=password;
+        this.connected=0;
     }
     public UserInfo(String id, String role,String name){
         this.id=id;
         this.role=role;
         this.name=name;
         this.password="";
+        this.connected=0;
     }
 
     public UserInfo(String id, String name){
@@ -28,6 +31,7 @@ public class UserInfo implements Serializable {
         this.name=name;
         this.role="Customer";
         this.password="";
+        this.connected=0;
     }
 
     public UserInfo(UserInfo u){
@@ -35,6 +39,7 @@ public class UserInfo implements Serializable {
         this.role=u.getRole();
         this.name=u.getName();
         this.password=u.getPassword();
+        this.connected=u.getConnected();
     }
 
     public void setId(String id){
@@ -59,4 +64,8 @@ public class UserInfo implements Serializable {
     }
     public String getPassword(){return this.password;}
     public void setPassword(String p){this.password=p;}
+
+    public int getConnected(){return this.connected;}
+    public void setConnected(int c){this.connected=c;}
+
 }

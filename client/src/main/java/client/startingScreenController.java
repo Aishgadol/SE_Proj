@@ -25,6 +25,7 @@ public class startingScreenController {
     private int msgId;
     private List<MovieInfo> movieInfoList=new ArrayList<>();
     boolean customerLoginModeEnabled=true;
+    boolean userConnected;
     private List<UserInfo> userInfoList=new ArrayList<>();
     @FXML
     private ImageView backgroundImageView;
@@ -94,17 +95,73 @@ public class startingScreenController {
             });
         }
         else{
+            //check user exists, then transfer to customer/worker page (update that the custoemr/worker has connected too)
+            askDB("getUsers");
+            String chosenId=idTextField.getText();
+            UserInfo u0=null;
+            for(UserInfo u: this.userInfoList) {
+                if(u.getId().equals(chosenId)){
+                    u0=u;
+                    break;
+                }
+            }
+            if(u0==null){
+                popUserDoesntExistMessage(chosenId);
+                return;
+            }
+            if(u0.getConnected()!=0){
+                //user is already connected
+                popUserAlreadyConnectedMessage(chosenId);
+                return;
+            }
             if(customerLoginModeEnabled){
-                //check customer exists, then transfer to customer page (update that the custoemr has connected too)
-                System.out.println("customer login");
+                askDB("connectCustomer "+chosenId);
+                changeToCustomerScreen(); //<-- need to somehow transfer to customer screen and also let new screen know about current customer that's working
             }
             else{
-                //check worker exists, then transfer to worker page according to role(update that the worker has connected too)
-                System.out.println("worker login");
+                //also check if password is good(we got here so id is good)
+                if(passwordField.getText().equals(u0.getPassword())) {
+                    askDB("connectWorker "+chosenId);
+                    changeToWorkerScreen(); //same issue here
+                }
+                else{
+                    Platform.runLater(()->{
+                        Alert a=new Alert(Alert.AlertType.ERROR);
+                        a.setTitle("Incorrect password!");
+                        a.setHeaderText("The password you've enetered is incorrect");
+                        a.show();
+                    });
+                    return;
+                }
             }
         }
     }
+    @FXML
+    private void changeToCustomerScreen(){
 
+    }
+    @FXML
+    private void changeToWorkerScreen(){
+
+    }
+    @FXML
+    private void popUserAlreadyConnectedMessage(String id){
+        Platform.runLater(()->{
+            Alert a=new Alert(Alert.AlertType.ERROR);
+            a.setTitle("User already connected!");
+            a.setHeaderText("User with ID: "+id+" is already connected.");
+            a.show();
+        });
+    }
+    @FXML
+    private void popUserDoesntExistMessage(String id){
+        Platform.runLater(()->{
+                        Alert a=new Alert(Alert.AlertType.ERROR);
+                        a.setTitle("User does not exist!");
+                        a.setHeaderText("User with ID: "+id+" does not exist.");
+                        a.show();
+                    });
+    }
     @FXML
     private void popMessageWithMovieInfo(String title){
         for(MovieInfo m: this.movieInfoList){
