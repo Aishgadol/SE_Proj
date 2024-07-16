@@ -178,10 +178,10 @@ public class SimpleServer extends AbstractServer {
 		session.beginTransaction();
 		return true;
 	}
-	private boolean connectCustomer(String id){
+	private boolean connectCustomer(String name){
 		this.customersList=getCustomersFromDB();
 		for(Customer c:this.customersList){
-			if(c.getId().equals(id)){
+			if(c.getName().toLowerCase().equals(name)){
 				c.setConnected(1);
 				session.saveOrUpdate(c);
 				session.flush();
@@ -193,10 +193,10 @@ public class SimpleServer extends AbstractServer {
 		}
 		return false;
 	}
-	private boolean connectWorker(String id){
+	private boolean connectWorker(String name){
 		this.workersList=getWorkersFromDB();
 		for(Worker w:this.workersList){
-			if(w.getId().equals(id)){
+			if(w.getName().toLowerCase().equals(name)){
 				w.setConnected(1);
 				session.saveOrUpdate(w);
 				session.flush();
@@ -208,10 +208,10 @@ public class SimpleServer extends AbstractServer {
 		}
 		return false;
 	}
-	private boolean disconnectCustomer(String id){
+	private boolean disconnectCustomer(String name){
 		this.customersList=getCustomersFromDB();
 		for(Customer c:this.customersList){
-			if (c.getId().equals(id)) {
+			if (c.getName().toLowerCase().equals(name)) {
 				c.setConnected(0);
 				session.saveOrUpdate(c);
 				session.flush();
@@ -223,10 +223,10 @@ public class SimpleServer extends AbstractServer {
 		}
 		return false;
 	}
-	private boolean disconnectWorker(String id){
+	private boolean disconnectWorker(String name){
 		this.workersList=getWorkersFromDB();
 		for(Worker w:this.workersList){
-			if (w.getId().equals(id)) {
+			if (w.getName().toLowerCase().equals(name)) {
 				w.setConnected(0);
 				session.saveOrUpdate(w);
 				session.flush();
@@ -515,7 +515,7 @@ public class SimpleServer extends AbstractServer {
 			}
 			else if(request.startsWith("connectCustomer")){
 				String[] splitted=request.split(" ",2);
-				if(connectCustomer(splitted[1])){
+				if(connectCustomer(splitted[1].toLowerCase())){
 					message.setMessage("Customer succesfully connected");
 					message.setUserInfoList(this.userInfoList);
 					sendToAllClients(message);
@@ -523,7 +523,7 @@ public class SimpleServer extends AbstractServer {
 			}
 			else if(request.startsWith("connectWorker")){
 				String[] splitted=request.split(" ",2);
-				if(connectWorker(splitted[1])){
+				if(connectWorker(splitted[1].toLowerCase())){
 					message.setMessage("Worker succesfully connected");
 					message.setUserInfoList(this.userInfoList);
 					sendToAllClients(message);
@@ -531,7 +531,7 @@ public class SimpleServer extends AbstractServer {
 			}
 			else if(request.startsWith("disconnectCustomer")){
 				String[] splitted=request.split(" ",2);
-				if(disconnectCustomer(splitted[1])){
+				if(disconnectCustomer(splitted[1].toLowerCase())){
 					message.setMessage("Customer succesfully disconnected");
 					message.setUserInfoList(this.userInfoList);
 					sendToAllClients(message);
@@ -539,7 +539,7 @@ public class SimpleServer extends AbstractServer {
 			}
 			else if(request.startsWith("disconnectWorker")){
 				String[] splitted=request.split(" ",2);
-				if(disconnectWorker(splitted[1])){
+				if(disconnectWorker(splitted[1].toLowerCase())){
 					message.setMessage("Worker succesfully disconnected");
 					message.setUserInfoList(this.userInfoList);
 					sendToAllClients(message);

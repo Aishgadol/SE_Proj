@@ -5,7 +5,6 @@ import entities.MovieInfo;
 import entities.UserInfo;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
-import javafx.event.Event;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Pos;
@@ -45,7 +44,7 @@ public class StartingScreenController {
     @FXML
     private Button workerLoginButton;
     @FXML
-    private TextField idTextField;
+    private TextField nameTextField;
 
     @FXML
     private HBox imageHBox;
@@ -56,7 +55,8 @@ public class StartingScreenController {
     private Label statusLabel;
     @FXML
     private Button loginButton;
-
+    @FXML
+    private VBox screen;
     @FXML
     private PasswordField passwordField;
     @FXML
@@ -95,41 +95,41 @@ public class StartingScreenController {
     }
     @FXML
     void loginButtonPressed(ActionEvent event) {
-        if(idTextField.getText().length()!=9){
+        if(nameTextField.getText().isEmpty()){
             Platform.runLater(()->{
                 Alert alert=new Alert(Alert.AlertType.ERROR);
-                alert.setTitle("Incorrect ID");
-                alert.setHeaderText("Entered incorrect ID, please fix");
+                alert.setTitle("Name error");
+                alert.setHeaderText("Name inserted is too short");
                 alert.show();
             });
         }
         else{
             //check user exists, then transfer to customer/worker page (update that the custoemr/worker has connected too)
             askDB("getUsers");
-            String chosenId=idTextField.getText();
+            String chosenName=nameTextField.getText().toLowerCase();
             UserInfo u0=null;
             for(UserInfo u: this.userInfoList) {
-                if(u.getId().equals(chosenId)){
+                if(u.getName().toLowerCase().equals(chosenName)){
                     u0=u;
                     break;
                 }
             }
             if(u0==null){
-                popUserDoesntExistMessage(chosenId);
+                popUserDoesntExistMessage(chosenName);
                 return;
             }
             if(customerLoginModeEnabled){
                 if(u0.getRole().equals("Customer")){
                     if(u0.getConnected()==0) {
-                        askDB("connectCustomer " + chosenId);
-                        changeToCustomerScreen(chosenId, event);
+                        askDB("connectCustomer " + chosenName);
+                        changeToCustomerScreen(chosenName, event);
                     }
                     else{
-                        popUserAlreadyConnectedMessage(chosenId);
+                        popUserAlreadyConnectedMessage(chosenName);
                     }
                 }
                 else{
-                    popUserDoesntExistMessage(chosenId);
+                    popUserDoesntExistMessage(chosenName);
                 }
             }
             else{
@@ -138,7 +138,7 @@ public class StartingScreenController {
                     Platform.runLater(()->{
                         Alert a=new Alert(Alert.AlertType.ERROR);
                         a.setTitle("User is not a worker");
-                        a.setHeaderText("User with ID: "+chosenId+" is not a worker.");
+                        a.setHeaderText("User named: "+chosenName+" is not a worker.");
                         a.setResizable(false);
                         a.show();
                     });
@@ -146,11 +146,11 @@ public class StartingScreenController {
                 }
                 if(passwordField.getText().equals(u0.getPassword())) {
                     if(u0.getConnected()==0) {
-                        askDB("connectWorker " + chosenId);
-                        changeToWorkerScreen(chosenId, u0.getRole(), event); //same issue here
+                        askDB("connectWorker " + chosenName);
+                        changeToWorkerScreen(chosenName, u0.getRole(), event); //same issue here
                     }
                     else{
-                        popUserAlreadyConnectedMessage(chosenId);
+                        popUserAlreadyConnectedMessage(chosenName);
                     }
                 }
                 else{
@@ -166,18 +166,19 @@ public class StartingScreenController {
         }
     }
     @FXML
-    private void changeToCustomerScreen(String id,ActionEvent event){
+    private void changeToCustomerScreen(String name,ActionEvent event){
         try {
             EventBus.getDefault().unregister(this);
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/customerMainScreen.fxml"));
-            root = loader.load();
+            Parent root = loader.load();
             CustomerMainScreenController controller = loader.getController();
-            controller.setCurrUserId(id);
-            controller.setInfoLabel(id);
+            controller.setCurrUserName(name);
+            controller.setInfoLabel(name);
             stage=(Stage) ((Node)event.getSource()).getScene().getWindow();
             scene=new Scene(root,1280,800);
             stage.setScene(scene);
             stage.setResizable(false);
+            stage.setOnCloseRequest(some_event->handleCustomerClose(name));
             stage.setTitle("Customer Main Screen");
             stage.show();
         }catch(Exception e){
@@ -185,7 +186,7 @@ public class StartingScreenController {
         }
     }
     @FXML
-    private void changeToWorkerScreen(String id,String role,ActionEvent event){
+    private void changeToWorkerScreen(String name,String role,ActionEvent event){
         try {
             EventBus.getDefault().unregister(this);
             FXMLLoader loader=null;
@@ -196,28 +197,28 @@ public class StartingScreenController {
                     loader=new FXMLLoader(getClass().getResource("/generalManagerMainScreen.fxml"));
                     root = loader.load();
                     GeneralManagerMainScreenController controller=loader.getController();
-                    controller.setCurrUserId(id);
+                    controller.setCurrUserName(name);
                     break;
                 case "Cinema Manager":
                     title="Cinema Manager";
                     loader=new FXMLLoader(getClass().getResource("/cinemaManagerMainScreen.fxml"));
                     root = loader.load();
                     CinemaManagerMainScreenController controller1=loader.getController();
-                    controller1.setCurrUserId(id);
+                    controller1.setCurrUserName(name);
                     break;
                 case "Content Manager":
                     title="Content Manager";
                     loader=new FXMLLoader(getClass().getResource("/contentManagerMainScreen.fxml"));
                     root = loader.load();
                     ContentManagerMainScreenController controller2=loader.getController();
-                    controller2.setCurrUserId(id);
+                    controller2.setCurrUserName(name);
                     break;
                 case "Customer Complaint Worker":
                     title="Customer Complaint Worker";
                     loader=new FXMLLoader(getClass().getResource("/ccwMainScreen.fxml"));
                     root = loader.load();
                     CCWMainScreenController controller3=loader.getController();
-                    controller3.setCurrUserId(id);
+                    controller3.setCurrUserName(name);
                     break;
                 default:
                     System.out.println("Illegal role");
@@ -227,6 +228,7 @@ public class StartingScreenController {
             scene=new Scene(root,1280,800);
             stage.setScene(scene);
             stage.setResizable(false);
+            stage.setOnCloseRequest(some_event->handleWorkerClose(name));
             stage.setTitle(title+" Main Screen");
             stage.show();
         }catch(Exception e){
@@ -234,20 +236,20 @@ public class StartingScreenController {
         }
     }
     @FXML
-    private void popUserAlreadyConnectedMessage(String id){
+    private void popUserAlreadyConnectedMessage(String name){
         Platform.runLater(()->{
             Alert a=new Alert(Alert.AlertType.ERROR);
             a.setTitle("User already connected!");
-            a.setHeaderText("User with ID: "+id+" is already connected.");
+            a.setHeaderText("User "+name+" is already connected.");
             a.show();
         });
     }
     @FXML
-    private void popUserDoesntExistMessage(String id){
+    private void popUserDoesntExistMessage(String name){
         Platform.runLater(()->{
                         Alert a=new Alert(Alert.AlertType.ERROR);
                         a.setTitle("User does not exist!");
-                        a.setHeaderText("User with ID: "+id+" does not exist.");
+                        a.setHeaderText("User "+name+" does not exist.");
                         a.show();
                     });
     }
@@ -391,17 +393,17 @@ public class StartingScreenController {
         this.userInfoList=event.getMessage().getUserInfoList();
     }
 
-    private boolean isCustomer(String id){
+    private boolean isCustomer(String name){
         for(UserInfo u: this.userInfoList){
-            if (u.getId().equals(id)) {
+            if (u.getName().toLowerCase().equals(name)) {
                 return u.getRole().equals("Customer");
             }
         }
         return false;
     }
-    private UserInfo getUserInfoById(String id){
+    private UserInfo getUserInfoByName(String name){
         for(UserInfo u: userInfoList){
-            if (u.getId().equals(id)){
+            if (u.getName().toLowerCase().equals(name)){
                 return u;
             }
         }
@@ -416,6 +418,15 @@ public class StartingScreenController {
         }
     }
 
+    private void handleCustomerClose(String name){
+        askDB("disconnectCustomer "+name);
+        stage.close();
+    }
+    private void handleWorkerClose(String name){
+        askDB("disconnectWorker "+name);
+        stage.close();
+    }
+
     @FXML
     private void initialize(){
         EventBus.getDefault().register(this);
@@ -426,12 +437,12 @@ public class StartingScreenController {
         this.passwordField.setVisible(false);
         this.availableMoviesButton.setDisable(true);
         //listener to limit inputID length and allowed characters
-        this.idTextField.textProperty().addListener((observable, oldValue, newValue) -> {
-            if (newValue.length() > 9) {
-                this.idTextField.setText(oldValue); // revert to old value if exceeds max length
+        this.nameTextField.textProperty().addListener((observable, oldValue, newValue) -> {
+            if (newValue.length() > 30) {
+                this.nameTextField.setText(oldValue); // revert to old value if exceeds max length
             }
-            if (!newValue.matches("[0-9]*")) {
-                this.idTextField.setText(oldValue);
+            if (!newValue.matches("[a-zA-z ']*")) {
+                this.nameTextField.setText(oldValue);
             }
         });
         //listener to limit password length and allowed characters
@@ -439,7 +450,7 @@ public class StartingScreenController {
             if (newValue.length() > 25) {
                 this.passwordField.setText(oldValue); // revert to old value if exceeds max length
             }
-            if (!newValue.matches("[a-zA-Z0-9., -!@#$%^&*()/]*")) {
+            if (!newValue.matches("[a-zA-Z0-9., !@#$%^&*()/]*")) {
                 this.passwordField.setText(oldValue);
             }
         });

@@ -38,12 +38,13 @@ public class SimpleChatClient extends Application {
         primaryStage.setResizable(false);
         primaryStage.show();
         PauseTransition delay=new PauseTransition(Duration.millis(1798.0));
-        delay.setOnFinished(event ->{
+        delay.setOnFinished(notevent ->{
             try{
                 //scene=new Scene(loadFXML("mainScreen"),1280,800);
                 scene=new Scene(loadFXML("startingScreen"),1280,800);
                 primaryStage.setScene(scene);
                 primaryStage.setResizable(false);
+                primaryStage.setOnCloseRequest(event->handleClose());
                 primaryStage.setTitle("Welcome Screen");
                 primaryStage.show();
             } catch (IOException e){
@@ -55,6 +56,9 @@ public class SimpleChatClient extends Application {
 
     }
 
+    private void handleClose(){
+        primaryStage.close();
+    }
 
     static void setRoot(String fxml) throws IOException {
         scene.setRoot(loadFXML(fxml));

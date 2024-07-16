@@ -24,12 +24,18 @@
                   <HBox fx:id="imageHBox" alignment="CENTER" prefHeight="335.0" prefWidth="1134.0" spacing="25.0" />
                </content>
             </ScrollPane>
-            <Button fx:id="upcomingMoviesButton" alignment="CENTER" layoutX="690.0" layoutY="203.0" mnemonicParsing="false" onAction="#showUpcomingMovies" prefHeight="39.0" prefWidth="235.0" text="Show Upcoming Movies" textAlignment="CENTER" wrapText="true">
+            <Button fx:id="cancelSelectionButton" layoutX="426.0" layoutY="246.0" mnemonicParsing="false" onAction="#cancelSelection" prefHeight="139.0" prefWidth="36.0" text="←">
+               <font>
+                  <Font size="14.0" />
+               </font>
+            </Button>
+            <HBox fx:id="selectedMovieHBox" alignment="CENTER" layoutX="459.0" layoutY="248.0" prefHeight="448.0" prefWidth="423.0" />
+            <Button fx:id="upcomingMoviesButton" alignment="CENTER" layoutX="882.0" layoutY="204.0" mnemonicParsing="false" onAction="#showUpcomingMovies" prefHeight="39.0" prefWidth="235.0" text="Show Upcoming Movies" textAlignment="CENTER" wrapText="true">
                <font>
                   <Font size="18.0" />
                </font>
             </Button>
-            <Button fx:id="availableMoviesButton" alignment="CENTER" layoutX="284.0" layoutY="205.0" mnemonicParsing="false" onAction="#showAvailableMovies" prefHeight="39.0" prefWidth="235.0" text="Show Available Movies" textAlignment="CENTER" wrapText="true">
+            <Button fx:id="availableMoviesButton" alignment="CENTER" layoutX="184.0" layoutY="206.0" mnemonicParsing="false" onAction="#showAvailableMovies" prefHeight="39.0" prefWidth="235.0" text="Show Available Movies" textAlignment="CENTER" wrapText="true">
                <font>
                   <Font size="18.0" />
                </font>

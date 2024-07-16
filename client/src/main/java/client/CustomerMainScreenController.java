@@ -17,6 +17,7 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import org.greenrobot.eventbus.EventBus;
@@ -32,16 +33,19 @@ public class CustomerMainScreenController {
     private Scene scene;
     private Parent root;
     private List<MovieInfo> movieInfoList;
+    private MovieInfo selectedMovieInfo=null;
     private List<UserInfo> userInfoList;
-    private String currUserId;
+    private String currUserName;
     private MovieInfo currMovieInfo;
 
     @FXML
     private Button availableMoviesButton;
-
+    @FXML
+    private HBox selectedMovieHBox;
     @FXML
     private Label infoLabel;
-
+    @FXML
+    private Button cancelSelectionButton;
     @FXML
     private ImageView backgroundImageView;
 
@@ -57,13 +61,33 @@ public class CustomerMainScreenController {
     @FXML
     private Button upcomingMoviesButton;
 
+
+
+
     @FXML
-    void setInfoLabel(String id){
-        infoLabel.setText("Connect Customer with ID: "+id);
+    private void cancelSelection(ActionEvent event){
+        askDB("getTitles");
+        selectedMovieHBox.setDisable(true);
+        selectedMovieHBox.setVisible(false);
+        cancelSelectionButton.setVisible(false);
+        cancelSelectionButton.setDisable(true);
+        upcomingMoviesButton.setDisable(false);
+        upcomingMoviesButton.setVisible(true);
+        availableMoviesButton.setDisable(false);
+        availableMoviesButton.setVisible(true);
+        imageHBox.setVisible(true);
+        imageHBox.setDisable(false);
+        imageScrollPane.setVisible(true);
+        imageScrollPane.setDisable(false);
+        showAvailableMovies();
+    }
+    @FXML
+    void setInfoLabel(String name){
+        infoLabel.setText(name+ " is connected.");
     }
     @FXML
     private void disconnectButtonPressed(ActionEvent event) {
-        askDB("disconnectCustomer "+currUserId);
+        askDB("disconnectCustomer "+currUserName);
         try {
             EventBus.getDefault().unregister(this);
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/startingScreen.fxml"));
@@ -112,39 +136,35 @@ public class CustomerMainScreenController {
         clearDisplay();
         displayMovies(getAvailableMovieInfoList());
     }
-    @FXML
-    private void popMessageWithMovieInfo(String title){
-        for(MovieInfo m: this.movieInfoList){
-            if(m.getName().equals(title)){
-                currMovieInfo=m;
-            }
-        }
-        if(currMovieInfo==null){
-            Platform.runLater(()->{
-                Alert alert=new Alert(Alert.AlertType.ERROR);
-                alert.setTitle("Movie not found in database");
-                alert.setHeaderText("Error looking for movie information to show");
-                alert.show();
-            });
-            return;
-        }
-        Platform.runLater(()->{
-            Alert alert = new Alert(Alert.AlertType.INFORMATION);
-            alert.setTitle("Information on "+currMovieInfo.getName());
-            alert.setHeaderText("This is information about the movie: "+currMovieInfo.getName()+"\n ");
-            alert.setContentText(currMovieInfo.toString());
-            alert.setResizable(true);
-            alert.setWidth(400.0);
-            alert.setHeight(600.0);
-            alert.show();
-        });
-    }
+
     @FXML
     private void handleImageClick(MouseEvent event){
-        ImageView clickedImageView=(ImageView) event.getSource();
-        String title=clickedImageView.getId();
-        popMessageWithMovieInfo(title);
+        VBox clickedImageImageView=(VBox) event.getSource();
+        String title=clickedImageImageView.getId();
+        for(MovieInfo m: this.movieInfoList){
+            if(m.getName().equals(title)){
+                this.selectedMovieInfo=m;
+            }
+        }
+        cancelSelectionButton.setVisible(true);
+        cancelSelectionButton.setDisable(false);
+        imageHBox.setVisible(false);
+        imageHBox.setDisable(true);
+        availableMoviesButton.setVisible(false);
+        availableMoviesButton.setDisable(true);
+        upcomingMoviesButton.setDisable(true);
+        upcomingMoviesButton.setVisible(false);
+        imageScrollPane.setDisable(true);
+        imageScrollPane.setVisible(false);
+        selectedMovieHBox.setVisible(true);
+        selectedMovieHBox.getChildren().clear();
+        selectedMovieHBox.getChildren().add(clickedImageImageView);
+        selectedMovieHBox.setAlignment(Pos.CENTER);
+        clickedImageImageView.setScaleX(1.8);
+        clickedImageImageView.setScaleY(1.8);
+        //HBox.setHgrow(clickedImageImageView, Priority.ALWAYS);
     }
+
      @FXML
     private void displayMovies(List<MovieInfo> movieInfoList) {
         for (MovieInfo movieInfo : movieInfoList) {
@@ -158,7 +178,6 @@ public class CustomerMainScreenController {
                     imageView.setFitWidth(200);
                     imageView.setFitHeight(250);
                     imageView.setPreserveRatio(false);
-                    imageView.setOnMouseClicked(this::handleImageClick);
                     imageView.setId(movieInfo.getName());
 
                     Label nameLabel = new Label(movieInfo.getName());
@@ -170,6 +189,7 @@ public class CustomerMainScreenController {
                     imageContainer.setAlignment(Pos.CENTER);
                     imageContainer.setMaxWidth(220);
                     imageContainer.setMaxHeight(260);
+                    if(movieInfo.getStatus().equals("Available")){imageContainer.setOnMouseClicked(this::handleImageClick);}
                     imageContainer.setStyle("-fx-border-color: black; -fx-border-width: 3;-fx-padding: 0");
 
 
@@ -233,8 +253,8 @@ public class CustomerMainScreenController {
         this.userInfoList=event.getMessage().getUserInfoList();
     }
 
-    public void setCurrUserId(String id){
-        this.currUserId=id;
+    public void setCurrUserName(String name){
+        this.currUserName=name;
     }
     private void askDB(String title){
         try {
@@ -244,11 +264,16 @@ public class CustomerMainScreenController {
             e.printStackTrace();
         }
     }
+
+
     @FXML
     private void initialize(){
         EventBus.getDefault().register(this);
         msgId=0;
+        this.cancelSelectionButton.setDisable(true);
+        this.cancelSelectionButton.setVisible(false);
         this.availableMoviesButton.setDisable(true);
+        this.selectedMovieHBox.setVisible(false);
         askDB("getBackgroundImage");
         askDB("getTitles");
         askDB("getUsers");

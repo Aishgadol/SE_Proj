@@ -10,9 +10,9 @@ public class CCWMainScreenController {
     private Stage stage;
     private Scene scene;
     private Parent root;
-    private String currUserId;
+    private String currUserName;
 
-    public void setCurrUserId(String id){
-        this.currUserId=id;
+    public void setCurrUserName(String name){
+        this.currUserName=name;
     }
 }
