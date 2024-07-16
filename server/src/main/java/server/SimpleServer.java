@@ -183,32 +183,62 @@ public class SimpleServer extends AbstractServer {
 		for(Customer c:this.customersList){
 			if(c.getId().equals(id)){
 				c.setConnected(1);
-				setUserInfoList();
 				session.saveOrUpdate(c);
 				session.flush();
 				session.getTransaction().commit();
 				session.beginTransaction();
+				setUserInfoList();
+				return true;
+			}
+		}
+		return false;
+	}
+	private boolean connectWorker(String id){
+		this.workersList=getWorkersFromDB();
+		for(Worker w:this.workersList){
+			if(w.getId().equals(id)){
+				w.setConnected(1);
+				session.saveOrUpdate(w);
+				session.flush();
+				session.getTransaction().commit();
+				session.beginTransaction();
+				setUserInfoList();
+				return true;
+			}
+		}
+		return false;
+	}
+	private boolean disconnectCustomer(String id){
+		this.customersList=getCustomersFromDB();
+		for(Customer c:this.customersList){
+			if (c.getId().equals(id)) {
+				c.setConnected(0);
+				session.saveOrUpdate(c);
+				session.flush();
+				session.getTransaction().commit();
+				session.beginTransaction();
+				setUserInfoList();
+				return true;
+			}
+		}
+		return false;
+	}
+	private boolean disconnectWorker(String id){
+		this.workersList=getWorkersFromDB();
+		for(Worker w:this.workersList){
+			if (w.getId().equals(id)) {
+				w.setConnected(0);
+				session.saveOrUpdate(w);
+				session.flush();
+				session.getTransaction().commit();
+				session.beginTransaction();
+				setUserInfoList();
 				return true;
 			}
 		}
 		return false;
 	}
 
-	private boolean connectWorker(String id){
-		this.workersList=getWorkersFromDB();
-		for(Worker w:this.workersList){
-			if(w.getId().equals(id)){
-				w.setConnected(1);
-				setUserInfoList();
-				session.saveOrUpdate(w);
-				session.flush();
-				session.getTransaction().commit();
-				session.beginTransaction();
-				return true;
-			}
-		}
-		return false;
-	}
 
 
 
@@ -490,6 +520,22 @@ public class SimpleServer extends AbstractServer {
 				String[] splitted=request.split(" ",2);
 				if(connectWorker(splitted[1])){
 					message.setMessage("Worker succesfully connected");
+					message.setUserInfoList(this.userInfoList);
+					sendToAllClients(message);
+				}
+			}
+			else if(request.startsWith("disconnectCustomer")){
+				String[] splitted=request.split(" ",2);
+				if(disconnectCustomer(splitted[1])){
+					message.setMessage("Customer succesfully disconnected");
+					message.setUserInfoList(this.userInfoList);
+					sendToAllClients(message);
+				}
+			}
+			else if(request.startsWith("disconnectWorker")){
+				String[] splitted=request.split(" ",2);
+				if(disconnectWorker(splitted[1])){
+					message.setMessage("Worker succesfully disconnected");
 					message.setUserInfoList(this.userInfoList);
 					sendToAllClients(message);
 				}

@@ -5,14 +5,20 @@ import entities.MovieInfo;
 import entities.UserInfo;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
+import javafx.event.Event;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.geometry.Pos;
+import javafx.scene.Node;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
+import javafx.stage.Stage;
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 
@@ -20,7 +26,10 @@ import java.io.ByteArrayInputStream;
 import java.util.ArrayList;
 import java.util.List;
 
-public class startingScreenController {
+public class StartingScreenController {
+    private Stage stage;
+    private Scene scene;
+    private Parent root;
     private MovieInfo currMovieInfo;
     private int msgId;
     private List<MovieInfo> movieInfoList=new ArrayList<>();
@@ -116,13 +125,13 @@ public class startingScreenController {
             }
             if(customerLoginModeEnabled){
                 askDB("connectCustomer "+chosenId);
-                changeToCustomerScreen(); //<-- need to somehow transfer to customer screen and also let new screen know about current customer that's working
+                changeToCustomerScreen(chosenId,event); //<-- need to somehow transfer to customer screen and also let new screen know about current customer that's working
             }
             else{
                 //also check if password is good(we got here so id is good)
                 if(passwordField.getText().equals(u0.getPassword())) {
                     askDB("connectWorker "+chosenId);
-                    changeToWorkerScreen(); //same issue here
+                    changeToWorkerScreen(chosenId,u0.getRole(),event); //same issue here
                 }
                 else{
                     Platform.runLater(()->{
@@ -137,12 +146,68 @@ public class startingScreenController {
         }
     }
     @FXML
-    private void changeToCustomerScreen(){
-
+    private void changeToCustomerScreen(String id,ActionEvent event){
+        try {
+            EventBus.getDefault().unregister(this);
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/customerMainScreen.fxml"));
+            root = loader.load();
+            CustomerMainScreenController controller = loader.getController();
+            controller.setCurrUserId(id);
+            stage=(Stage) ((Node)event.getSource()).getScene().getWindow();
+            scene=new Scene(root,1280,800);
+            stage.setScene(scene);
+            stage.setResizable(false);
+            stage.setTitle("Customer Main Screen");
+            stage.show();
+        }catch(Exception e){
+            e.printStackTrace();
+        }
     }
     @FXML
-    private void changeToWorkerScreen(){
-
+    private void changeToWorkerScreen(String id,String role,ActionEvent event){
+        try {
+            EventBus.getDefault().unregister(this);
+            FXMLLoader loader;
+            String title="";
+            switch(role){
+                case "General Manager":
+                    title="General Manager";
+                    loader=new FXMLLoader(getClass().getResource("/generalManagerMainScreen.fxml"));
+                    root = loader.load();
+                    GeneralManagerMainScreenController controller=controller=loader.getController();
+                    break;
+                case "Cinema Manager":
+                    title="Cinema Manager";
+                    loader=new FXMLLoader(getClass().getResource("/cinemaManagerMainScreen.fxml"));
+                    root = loader.load();
+                    CinemaManagerMainScreenController controller=controller=loader.getController();
+                    break;
+                case "Content Manager":
+                    title="Content Manager";
+                    loader=new FXMLLoader(getClass().getResource("/contentManagerMainScreen.fxml"));
+                    root = loader.load();
+                    ContentManagerMainScreenController controller=controller=loader.getController();
+                    break;
+                case "Customer Complaint Worker":
+                    title="Customer Complaint Worker";
+                    loader=new FXMLLoader(getClass().getResource("/ccwMainScreen.fxml"));
+                    root = loader.load();
+                    CCWMainScreenController controller=loader.getController();
+                    break;
+                default:
+                    System.out.println("Illegal role");
+                    break;
+            }
+            controller.setCurrUserId(id);
+            stage=(Stage) ((Node)event.getSource()).getScene().getWindow();
+            scene=new Scene(root,1280,800);
+            stage.setScene(scene);
+            stage.setResizable(false);
+            stage.setTitle(title+" Main Screen");
+            stage.show();
+        }catch(Exception e){
+            e.printStackTrace();
+        }
     }
     @FXML
     private void popUserAlreadyConnectedMessage(String id){
@@ -267,7 +332,7 @@ public class startingScreenController {
             }
         }
     }
-    List<MovieInfo> getAvailableMovieInfoList(){
+    private List<MovieInfo> getAvailableMovieInfoList(){
         List<MovieInfo> list=new ArrayList<>();
         for(MovieInfo m: this.movieInfoList){
             if(m.getStatus().equals("Available")){
@@ -276,7 +341,7 @@ public class startingScreenController {
         }
         return list;
     }
-    List<MovieInfo> getUpcomingMovieInfoList(){
+    private List<MovieInfo> getUpcomingMovieInfoList(){
         List<MovieInfo> list=new ArrayList<>();
         for(MovieInfo m: this.movieInfoList){
             if(m.getStatus().equals("Upcoming")){
@@ -300,10 +365,9 @@ public class startingScreenController {
     @Subscribe
     public void catchUserInfoList(UserInfoListEvent event){
         this.userInfoList=event.getMessage().getUserInfoList();
-
     }
 
-    boolean isCustomer(String id){
+    private boolean isCustomer(String id){
         for(UserInfo u: this.userInfoList){
             if (u.getId().equals(id)) {
                 return u.getRole().equals("Customer");
@@ -311,7 +375,7 @@ public class startingScreenController {
         }
         return false;
     }
-    UserInfo getUserInfoById(String id){
+    private UserInfo getUserInfoById(String id){
         for(UserInfo u: userInfoList){
             if (u.getId().equals(id)){
                 return u;
@@ -319,7 +383,7 @@ public class startingScreenController {
         }
         return null;
     }
-    void askDB(String title){
+    private void askDB(String title){
         try {
             Message message = new Message(msgId++, title);
             SimpleClient.getClient().sendToServer(message);
@@ -329,7 +393,7 @@ public class startingScreenController {
     }
 
     @FXML
-    void initialize(){
+    private void initialize(){
         EventBus.getDefault().register(this);
         msgId=0;
         askDB("getBackgroundImage");

@@ -54,6 +54,18 @@ public class SimpleClient extends AbstractClient {
 		else if(message.getMessage().startsWith("ListOfUserInfos")){
 			EventBus.getDefault().post(new UserInfoListEvent(message));
 		}
+		else if(message.getMessage().startsWith("Worker succesfully connected")){
+			EventBus.getDefault().post(new UserInfoListEvent(message));
+		}
+		else if(message.getMessage().startsWith("Customer succesfully connected")){
+			EventBus.getDefault().post(new UserInfoListEvent(message));
+		}
+		else if(message.getMessage().startsWith("Worker succesfully disconnected")){
+			EventBus.getDefault().post(new UserInfoListEvent(message));
+		}
+		else if(message.getMessage().startsWith("Customer succesfully disconnected")){
+			EventBus.getDefault().post(new UserInfoListEvent(message));
+		}
 		else {
 			EventBus.getDefault().post(new MessageEvent(message));
 		}
