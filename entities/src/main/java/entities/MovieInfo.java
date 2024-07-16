@@ -16,14 +16,16 @@ public class MovieInfo implements Serializable {
      String producer;
      String summary;
      String actors;
+     String status;
 
-    public MovieInfo(String name, String releaseDate,String genre, String producer, String actors, String summary){
+    public MovieInfo(String name, String releaseDate,String genre, String producer, String actors, String summary,String status){
         this.name=name;
         this.releaseDate=releaseDate;
         this.genre=genre;
         this.summary=summary;
         this.actors=actors;
         this.producer=producer;
+        this.status=status;
     }
 
     public MovieInfo(MovieInfo movieInfo){
@@ -33,6 +35,7 @@ public class MovieInfo implements Serializable {
         this.summary=movieInfo.getSummary();
         this.actors=movieInfo.getActors();
         this.producer=movieInfo.getProducer();
+        this.status=movieInfo.getStatus();
         this.displayTimes=movieInfo.getDisplayTimes();
     }
 
@@ -75,6 +78,13 @@ public class MovieInfo implements Serializable {
 
     public void setSummary(String summary){this.summary=summary;}
     public String getSummary(){return this.summary;}
+
+    public void setStatus(String status){
+        if(status.equals("Available") || status.equals("Upcoming")){
+            this.status=status;
+        }
+    }
+    public String getStatus(){return this.status;}
 
     public String toString(){
         StringBuilder sb=new StringBuilder();

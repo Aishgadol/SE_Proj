@@ -3,6 +3,7 @@ package server;
 
 import entities.Message;
 import entities.MovieInfo;
+import entities.UserInfo;
 import ocsf.AbstractServer;
 import ocsf.ConnectionToClient;
 import ocsf.SubscribedClient;
@@ -24,6 +25,7 @@ import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
 import org.hibernate.cfg.Configuration;
+import org.hibernate.jdbc.Work;
 import org.hibernate.service.ServiceRegistry;
 
 
@@ -34,8 +36,11 @@ public class SimpleServer extends AbstractServer {
 	private MovieInfo currMovieInfo;
 	private Movie currMovie;
 	private boolean gifMode=false;
-	private List<MovieInfo> movieInfos=new ArrayList<>(); //this list holds current movies in db at current time, keep it updated
+	private List<MovieInfo> movieInfoList=new ArrayList<>(); //this list holds current movies in db at current time, keep it updated
 	private List<DisplayTime> currDisplayTimes=new ArrayList<>();
+	private List<Worker> workersList=new ArrayList<>();
+	private List<Customer> customersList=new ArrayList<>();
+	private List<UserInfo> userInfoList=new ArrayList<>();
 
 
 	private static SessionFactory getSessionFactory() throws HibernateException{
@@ -52,28 +57,34 @@ public class SimpleServer extends AbstractServer {
 	}
 
 	//only use these functions if protoype database gets deleted, it should not happen.
-	/*
-	public void generateMovies() throws Exception {
-			Movie movie1=new Movie("Margol","1973","Romance","Zohar Argov","Margalit Tzanany, Eyal Golan, Shimi Tavory","MARGOL!");
+
+	public void generateData() throws Exception {
+			Movie movie1=new Movie("Margol","1973","Romance","Zohar Argov","Margalit Tzanany, Eyal Golan, Shimi Tavory","MARGOL!","Available");
 			movie1.setImageData(getImageFromFilesByTitleAsByteArray("margol"));
 			session.save(movie1);
-			Movie movie2=new Movie("The Boys","2018","Action","Billy Butcher","God","A bunch of no-good people trying to steal the country, will homelander be able to stop them?");
+			Movie movie2=new Movie("The Boys","2018","Action","Billy Butcher","God","A bunch of no-good people trying to steal the country, will homelander be able to stop them?","Available");
 			movie2.setImageData(getImageFromFilesByTitleAsByteArray("the_boys"));
 			session.save(movie2);
-			Movie movie3=new Movie("Scary Movie 5","2012","Comedy","Snoop Dogg","Terry Crews, Charlie Sheen", "Funny movie you should watch, its the 5th one");
+			Movie movie3=new Movie("Scary Movie 5","2012","Comedy","Snoop Dogg","Terry Crews, Charlie Sheen", "Funny movie you should watch, its the 5th one","Available");
 			movie3.setImageData(getImageFromFilesByTitleAsByteArray("scary_movie_5"));
 			session.save(movie3);
-			Movie movie4=new Movie("House of Cards","2006","Drama","Boujee Herzog","Bibi Netanyahu, Simha Rotman, Yoav Gallant, Tali Gotlib","Welcome to the house of corruption!");
+			Movie movie4=new Movie("House of Cards","2006","Drama","Boujee Herzog","Bibi Netanyahu, Simha Rotman, Yoav Gallant, Tali Gotlib","Welcome to the house of corruption!","Available");
 			movie4.setImageData(getImageFromFilesByTitleAsByteArray("house_of_cards"));
 			session.save(movie4);
-			Movie movie5=new Movie("Pulp Fiction","1969","Action","Quentin Tarantino","John Travolta, Samuel L. Jackson, Uma Thurman","Cool gangsters, bruce willis punching a mafia boss, drugs and dancing");
+			Movie movie5=new Movie("Pulp Fiction","1969","Action","Quentin Tarantino","John Travolta, Samuel L. Jackson, Uma Thurman","Cool gangsters, bruce willis punching a mafia boss, drugs and dancing","Available");
 			movie5.setImageData(getImageFromFilesByTitleAsByteArray("pulp_fiction"));
 			session.save(movie5);
-			Movie movie6=new Movie("Automobiles","2024","Comedy","Steven Spielberg","Dwayne Johnson, Kevin Hart, Kobi82","Parody movie about the movie Cars, much funnier to my opinion");
+			Movie movie6=new Movie("Automobiles","2024","Comedy","Steven Spielberg","Dwayne Johnson, Kevin Hart, Kobi82","Parody movie about the movie Cars, much funnier to my opinion","Available");
 			movie6.setImageData(getImageFromFilesByTitleAsByteArray("automobiles"));
 			session.save(movie6);
+			Worker w1=new Worker("000000000","Manager","Kobi Kobi","123456");
+			session.save(w1);
+			Customer c1=new Customer("000000001","CustomerMan");
+			session.save(c1);
             session.flush();
-	}*/
+	}
+
+
 
 
 	private List<Worker> getWorkersFromDB(){
@@ -120,7 +131,7 @@ public class SimpleServer extends AbstractServer {
 
 
 	private MovieInfo getMovieInfoByTitle(String title){
-		for(MovieInfo m : movieInfos){
+		for(MovieInfo m : movieInfoList){
 			if(m.getName().equals(title)){
 				return m;
 			}
@@ -152,13 +163,13 @@ public class SimpleServer extends AbstractServer {
 	//this func handles adding movie object to movie table
 	private boolean addMovieToDB(MovieInfo movieInfo) throws IOException {
 		//check if movie is already in movies, no error message sent back cuz not needed
-		for(MovieInfo m:this.movieInfos){
+		for(MovieInfo m:this.movieInfoList){
 			if(m.getName().equals(movieInfo.getName())){
 				//if the movie already exists in db, just dont do anything
 				return false;
 			}
 		}
-		this.movieInfos.add(movieInfo);
+		this.movieInfoList.add(movieInfo);
 		Movie movie=new Movie(movieInfo);
 		movie.setImageData(movieInfo.getImageData());
 		session.save(movie);
@@ -237,13 +248,13 @@ public class SimpleServer extends AbstractServer {
 			for(DisplayTime d:getDisplayTimesFromDB()){
 				removeDisplayTimeFromMovieFromDB(d.getDisplayTime());
 			}
-			this.movieInfos = removeMovieInfoWithName(this.movieInfos, movieToDelete.getName());
+			this.movieInfoList = removeMovieInfoWithName(this.movieInfoList, movieToDelete.getName());
 			session.saveOrUpdate(movieToDelete);
 			session.delete(movieToDelete);
 			session.flush();
 			session.getTransaction().commit();
 			session.beginTransaction();
-			setMovieInfos();
+			setMovieInfoList();
 		}catch(Exception e){
 			e.printStackTrace();
 		}
@@ -328,18 +339,29 @@ public class SimpleServer extends AbstractServer {
 		return imageData;
 	}
 
-	private void setMovieInfos(){
-		this.movieInfos=new ArrayList<>();
+	private void setMovieInfoList(){
+		this.movieInfoList=new ArrayList<>();
 		byte[] movieImageByteArray=null;
 		List<Movie> movies=getMoviesFromDB();
 		for(Movie m: movies){
-			MovieInfo mi=new MovieInfo(m.getName(),m.getReleasedate(),m.getGenre(),m.getProducer(),m.getActors(),m.getSummary());
+			MovieInfo mi=new MovieInfo(m.getName(),m.getReleasedate(),m.getGenre(),m.getProducer(),m.getActors(),m.getSummary(),m.getStatus());
 			mi.setImageData(m.getImageData());
 			//add display times from movie to movieinfo
 			for(DisplayTime d: m.getDisplayTimes()){
 				mi.addDisplayTime(d.getDisplayTime());
 			}
-			this.movieInfos.add(mi);
+			this.movieInfoList.add(mi);
+		}
+	}
+	private void setUserInfoList(){
+		this.customersList=getCustomersFromDB();
+		this.workersList=getWorkersFromDB();
+		this.userInfoList=new ArrayList<>();
+		for(Customer c: customersList){
+			userInfoList.add(new UserInfo(c.getId(),c.getName()));
+		}
+		for(Worker w: workersList){
+			userInfoList.add(new UserInfo(w.getId(),w.getRole(),w.getName()));
 		}
 	}
 
@@ -375,8 +397,8 @@ public class SimpleServer extends AbstractServer {
 				client.sendToClient(message);
 			}
 			else if(request.startsWith("getTitles")){
-				setMovieInfos();
-				message.setMovieInfoList(this.movieInfos);
+				setMovieInfoList();
+				message.setMovieInfoList(this.movieInfoList);
 				message.setMessage("ListOfMovieInfos");
 				client.sendToClient(message);
 			}
@@ -420,6 +442,12 @@ public class SimpleServer extends AbstractServer {
 				sendToAllClients(message);
 
 			}
+			else if(request.startsWith("getUsers")){
+				setUserInfoList();
+				message.setUserInfoList(this.userInfoList);
+				message.setMessage("ListOfUserInfos");
+				client.sendToClient(message);
+			}
 			else {
 				addMsgToDB(request);
 				StringBuilder s = new StringBuilder();
@@ -458,21 +486,23 @@ public class SimpleServer extends AbstractServer {
 			sessionFactory=getSessionFactory();
 			session=sessionFactory.openSession();
 			session.beginTransaction();
-			setMovieInfos(); //uncomment this when hibernate is on update mode
+			//setMovieInfoList(); //uncomment this when hibernate is on update mode
+			//setUserInfoList();
 		} catch(Exception e) {
 			if(session!=null){
 				session.getTransaction().rollback();
 			}
 			e.printStackTrace();
 		}//uncomment this section when running server for the first time
-		/*try{
-			generateMovies();
-			setMovieInfos();
+		try{
+			generateData();
+			setMovieInfoList();
+			setUserInfoList();
 		}catch(Exception e) {
 			e.printStackTrace();
 		}
 		session.getTransaction().commit();
-		session.beginTransaction();*/
+		session.beginTransaction();
 	}
 
 	public void sendToAllClients(Message message) {
@@ -510,6 +540,26 @@ public class SimpleServer extends AbstractServer {
 		while (iterator.hasNext()) {
 			MovieInfo obj = iterator.next();
 			if (obj.getName().equals(nameToRemove)) {
+				iterator.remove();
+			}
+		}
+	return list;
+	}
+	private List<Customer> removeCustomerWithId(List<Customer> list, String idToRemove) {
+		Iterator<Customer> iterator = list.iterator();
+		while (iterator.hasNext()) {
+			Customer obj = iterator.next();
+			if (obj.getId().equals(idToRemove)) {
+				iterator.remove();
+			}
+		}
+	return list;
+	}
+	private List<Worker> removeWorkerWithId(List<Worker> list, String idToRemove) {
+		Iterator<Worker> iterator = list.iterator();
+		while (iterator.hasNext()) {
+			Worker obj = iterator.next();
+			if (obj.getId().equals(idToRemove)) {
 				iterator.remove();
 			}
 		}

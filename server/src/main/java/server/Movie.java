@@ -29,6 +29,9 @@ public class Movie implements Serializable {
     @Column
     String genre;
 
+    @Column(name="Availability_Status")
+    String status;
+
     @Column
     String producer;
 
@@ -64,6 +67,7 @@ public class Movie implements Serializable {
         this.summary=movieInfo.getSummary();
         this.actors=movieInfo.getActors();
         this.producer=movieInfo.getProducer();
+        this.status=movieInfo.getStatus();
         /*if(movieInfo.getDisplayTimes().size()!=0){
             for(String d : movieInfo.getDisplayTimes()){
                 this.displayTimes.add(new DisplayTime(d));
@@ -71,13 +75,14 @@ public class Movie implements Serializable {
         }*/ //might delete later
     }
 
-    public Movie(String name, String releaseDate,String genre, String producer, String actors, String summary){
+    public Movie(String name, String releaseDate,String genre, String producer, String actors, String summary,String status){
         this.name=name;
         this.releaseDate=releaseDate;
         this.genre=genre;
         this.summary=summary;
         this.actors=actors;
         this.producer=producer;
+        this.status=status;
     }
 
     public void setName(String name){
@@ -111,6 +116,13 @@ public class Movie implements Serializable {
 
     public void setSummary(String summary){this.summary=summary;}
     public String getSummary(){return this.summary;}
+
+    public void setStatus(String status){
+        if(status.equals("Available") || status.equals("Upcoming")){
+            this.status=status;
+        }
+    }
+    public String getStatus(){return this.status;}
 
     public String toString(){
         StringBuilder sb=new StringBuilder();

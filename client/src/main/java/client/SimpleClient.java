@@ -49,7 +49,10 @@ public class SimpleClient extends AbstractClient {
 			EventBus.getDefault().post(new MovieRemovedSuccesfullyEvent(message));
 		}
 		else if(message.getMessage().startsWith("opening gif")){
-			EventBus.getDefault().post((new OpeningGifEvent(message)));
+			EventBus.getDefault().post(new OpeningGifEvent(message));
+		}
+		else if(message.getMessage().startsWith("ListOfUserInfos")){
+			EventBus.getDefault().post(new UserInfoListEvent(message));
 		}
 		else {
 			EventBus.getDefault().post(new MessageEvent(message));

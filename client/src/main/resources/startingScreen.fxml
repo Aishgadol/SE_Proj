@@ -38,6 +38,16 @@
                </font>
             </Button>
             <PasswordField fx:id="passwordField" layoutX="525.0" layoutY="700.0" prefHeight="39.0" prefWidth="238.0" promptText="Enter your password" />
+            <Button fx:id="changeModeButton" layoutX="245.0" layoutY="680.0" mnemonicParsing="false" onAction="#changeModeButtonPressed" prefHeight="36.0" prefWidth="191.0" text="Change Login Mode" textAlignment="CENTER" wrapText="true">
+               <font>
+                  <Font size="18.0" />
+               </font>
+            </Button>
+            <Label fx:id="statusLabel" alignment="CENTER" contentDisplay="CENTER" layoutX="178.0" layoutY="632.0" prefHeight="39.0" prefWidth="313.0" text="Current Login Mode: Customer Login" textAlignment="CENTER" wrapText="true">
+               <font>
+                  <Font size="17.0" />
+               </font>
+            </Label>
          </children>
       </AnchorPane>
    </children>

@@ -1,5 +1,7 @@
 package server;
 
+import entities.UserInfo;
+
 import javax.persistence.*;
 import javax.persistence.Entity;
 import java.io.Serializable;
@@ -11,7 +13,7 @@ public class Worker implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    int index;
+    int id;
 
     @Column(name="User_ID", unique=true, nullable = false)
     String userID;
@@ -22,19 +24,24 @@ public class Worker implements Serializable {
     @Column(name="Full_Name")
     String name;
 
+    @Column(name="password")
+    String password;
+
     public Worker(){
     }
 
-    public Worker(String id, String role,String name){
+    public Worker(String id, String role,String name,String password){
         this.userID=id;
         this.role=role;
         this.name=name;
+        this.password=password;
     }
 
     public Worker(Worker w){
         this.userID=w.getId();
         this.role=w.getRole();
         this.name=w.getName();
+        this.password=w.getPassword();
     }
 
     public void setId(String id){
@@ -54,5 +61,11 @@ public class Worker implements Serializable {
     }
     public String getName(){
         return this.name;
+    }
+    public void setPassword(String p){
+        this.password=p;
+    }
+    public String getPassword(){
+        return this.password;
     }
 }

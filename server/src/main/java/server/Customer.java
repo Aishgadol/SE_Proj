@@ -1,5 +1,7 @@
 package server;
 
+import entities.UserInfo;
+
 import javax.persistence.*;
 import javax.persistence.Entity;
 import java.io.Serializable;
@@ -11,7 +13,7 @@ public class Customer implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    int index;
+    int id;
 
     @Column(name="User_ID", unique=true, nullable = false)
     String userID;
@@ -22,8 +24,8 @@ public class Customer implements Serializable {
     @Column(name="Full_Name")
     String name;
 
-    public Customer(){
-    }
+    public Customer(){}
+
     public Customer(String Id,String name){
         this.userID=Id;
         this.role="Customer";

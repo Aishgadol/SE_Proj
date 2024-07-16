@@ -55,11 +55,12 @@ public class AddMovieController {
     private TextField actorsTextField;
     @FXML
     private TextField producerTextField;
+    @private ComboBox<String> statusComboBox;
 
     private void setCurrMovieInfo(){
         this.currMovieInfo=new MovieInfo(this.movieNameTextField.getText(),
                 this.chooseYearComboBox.getValue(),this.genreComboBox.getValue(),
-                this.producerTextField.getText(),this.actorsTextField.getText(),this.summaryTextArea.getText());
+                this.producerTextField.getText(),this.actorsTextField.getText(),this.summaryTextArea.getText(),this.statusComboBox.getValue());
         this.currMovieInfo.setImageData(this.currImageData);
     }
 
@@ -244,6 +245,7 @@ public class AddMovieController {
         List<String> times=generateYears();//initialization of timeslots
         this.chooseYearComboBox.getItems().addAll(times);
         this.genreComboBox.getItems().addAll("Action", "Comedy", "Romance","Drama","Horror");
+        this.statusComboBox.getItems().addAll("Available","Upcoming");
         this.summaryTextArea.setWrapText(true);
 
         //listener to limit name length

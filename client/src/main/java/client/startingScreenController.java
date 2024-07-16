@@ -23,8 +23,9 @@ import java.util.List;
 public class startingScreenController {
     private MovieInfo currMovieInfo;
     private int msgId;
-    private List<MovieInfo> currMovieInfos;
-    private List<UserInfo> users=new ArrayList<>();
+    private List<MovieInfo> movieInfoList=new ArrayList<>();
+    boolean customerLoginModeEnabled=true;
+    private List<UserInfo> userInfoList=new ArrayList<>();
     @FXML
     private ImageView backgroundImageView;
 
@@ -38,13 +39,32 @@ public class startingScreenController {
 
     @FXML
     private ScrollPane imageScrollPane;
-
+    @FXML
+    private Label statusLabel;
     @FXML
     private Button loginButton;
 
     @FXML
     private PasswordField passwordField;
+    @FXML
+    private Button changeModeButton;
 
+
+    @FXML
+    void changeModeButtonPressed(ActionEvent event){
+        if(customerLoginModeEnabled){
+            //change to worker login
+            statusLabel.setText("Current Login Mode: Worker Login");
+            passwordField.setVisible(true);
+            customerLoginModeEnabled=false;
+        }
+        else{
+            //change to customer login
+            statusLabel.setText("Current Login Mode: Customer Login");
+            passwordField.setVisible(false);
+            customerLoginModeEnabled=true;
+        }
+    }
     @FXML
     void loginButtonPressed(ActionEvent event) {
         if(idTextField.getText().length()!=9){
@@ -56,16 +76,20 @@ public class startingScreenController {
             });
         }
         else{
-            //here we need to transfer the screen to be the Customer screen, since it's a customer
+            if(customerLoginModeEnabled){
+                //check customer exists, then transfer to customer page (update that the custoemr has connected too)
+                System.out.println("customer login");
+            }
+            else{
+                //check worker exists, then transfer to worker page according to role(update that the worker has connected too)
+                System.out.println("worker login");
+            }
         }
     }
-    @FXML
-    void workerLoginButtonPressed(ActionEvent event){
-        //here we need to transfer worker screen, depends on which worker (General Manager, Cinema Manager, Content Manager, CustomerComplaintWorker
-    }
+
     @FXML
     private void popMessageWithMovieInfo(String title){
-        for(MovieInfo m: this.currMovieInfos){
+        for(MovieInfo m: this.movieInfoList){
             if(m.getName().equals(title)){
                 currMovieInfo=m;
             }
@@ -98,7 +122,7 @@ public class startingScreenController {
     }
      @FXML
     private void displayAllMovies() {
-        for (MovieInfo movieInfo : this.currMovieInfos) {
+        for (MovieInfo movieInfo : this.movieInfoList) {
             byte[] data = movieInfo.getImageData();
             if (data != null) {
                 try {
@@ -172,7 +196,7 @@ public class startingScreenController {
 
     @Subscribe
     public void catchMovieInfoList(MovieInfoListEvent event){
-        this.currMovieInfos=event.getMessage().getMovieInfoList();
+        this.movieInfoList=event.getMessage().getMovieInfoList();
         clearDisplay();
         displayAllMovies();
     }
@@ -181,17 +205,28 @@ public class startingScreenController {
         byte[] data=event.getMessage().getImageData();
         setBackground(data);
     }
+    @Subscribe
+    public void catchUserInfoList(UserInfoListEvent event){
+        this.userInfoList=event.getMessage().getUserInfoList();
 
+    }
 
     boolean isCustomer(String id){
-        for(UserInfo u: users){
+        for(UserInfo u: this.userInfoList){
             if (u.getId().equals(id)) {
-                return u.getRole().equals("customer");
+                return u.getRole().equals("Customer");
             }
         }
         return false;
     }
-
+    UserInfo getUserInfoById(String id){
+        for(UserInfo u: userInfoList){
+            if (u.getId().equals(id)){
+                return u;
+            }
+        }
+        return null;
+    }
     void askDB(String title){
         try {
             Message message = new Message(msgId++, title);
@@ -207,6 +242,7 @@ public class startingScreenController {
         msgId=0;
         askDB("getBackgroundImage");
         askDB("getTitles");
+        askDB("getUsers");
         this.passwordField.setVisible(false);
         //listener to limit inputID length and allowed characters
         this.idTextField.textProperty().addListener((observable, oldValue, newValue) -> {
@@ -215,15 +251,6 @@ public class startingScreenController {
             }
             if (!newValue.matches("[0-9]*")) {
                 this.idTextField.setText(oldValue);
-            }
-            if(newValue.length()==9){
-                if(isCustomer(newValue)){
-                    passwordField.setVisible(true);
-                    loginButton.setDisable(true);
-                    loginButton.setVisible(false);
-                    workerLoginButton.setVisible(true);
-                    workerLoginButton.setDisable(false);
-                }
             }
         });
         //listener to limit password length and allowed characters

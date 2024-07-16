@@ -6,17 +6,35 @@ public class UserInfo implements Serializable {
     String id;
     String role;
     String name;
+    String password;
 
+    public UserInfo(){}
+
+    public UserInfo(String id, String role,String name,String password){
+        this.id=id;
+        this.role=role;
+        this.name=name;
+        this.password=password;
+    }
     public UserInfo(String id, String role,String name){
         this.id=id;
         this.role=role;
         this.name=name;
+        this.password="";
+    }
+
+    public UserInfo(String id, String name){
+        this.id=id;
+        this.name=name;
+        this.role="Customer";
+        this.password="";
     }
 
     public UserInfo(UserInfo u){
         this.id=u.getId();
         this.role=u.getRole();
         this.name=u.getName();
+        this.password=u.getPassword();
     }
 
     public void setId(String id){
@@ -39,4 +57,6 @@ public class UserInfo implements Serializable {
     public String getName(){
         return this.name;
     }
+    public String getPassword(){return this.password;}
+    public void setPassword(String p){this.password=p;}
 }
