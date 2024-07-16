@@ -79,7 +79,7 @@ public class SimpleServer extends AbstractServer {
 			session.save(movie6);
 			Worker w1=new Worker("111111111","General Manager","Kobi Kobi","123456");
 			session.save(w1);
-			Customer c1=new Customer("000000000","CustomerMan");
+			Customer c1=new Customer("000000000","bo");
 			session.save(c1);
             session.flush();
 	}

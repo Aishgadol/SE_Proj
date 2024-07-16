@@ -36,8 +36,13 @@ public class CustomerMainScreenController {
     private MovieInfo selectedMovieInfo=null;
     private List<UserInfo> userInfoList;
     private String currUserName;
+    private HBox chosenImageContainer=null;
     private MovieInfo currMovieInfo;
 
+    @FXML
+    private Button purchaseTicketButton;
+    @FXML
+    private ScrollPane movieInfoScrollPane;
     @FXML
     private Button availableMoviesButton;
     @FXML
@@ -48,7 +53,8 @@ public class CustomerMainScreenController {
     private Button cancelSelectionButton;
     @FXML
     private ImageView backgroundImageView;
-
+    @FXML
+    private Label movieInfoLabel;
     @FXML
     private Button disconnectButton;
 
@@ -63,18 +69,41 @@ public class CustomerMainScreenController {
 
 
 
-
+    @FXML
+    private void purchaseTicketPressed(ActionEvent event){
+        try {
+            EventBus.getDefault().unregister(this);
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/purchaseTicketScreen.fxml"));
+            root = loader.load();
+            PurchaseTicketScreenController controller = loader.getController();
+            controller.setCurrUserName(this.currUserName);
+            controller.setImageContainer(this.chosenImageContainer);
+            stage=(Stage) ((Node)event.getSource()).getScene().getWindow();
+            scene=new Scene(root,800,800);
+            stage.setScene(scene);
+            stage.setResizable(false);
+            stage.setOnCloseRequest(some_event->handleClose(currUserName));
+            stage.setTitle("Purchase Ticket");
+            stage.show();
+        }catch(Exception e){
+            e.printStackTrace();
+        }
+    }
     @FXML
     private void cancelSelection(ActionEvent event){
         askDB("getTitles");
         selectedMovieHBox.setDisable(true);
         selectedMovieHBox.setVisible(false);
         cancelSelectionButton.setVisible(false);
+        this.purchaseTicketButton.setVisible(false);
+        this.purchaseTicketButton.setDisable(true);
         cancelSelectionButton.setDisable(true);
         upcomingMoviesButton.setDisable(false);
         upcomingMoviesButton.setVisible(true);
+        movieInfoScrollPane.setVisible(false);
         availableMoviesButton.setDisable(false);
         availableMoviesButton.setVisible(true);
+        movieInfoLabel.setVisible(false);
         imageHBox.setVisible(true);
         imageHBox.setDisable(false);
         imageScrollPane.setVisible(true);
@@ -146,6 +175,9 @@ public class CustomerMainScreenController {
                 this.selectedMovieInfo=m;
             }
         }
+        movieInfoScrollPane.setVisible(true);
+        movieInfoLabel.setText(this.selectedMovieInfo.toString());
+        movieInfoLabel.setVisible(true);
         cancelSelectionButton.setVisible(true);
         cancelSelectionButton.setDisable(false);
         imageHBox.setVisible(false);
@@ -153,12 +185,15 @@ public class CustomerMainScreenController {
         availableMoviesButton.setVisible(false);
         availableMoviesButton.setDisable(true);
         upcomingMoviesButton.setDisable(true);
+        this.purchaseTicketButton.setVisible(true);
+        this.purchaseTicketButton.setDisable(false);
         upcomingMoviesButton.setVisible(false);
         imageScrollPane.setDisable(true);
         imageScrollPane.setVisible(false);
         selectedMovieHBox.setVisible(true);
         selectedMovieHBox.getChildren().clear();
         selectedMovieHBox.getChildren().add(clickedImageImageView);
+        this.chosenImageContainer=selectedMovieHBox;
         selectedMovieHBox.setAlignment(Pos.CENTER);
         clickedImageImageView.setScaleX(1.8);
         clickedImageImageView.setScaleY(1.8);
@@ -187,6 +222,7 @@ public class CustomerMainScreenController {
                     VBox imageContainer = new VBox();
                     imageContainer.getChildren().addAll(imageView, nameLabel);
                     imageContainer.setAlignment(Pos.CENTER);
+                    imageContainer.setId(movieInfo.getName());
                     imageContainer.setMaxWidth(220);
                     imageContainer.setMaxHeight(260);
                     if(movieInfo.getStatus().equals("Available")){imageContainer.setOnMouseClicked(this::handleImageClick);}
@@ -264,7 +300,10 @@ public class CustomerMainScreenController {
             e.printStackTrace();
         }
     }
-
+    private void handleClose(String name){
+        askDB("disconnectCustomer "+name);
+        stage.close();
+    }
 
     @FXML
     private void initialize(){
@@ -273,7 +312,12 @@ public class CustomerMainScreenController {
         this.cancelSelectionButton.setDisable(true);
         this.cancelSelectionButton.setVisible(false);
         this.availableMoviesButton.setDisable(true);
+        this.movieInfoScrollPane.setVisible(false);
         this.selectedMovieHBox.setVisible(false);
+        this.imageHBox.setVisible(true);
+        this.purchaseTicketButton.setVisible(false);
+        this.purchaseTicketButton.setDisable(true);
+        this.imageScrollPane.setVisible(true);
         askDB("getBackgroundImage");
         askDB("getTitles");
         askDB("getUsers");

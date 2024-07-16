@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+
+<VBox prefHeight="700.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="client.PurchaseTicketScreenController">
+   <children>
+      <AnchorPane prefHeight="700.0" prefWidth="600.0">
+         <children>
+            <ImageView fx:id="backgroundImageView" blendMode="SRC_ATOP" fitHeight="700.0" fitWidth="600.0" opacity="0.19" pickOnBounds="true" />
+            <Label alignment="CENTER" layoutX="147.0" layoutY="14.0" mouseTransparent="true" prefHeight="58.0" prefWidth="480.0" text="CINEMA NAMAL" textAlignment="CENTER">
+               <font>
+                  <Font name="Constantia" size="60.0" />
+               </font>
+            </Label>
+            <Label alignment="CENTER" layoutX="14.0" layoutY="72.0" mouseTransparent="true" prefWidth="743.0" text="Purchase Ticket" textAlignment="CENTER">
+               <font>
+                  <Font name="Constantia" size="55.0" />
+               </font>
+            </Label>
+            <HBox fx:id="selectedMovieHBox" alignment="CENTER" layoutX="191.0" layoutY="140.0" prefHeight="260.0" prefWidth="220.0" />
+            <Button fx:id="backButton" alignment="CENTER" contentDisplay="CENTER" graphicTextGap="0.0" mnemonicParsing="false" onAction="#backButtonPressed" prefHeight="0.0" prefWidth="0.0" text="←" textOverrun="CLIP" wrapText="true">
+               <font>
+                  <Font name="System Bold" size="21.0" />
+               </font>
+            </Button>
+         </children>
+      </AnchorPane>
+   </children>
+</VBox>

@@ -89,14 +89,14 @@ public class MovieInfo implements Serializable {
     public String toString(){
         StringBuilder sb=new StringBuilder();
         sb.append("Movie Information:\n");
-        sb.append("Name: ").append(this.name).append("\n");
-        sb.append("Release Date: ").append(this.releaseDate).append("\n");
-        sb.append("Genre: ").append(this.genre).append("\n");
-        sb.append("Producer: ").append(this.producer).append("\n");
-        sb.append("Summary: ").append(this.summary).append("\n");
-        sb.append("Actors: ").append(this.actors).append("\n");
+        sb.append("Name: \n").append(this.name).append("\n\n");
+        sb.append("Release Date: \n").append(this.releaseDate).append("\n\n");
+        sb.append("Genre: \n").append(this.genre).append("\n\n");
+        sb.append("Producer: \n").append(this.producer).append("\n\n");
+        sb.append("Actors: \n").append(this.actors).append("\n\n");
+        sb.append("Summary: \n").append(this.summary).append("\n\n");
 
-        sb.append("Display Times:\n");
+        sb.append("Display Times:\n\n");
         for (String dt : this.displayTimes) {
             sb.append("  - ").append(dt).append("\n");
         }
