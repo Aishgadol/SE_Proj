@@ -118,20 +118,40 @@ public class StartingScreenController {
                 popUserDoesntExistMessage(chosenId);
                 return;
             }
-            if(u0.getConnected()!=0){
-                //user is already connected
-                popUserAlreadyConnectedMessage(chosenId);
-                return;
-            }
             if(customerLoginModeEnabled){
-                askDB("connectCustomer "+chosenId);
-                changeToCustomerScreen(chosenId,event); //<-- need to somehow transfer to customer screen and also let new screen know about current customer that's working
+                if(u0.getRole().equals("Customer")){
+                    if(u0.getConnected()==0) {
+                        askDB("connectCustomer " + chosenId);
+                        changeToCustomerScreen(chosenId, event);
+                    }
+                    else{
+                        popUserAlreadyConnectedMessage(chosenId);
+                    }
+                }
+                else{
+                    popUserDoesntExistMessage(chosenId);
+                }
             }
             else{
                 //also check if password is good(we got here so id is good)
+                if(!u0.getRole().equals("General Manager") && !u0.getRole().equals("Cinema Manager") && !u0.getRole().equals("Content Manager") && !u0.getRole().equals("Customer Complaint Worker")){
+                    Platform.runLater(()->{
+                        Alert a=new Alert(Alert.AlertType.ERROR);
+                        a.setTitle("User is not a worker");
+                        a.setHeaderText("User with ID: "+chosenId+" is not a worker.");
+                        a.setResizable(false);
+                        a.show();
+                    });
+                    return;
+                }
                 if(passwordField.getText().equals(u0.getPassword())) {
-                    askDB("connectWorker "+chosenId);
-                    changeToWorkerScreen(chosenId,u0.getRole(),event); //same issue here
+                    if(u0.getConnected()==0) {
+                        askDB("connectWorker " + chosenId);
+                        changeToWorkerScreen(chosenId, u0.getRole(), event); //same issue here
+                    }
+                    else{
+                        popUserAlreadyConnectedMessage(chosenId);
+                    }
                 }
                 else{
                     Platform.runLater(()->{
@@ -153,6 +173,7 @@ public class StartingScreenController {
             root = loader.load();
             CustomerMainScreenController controller = loader.getController();
             controller.setCurrUserId(id);
+            controller.setInfoLabel(id);
             stage=(Stage) ((Node)event.getSource()).getScene().getWindow();
             scene=new Scene(root,1280,800);
             stage.setScene(scene);

@@ -59,5 +59,5 @@ public class Customer implements Serializable {
         return this.connected;
     }
     public void setConnected(int c){this.connected=c;}
-
+    public String getPassword(){return null;}
 }

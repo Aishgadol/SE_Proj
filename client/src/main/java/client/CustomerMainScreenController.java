@@ -40,6 +40,9 @@ public class CustomerMainScreenController {
     private Button availableMoviesButton;
 
     @FXML
+    private Label infoLabel;
+
+    @FXML
     private ImageView backgroundImageView;
 
     @FXML
@@ -55,13 +58,17 @@ public class CustomerMainScreenController {
     private Button upcomingMoviesButton;
 
     @FXML
+    void setInfoLabel(String id){
+        infoLabel.setText("Connect Customer with ID: "+id);
+    }
+    @FXML
     private void disconnectButtonPressed(ActionEvent event) {
         askDB("disconnectCustomer "+currUserId);
         try {
             EventBus.getDefault().unregister(this);
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/startingScreen.fxml"));
             root = loader.load();
-            CustomerMainScreenController controller = loader.getController();
+            StartingScreenController controller = loader.getController();
             stage=(Stage) ((Node)event.getSource()).getScene().getWindow();
             scene=new Scene(root,1280,800);
             stage.setScene(scene);
@@ -241,6 +248,7 @@ public class CustomerMainScreenController {
     private void initialize(){
         EventBus.getDefault().register(this);
         msgId=0;
+        this.availableMoviesButton.setDisable(true);
         askDB("getBackgroundImage");
         askDB("getTitles");
         askDB("getUsers");

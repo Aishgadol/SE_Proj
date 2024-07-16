@@ -77,9 +77,9 @@ public class SimpleServer extends AbstractServer {
 			Movie movie6=new Movie("Automobiles","2024","Comedy","Steven Spielberg","Dwayne Johnson, Kevin Hart, Kobi82","Parody movie about the movie Cars, much funnier to my opinion","Available");
 			movie6.setImageData(getImageFromFilesByTitleAsByteArray("automobiles"));
 			session.save(movie6);
-			Worker w1=new Worker("000000000","Manager","Kobi Kobi","123456");
+			Worker w1=new Worker("111111111","General Manager","Kobi Kobi","123456");
 			session.save(w1);
-			Customer c1=new Customer("000000001","CustomerMan");
+			Customer c1=new Customer("000000000","CustomerMan");
 			session.save(c1);
             session.flush();
 	}
@@ -417,11 +417,16 @@ public class SimpleServer extends AbstractServer {
 		this.customersList=getCustomersFromDB();
 		this.workersList=getWorkersFromDB();
 		this.userInfoList=new ArrayList<>();
+		UserInfo u=null;
 		for(Customer c: customersList){
-			userInfoList.add(new UserInfo(c.getId(),c.getName()));
+			u=new UserInfo(c.getId(),c.getName());
+			u.setConnected(c.getConnected());
+			userInfoList.add(u);
 		}
 		for(Worker w: workersList){
-			userInfoList.add(new UserInfo(w.getId(),w.getRole(),w.getName()));
+			u=new UserInfo(w.getId(),w.getRole(),w.getName(),w.getPassword());
+			u.setConnected(w.getConnected());
+			userInfoList.add(u);
 		}
 	}
 
