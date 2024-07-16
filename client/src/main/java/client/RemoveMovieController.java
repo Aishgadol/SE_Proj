@@ -65,7 +65,7 @@ public class RemoveMovieController {
 
     @Subscribe
     public void catchTitles(MovieInfoListEvent event){
-        this.movieInfos=event.getMessage().getList();
+        this.movieInfos=event.getMessage().getMovieInfoList();
         displayMovies();
     }
     @Subscribe

@@ -7,9 +7,6 @@ import ocsf.AbstractServer;
 import ocsf.ConnectionToClient;
 import ocsf.SubscribedClient;
 
-import java.awt.image.BufferedImage;
-import java.io.ByteArrayInputStream;
-import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -17,7 +14,6 @@ import java.nio.file.Paths;
 import java.util.*;
 import java.util.List;
 
-import javax.imageio.ImageIO;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Predicate;
@@ -48,13 +44,15 @@ public class SimpleServer extends AbstractServer {
 		configuration.addAnnotatedClass(Msg.class);
 		configuration.addAnnotatedClass(Movie.class);
 		configuration.addAnnotatedClass(DisplayTime.class);
+		configuration.addAnnotatedClass(Worker.class);
+		configuration.addAnnotatedClass(Customer.class);
 
 		ServiceRegistry serviceRegistry=new StandardServiceRegistryBuilder().applySettings(configuration.getProperties()).build();
 		return configuration.buildSessionFactory(serviceRegistry);
 	}
 
 	//only use these functions if protoype database gets deleted, it should not happen.
-
+	/*
 	public void generateMovies() throws Exception {
 			Movie movie1=new Movie("Margol","1973","Romance","Zohar Argov","Margalit Tzanany, Eyal Golan, Shimi Tavory","MARGOL!");
 			movie1.setImageData(getImageFromFilesByTitleAsByteArray("margol"));
@@ -75,6 +73,20 @@ public class SimpleServer extends AbstractServer {
 			movie6.setImageData(getImageFromFilesByTitleAsByteArray("automobiles"));
 			session.save(movie6);
             session.flush();
+	}*/
+
+
+	private List<Worker> getWorkersFromDB(){
+		CriteriaBuilder builder=session.getCriteriaBuilder();
+		CriteriaQuery<Worker> query=builder.createQuery(Worker.class);
+		query.from(Worker.class);
+        return session.createQuery(query).getResultList();
+	}
+	private List<Customer> getCustomersFromDB(){
+		CriteriaBuilder builder=session.getCriteriaBuilder();
+		CriteriaQuery<Customer> query=builder.createQuery(Customer.class);
+		query.from(Customer.class);
+        return session.createQuery(query).getResultList();
 	}
 
 	private List<Movie> getMoviesFromDB(){
@@ -364,7 +376,7 @@ public class SimpleServer extends AbstractServer {
 			}
 			else if(request.startsWith("getTitles")){
 				setMovieInfos();
-				message.setList(this.movieInfos);
+				message.setMovieInfoList(this.movieInfos);
 				message.setMessage("ListOfMovieInfos");
 				client.sendToClient(message);
 			}
@@ -446,21 +458,21 @@ public class SimpleServer extends AbstractServer {
 			sessionFactory=getSessionFactory();
 			session=sessionFactory.openSession();
 			session.beginTransaction();
-			//setMovieInfos(); //uncomment this when hibernate is on update mode
+			setMovieInfos(); //uncomment this when hibernate is on update mode
 		} catch(Exception e) {
 			if(session!=null){
 				session.getTransaction().rollback();
 			}
 			e.printStackTrace();
 		}//uncomment this section when running server for the first time
-		try{
+		/*try{
 			generateMovies();
 			setMovieInfos();
 		}catch(Exception e) {
 			e.printStackTrace();
 		}
 		session.getTransaction().commit();
-		session.beginTransaction();
+		session.beginTransaction();*/
 	}
 
 	public void sendToAllClients(Message message) {

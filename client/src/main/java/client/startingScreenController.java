@@ -2,6 +2,7 @@ package client;
 
 import entities.Message;
 import entities.MovieInfo;
+import entities.UserInfo;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -16,15 +17,19 @@ import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 
 import java.io.ByteArrayInputStream;
+import java.util.ArrayList;
 import java.util.List;
 
 public class startingScreenController {
     private MovieInfo currMovieInfo;
     private int msgId;
     private List<MovieInfo> currMovieInfos;
+    private List<UserInfo> users=new ArrayList<>();
     @FXML
     private ImageView backgroundImageView;
 
+    @FXML
+    private Button workerLoginButton;
     @FXML
     private TextField idTextField;
 
@@ -42,7 +47,21 @@ public class startingScreenController {
 
     @FXML
     void loginButtonPressed(ActionEvent event) {
-
+        if(idTextField.getText().length()!=9){
+            Platform.runLater(()->{
+                Alert alert=new Alert(Alert.AlertType.ERROR);
+                alert.setTitle("Incorrect ID");
+                alert.setHeaderText("Entered incorrect ID, please fix");
+                alert.show();
+            });
+        }
+        else{
+            //here we need to transfer the screen to be the Customer screen, since it's a customer
+        }
+    }
+    @FXML
+    void workerLoginButtonPressed(ActionEvent event){
+        //here we need to transfer worker screen, depends on which worker (General Manager, Cinema Manager, Content Manager, CustomerComplaintWorker
     }
     @FXML
     private void popMessageWithMovieInfo(String title){
@@ -153,7 +172,7 @@ public class startingScreenController {
 
     @Subscribe
     public void catchMovieInfoList(MovieInfoListEvent event){
-        this.currMovieInfos=event.getMessage().getList();
+        this.currMovieInfos=event.getMessage().getMovieInfoList();
         clearDisplay();
         displayAllMovies();
     }
@@ -163,6 +182,15 @@ public class startingScreenController {
         setBackground(data);
     }
 
+
+    boolean isCustomer(String id){
+        for(UserInfo u: users){
+            if (u.getId().equals(id)) {
+                return u.getRole().equals("customer");
+            }
+        }
+        return false;
+    }
 
     void askDB(String title){
         try {
@@ -187,6 +215,15 @@ public class startingScreenController {
             }
             if (!newValue.matches("[0-9]*")) {
                 this.idTextField.setText(oldValue);
+            }
+            if(newValue.length()==9){
+                if(isCustomer(newValue)){
+                    passwordField.setVisible(true);
+                    loginButton.setDisable(true);
+                    loginButton.setVisible(false);
+                    workerLoginButton.setVisible(true);
+                    workerLoginButton.setDisable(false);
+                }
             }
         });
         //listener to limit password length and allowed characters

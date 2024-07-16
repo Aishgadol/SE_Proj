@@ -9,8 +9,11 @@ public class Message implements Serializable {
     String message;
     String data;
     MovieInfo movieInfo;
-    List<MovieInfo> list;
+    List<MovieInfo> movieInfoList;
     byte[] imageData;
+    UserInfo userInfo;
+    List<UserInfo> userInfoList;
+
 
     public Message(int id, LocalDateTime timeStamp, String message) {
         this.id = id;
@@ -71,15 +74,22 @@ public class Message implements Serializable {
         this.movieInfo=m;
     }
 
-    public List<MovieInfo> getList(){
-        return this.list;
+    public List<MovieInfo> getMovieInfoList(){
+        return this.movieInfoList;
     }
-    public void setList(List<MovieInfo> list){
-        this.list=list;
+    public void setMovieInfoList(List<MovieInfo> movieInfoList){
+        this.movieInfoList = movieInfoList;
     }
 
     public byte[] getImageData(){
         return this.imageData;
     }
     public void setImageData(byte[] imageData){this.imageData=imageData;}
+
+    public UserInfo getUserInfo(){return this.userInfo;}
+    public void setUserInfo(UserInfo u){this.userInfo=u;}
+
+    public List<UserInfo> getUserInfoList(){return this.userInfoList;}
+    public void setUserInfoList(List<UserInfo> list){this.userInfoList=list;}
+
 }

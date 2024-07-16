@@ -110,7 +110,7 @@ public class CinemaController {
     }
     @Subscribe
     public void catchMovieInfoList(MovieInfoListEvent event){
-        this.currMovieInfos=event.getMessage().getList();
+        this.currMovieInfos=event.getMessage().getMovieInfoList();
         clearDisplay();
         displayAllMovies();
     }

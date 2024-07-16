@@ -14,7 +14,6 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
-import javafx.scene.control.Alert;
 
 import java.io.ByteArrayInputStream;
 import java.time.LocalDate;
@@ -237,7 +236,7 @@ public class UpdateController{
     @Subscribe
     public void getMoviesFromDB(MovieInfoListEvent event) {
         Message message = event.getMessage();
-        this.movieInfos = message.getList();
+        this.movieInfos = message.getMovieInfoList();
         resetAll();
         updateAll();
         Platform.runLater(() -> {
