@@ -38,7 +38,7 @@ public class SimpleServer extends AbstractServer {
 	private MovieInfo currMovieInfo;
 	private Movie currMovie;
 	private boolean gifMode=false;
-	private List<MovieInfo> movieInfos=new ArrayList<>();
+	private List<MovieInfo> movieInfos=new ArrayList<>(); //this list holds current movies in db at current time, keep it updated
 	private List<DisplayTime> currDisplayTimes=new ArrayList<>();
 
 
@@ -54,28 +54,28 @@ public class SimpleServer extends AbstractServer {
 	}
 
 	//only use these functions if protoype database gets deleted, it should not happen.
-	/*
+
 	public void generateMovies() throws Exception {
-			Movie movie1=new Movie("Margol","1973");
+			Movie movie1=new Movie("Margol","1973","Romance","Zohar Argov","Margalit Tzanany, Eyal Golan, Shimi Tavory","MARGOL!");
 			movie1.setImageData(getImageFromFilesByTitleAsByteArray("margol"));
 			session.save(movie1);
-			Movie movie2=new Movie("The Boys","2018");
+			Movie movie2=new Movie("The Boys","2018","Action","Billy Butcher","God","A bunch of no-good people trying to steal the country, will homelander be able to stop them?");
 			movie2.setImageData(getImageFromFilesByTitleAsByteArray("the_boys"));
 			session.save(movie2);
-			Movie movie3=new Movie("Scary Movie 5","2012");
+			Movie movie3=new Movie("Scary Movie 5","2012","Comedy","Snoop Dogg","Terry Crews, Charlie Sheen", "Funny movie you should watch, its the 5th one");
 			movie3.setImageData(getImageFromFilesByTitleAsByteArray("scary_movie_5"));
 			session.save(movie3);
-			Movie movie4=new Movie("House of Cards","2006");
+			Movie movie4=new Movie("House of Cards","2006","Drama","Boujee Herzog","Bibi Netanyahu, Simha Rotman, Yoav Gallant, Tali Gotlib","Welcome to the house of corruption!");
 			movie4.setImageData(getImageFromFilesByTitleAsByteArray("house_of_cards"));
 			session.save(movie4);
-			Movie movie5=new Movie("Pulp Fiction","1969");
+			Movie movie5=new Movie("Pulp Fiction","1969","Action","Quentin Tarantino","John Travolta, Samuel L. Jackson, Uma Thurman","Cool gangsters, bruce willis punching a mafia boss, drugs and dancing");
 			movie5.setImageData(getImageFromFilesByTitleAsByteArray("pulp_fiction"));
 			session.save(movie5);
-			Movie movie6=new Movie("Automobiles","2024");
+			Movie movie6=new Movie("Automobiles","2024","Comedy","Steven Spielberg","Dwayne Johnson, Kevin Hart, Kobi82","Parody movie about the movie Cars, much funnier to my opinion");
 			movie6.setImageData(getImageFromFilesByTitleAsByteArray("automobiles"));
 			session.save(movie6);
             session.flush();
-	}*/
+	}
 
 	private List<Movie> getMoviesFromDB(){
 		CriteriaBuilder builder=session.getCriteriaBuilder();
@@ -321,7 +321,7 @@ public class SimpleServer extends AbstractServer {
 		byte[] movieImageByteArray=null;
 		List<Movie> movies=getMoviesFromDB();
 		for(Movie m: movies){
-			MovieInfo mi=new MovieInfo(m.getName(),m.getReleasedate());
+			MovieInfo mi=new MovieInfo(m.getName(),m.getReleasedate(),m.getGenre(),m.getProducer(),m.getActors(),m.getSummary());
 			mi.setImageData(m.getImageData());
 			//add display times from movie to movieinfo
 			for(DisplayTime d: m.getDisplayTimes()){
@@ -446,14 +446,14 @@ public class SimpleServer extends AbstractServer {
 			sessionFactory=getSessionFactory();
 			session=sessionFactory.openSession();
 			session.beginTransaction();
-			setMovieInfos(); //uncomment this when hibernate is on update mode
+			//setMovieInfos(); //uncomment this when hibernate is on update mode
 		} catch(Exception e) {
 			if(session!=null){
 				session.getTransaction().rollback();
 			}
 			e.printStackTrace();
 		}//uncomment this section when running server for the first time
-		/*try{
+		try{
 			generateMovies();
 			setMovieInfos();
 		}catch(Exception e) {
@@ -461,7 +461,7 @@ public class SimpleServer extends AbstractServer {
 		}
 		session.getTransaction().commit();
 		session.beginTransaction();
-	*/}
+	}
 
 	public void sendToAllClients(Message message) {
 		try {

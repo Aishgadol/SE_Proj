@@ -47,9 +47,19 @@ public class AddMovieController {
     private Button uploadPhotoButton;
     @FXML
     private ImageView currImage;
+    @FXML
+    private ComboBox<String> genreComboBox;
+    @FXML
+    private TextArea summaryTextArea;
+    @FXML
+    private TextField actorsTextField;
+    @FXML
+    private TextField producerTextField;
 
     private void setCurrMovieInfo(){
-        this.currMovieInfo=new MovieInfo(this.movieNameTextField.getText(),this.chooseYearComboBox.getValue());
+        this.currMovieInfo=new MovieInfo(this.movieNameTextField.getText(),
+                this.chooseYearComboBox.getValue(),this.genreComboBox.getValue(),
+                this.producerTextField.getText(),this.actorsTextField.getText(),this.summaryTextArea.getText());
         this.currMovieInfo.setImageData(this.currImageData);
     }
 
@@ -96,28 +106,48 @@ public class AddMovieController {
         if(this.movieNameTextField.getText()!=null && this.movieNameTextField.getText().matches(".*[a-zA-Z]+.*")){
             if(this.chooseYearComboBox.getValue()!=null){
                 if(this.currImage.getImage()!=null){
-                    setCurrMovieInfo();
-                    askDB("addMovie");
+                    if(this.actorsTextField!=null){
+                        if(this.summaryTextArea!=null){
+                            if(this.producerTextField!=null){
+                                if(this.genreComboBox.getValue()!=null){
+                                    setCurrMovieInfo();
+                                    askDB("addMovie");
+                                }
+                                else{
+                                    showErrorPopUp("a Genre");
+                                }
+                            }
+                            else{
+                                showErrorPopUp("a Producer Name");
+                            }
+                        }
+                        else{
+                            showErrorPopUp("a ShortSummary");
+                        }
+                    }
+                    else{
+                        showErrorPopUp("Names of Actors");
+                    }
                 }
                 else{
-                    showErrorPopUp("Movie Poster");
+                    showErrorPopUp("a Movie Poster");
                 }
             }
             else{
-                showErrorPopUp("Year of Release");
+                showErrorPopUp("a Year of Release");
             }
         }
         else{
-            showErrorPopUp("Movie Name");
+            showErrorPopUp("a Movie Name");
         }
     }
     @FXML
     private void showErrorPopUp(String error){
         Platform.runLater(()->{
                 Alert alert = new Alert(Alert.AlertType.ERROR);
-                alert.setTitle("Error, You forgot to choose a "+error);
-                alert.setHeaderText("You forgot to choose a "+error+".");
-                alert.setContentText("Please close this window, and make sure to select a "+error);
+                alert.setTitle("Error, You forgot to choose "+error);
+                alert.setHeaderText("You forgot to choose "+error+".");
+                alert.setContentText("Please close this window, and make sure to select "+error);
                 alert.show();
             });
     }
@@ -213,17 +243,45 @@ public class AddMovieController {
         askDB("getBackgroundImage");
         List<String> times=generateYears();//initialization of timeslots
         this.chooseYearComboBox.getItems().addAll(times);
+        this.genreComboBox.getItems().addAll("Action", "Comedy", "Romance","Drama","Horror");
+        this.summaryTextArea.setWrapText(true);
+
         //listener to limit name length
         this.movieNameTextField.textProperty().addListener((observable, oldValue, newValue) -> {
             if (newValue.length() > 50) {
                 this.movieNameTextField.setText(oldValue); // revert to old value if exceeds max length
             }
-        });
-        //listener to allow only normal chars
-        this.movieNameTextField.textProperty().addListener((observable, oldValue, newValue) -> {
             if (!newValue.matches("[a-zA-Z0-9.,' -]*")) {
                 this.movieNameTextField.setText(oldValue);
             }
         });
+        //listener to limit usable characters of summary and length
+        this.summaryTextArea.textProperty().addListener((observable, oldValue, newValue) -> {
+            if (!newValue.matches("[a-zA-Z0-9., -]*")) {
+                this.summaryTextArea.setText(oldValue);
+            }
+            if (newValue.length() > 150) {
+                this.summaryTextArea.setText(oldValue); // revert to old value if exceeds max length
+            }
+        });
+        //listener to limit actors length and allowed characters
+        this.actorsTextField.textProperty().addListener((observable, oldValue, newValue) -> {
+            if (newValue.length() > 100) {
+                this.actorsTextField.setText(oldValue); // revert to old value if exceeds max length
+            }
+            if (!newValue.matches("[a-zA-Z0-9., -]*")) {
+                this.actorsTextField.setText(oldValue);
+            }
+        });
+        //listener to limit proucer length and allowed characters
+        this.producerTextField.textProperty().addListener((observable, oldValue, newValue) -> {
+            if (newValue.length() > 40) {
+                this.producerTextField.setText(oldValue); // revert to old value if exceeds max length
+            }
+            if (!newValue.matches("[a-zA-Z0-9., -]*")) {
+                this.producerTextField.setText(oldValue);
+            }
+        });
+
     }
 }

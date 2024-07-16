@@ -64,6 +64,7 @@ public class CinemaController {
     @FXML
     private HBox imageHBox;
 
+    @FXML
     private void popMessageWithMovieInfo(String title){
         for(MovieInfo m: this.currMovieInfos){
             if(m.getName().equals(title)){
@@ -73,14 +74,11 @@ public class CinemaController {
         Platform.runLater(()->{
             Alert alert = new Alert(AlertType.INFORMATION);
             alert.setTitle("Information on "+this.currMovieInfo.getName());
-            alert.setHeaderText("This is information about the movie: "+this.currMovieInfo.getName()+"\n " +
-                    "Released at: "+this.currMovieInfo.getReleaseDate());
-            StringBuilder sb=new StringBuilder();
-            for(String s : this.currMovieInfo.getDisplayTimes()){
-                sb.append(s);
-                sb.append("\n");
-            }
-            alert.setContentText("Showtimes: \n"+sb.toString());
+            alert.setHeaderText("This is information about the movie: "+this.currMovieInfo.getName()+"\n ");
+            alert.setContentText(this.currMovieInfo.toString());
+            alert.setResizable(true);
+            alert.setWidth(400.0);
+            alert.setHeight(600.0);
             alert.show();
         });
     }

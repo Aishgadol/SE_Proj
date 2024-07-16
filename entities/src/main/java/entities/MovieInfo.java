@@ -12,16 +12,28 @@ public class MovieInfo implements Serializable {
      String releaseDate;
      byte[] imageData;
      List<String> displayTimes=new ArrayList<>();
+     String genre;
+     String producer;
+     String summary;
+     String actors;
 
-    public MovieInfo(String name, String releaseDate){
+    public MovieInfo(String name, String releaseDate,String genre, String producer, String actors, String summary){
         this.name=name;
         this.releaseDate=releaseDate;
+        this.genre=genre;
+        this.summary=summary;
+        this.actors=actors;
+        this.producer=producer;
     }
 
-    public MovieInfo(MovieInfo m){
-        this.name=m.getName();
-        this.releaseDate=m.getReleaseDate();
-        this.displayTimes=m.getDisplayTimes();
+    public MovieInfo(MovieInfo movieInfo){
+        this.name=movieInfo.getName();
+        this.releaseDate=movieInfo.getReleaseDate();
+        this.genre=movieInfo.getGenre();
+        this.summary=movieInfo.getSummary();
+        this.actors=movieInfo.getActors();
+        this.producer=movieInfo.getProducer();
+        this.displayTimes=movieInfo.getDisplayTimes();
     }
 
     public void setName(String name){
@@ -50,6 +62,36 @@ public class MovieInfo implements Serializable {
     }
     public void removeDisplayTime(String displayTime){
         this.displayTimes.remove(displayTime);
+    }
+
+    public void setGenre(String genre){this.genre=genre;}
+    public String getGenre(){return this.genre;}
+
+    public void setActors(String actors){this.actors=actors;}
+    public String getActors(){return this.actors;}
+
+    public void setProducer(String producer){this.producer=producer;}
+    public String getProducer(){return this.producer;}
+
+    public void setSummary(String summary){this.summary=summary;}
+    public String getSummary(){return this.summary;}
+
+    public String toString(){
+        StringBuilder sb=new StringBuilder();
+        sb.append("Movie Information:\n");
+        sb.append("Name: ").append(this.name).append("\n");
+        sb.append("Release Date: ").append(this.releaseDate).append("\n");
+        sb.append("Genre: ").append(this.genre).append("\n");
+        sb.append("Producer: ").append(this.producer).append("\n");
+        sb.append("Summary: ").append(this.summary).append("\n");
+        sb.append("Actors: ").append(this.actors).append("\n");
+
+        sb.append("Display Times:\n");
+        for (String dt : this.displayTimes) {
+            sb.append("  - ").append(dt).append("\n");
+        }
+
+        return sb.toString();
     }
 
     public byte[] getImageData() {
