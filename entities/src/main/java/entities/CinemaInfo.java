@@ -15,7 +15,7 @@ public class CinemaInfo implements Serializable {
         this.name=name;
         this.location=location;
         this.hallInfoList=new ArrayList<>();
-        this.displayedMovieInfos=new ArrayList<>()
+        this.displayedMovieInfos=new ArrayList<>();
     }
 
     public CinemaInfo(CinemaInfo c){
