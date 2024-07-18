@@ -52,6 +52,12 @@ public class Movie implements Serializable {
     )
     private List<DisplayTime> displayTimes=new ArrayList<>();
 
+    @ManyToMany(mappedBy = "movieList")
+    private List<Cinema> cinemaList=new ArrayList<>();
+
+    @OneToMany(mappedBy = "movie",cascade = CascadeType.ALL,orphanRemoval = true)
+    private List<Ticket> ticketList=new ArrayList<>();
+
 
 
     public Movie(){
@@ -169,5 +175,38 @@ public class Movie implements Serializable {
                 }
             }
         }
-	}
+    }
+    public void setCinemaList(List<Cinema> l){this.cinemaList=l;}
+    public List<Cinema> getCinemaList(){return this.cinemaList;}
+
+    public void addCinema(Cinema cinema){
+        for(Cinema c:this.cinemaList){
+            if (c.getName().equals(cinema.getName())){
+                return;
+            }
+        }
+        this.cinemaList.add(cinema);
+    }
+
+
+    public void removeCinema(Cinema cinema){
+        boolean found=false;
+        for(Cinema c:this.cinemaList){
+                if(c.getName().equals(cinema.getName())){
+                    found=true;
+                    break;
+                }
+            }
+        if(found) {
+            Iterator<Cinema> iterator = this.cinemaList.iterator();
+            while (iterator.hasNext()) {
+                Cinema obj = iterator.next();
+                if (obj.getName().equals(cinema.getName())) {
+                    iterator.remove();
+                }
+            }
+        }
+    }
+
+
 }

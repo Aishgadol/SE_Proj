@@ -51,6 +51,9 @@ public class SimpleServer extends AbstractServer {
 		configuration.addAnnotatedClass(DisplayTime.class);
 		configuration.addAnnotatedClass(Worker.class);
 		configuration.addAnnotatedClass(Customer.class);
+		configuration.addAnnotatedClass(Cinema.class);
+		configuration.addAnnotatedClass(Ticket.class);
+
 
 		ServiceRegistry serviceRegistry=new StandardServiceRegistryBuilder().applySettings(configuration.getProperties()).build();
 		return configuration.buildSessionFactory(serviceRegistry);

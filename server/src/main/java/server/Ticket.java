@@ -1,4 +1,4 @@
-/*package server;
+package server;
 
 
 import javax.persistence.Entity;
@@ -14,8 +14,6 @@ public class Ticket implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
-    @Column(name="movie_name")
-    private String movieName;
 
     @ManyToOne
     @JoinColumn(name="movie_name",referencedColumnName = "name")
@@ -24,12 +22,6 @@ public class Ticket implements Serializable {
     @Column(name="hall_num")
     private int hallNum;
 
-    @ManyToOne
-    @JoinColumn(name="hall_number",referencedColumnName = "hall_num")
-    Hall hall;
-
-    @Column(name="cinema_name")
-    private String cinemaName;
     @Column
     private int col;
     @Column
@@ -41,14 +33,83 @@ public class Ticket implements Serializable {
 
     @ManyToOne
     @JoinColumn(name="customer_name",referencedColumnName = "Full_Name")
-    Customer customer;
+    private Customer customer;
 
 
     public Ticket(){}
 
-    public Ticket(){
+    public Ticket(Ticket ticket){
+        this.movie=ticket.getMovie();
+        this.col=ticket.getCol();
+        this.row=ticket.getRow();
+        this.cinema=ticket.getCinema();
+        this.customer=ticket.getCustomer();
+    }
 
+    public Ticket(Movie movie,int col, int row, Cinema cinema, Customer customer){
+        this.movie=movie;
+        this.col=col;
+        this.row=row;
+        this.cinema=cinema;
+        this.customer=customer;
+    }
+
+    public Movie getMovie() {
+        return movie;
+    }
+
+    public void setMovie(Movie movie) {
+        this.movie = movie;
+    }
+
+    public int getHallNum() {
+        return hallNum;
+    }
+
+    public void setHallNum(int hallNum) {
+        this.hallNum = hallNum;
+    }
+
+    public int getCol() {
+        return col;
+    }
+
+    public void setCol(int col) {
+        this.col = col;
+    }
+
+    public int getRow() {
+        return row;
+    }
+
+    public void setRow(int row) {
+        this.row = row;
+    }
+
+    public Cinema getCinema() {
+        return cinema;
+    }
+
+    public void setCinema(Cinema cinema) {
+        this.cinema = cinema;
+    }
+
+    public Customer getCustomer() {
+        return customer;
+    }
+
+    public void setCustomer(Customer customer) {
+        this.customer = customer;
+    }
+
+    @Override
+    public String toString(){
+        return "Ticket: \n" +
+                "Movie: "+movie.getName()+"\n"+
+                "Hall Num: "+hallNum+"\n"+
+                "Seat located at: ("+col+","+row+")\n"+
+                "Cinema: "+cinema.getName()+"\n"+
+                "Owner of this ticket: "+customer.getName()+".";
     }
 
 }
-*/
