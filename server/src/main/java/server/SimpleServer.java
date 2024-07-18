@@ -266,6 +266,9 @@ public class SimpleServer extends AbstractServer {
 
 		session.save(t);
 		session.flush();
+		session.getTransaction().commit();
+		session.beginTransaction();
+		return true;
 	}
 	private boolean addWorkerToDB(Worker worker) throws IOException{
 		for(Worker w:this.workerList){
