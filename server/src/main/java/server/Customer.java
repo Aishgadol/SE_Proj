@@ -28,8 +28,8 @@ public class Customer implements Serializable {
     @Column(name="is_user_connected")
     int connected;
 
-    @OneToMany(mappedBy = "customer",cascade = CascadeType.ALL)
-    List<Ticket> ticketList;
+    //@OneToMany(mappedBy = "customer",cascade = CascadeType.ALL)
+    //List<Ticket> ticketList;
 
     public Customer(){}
 

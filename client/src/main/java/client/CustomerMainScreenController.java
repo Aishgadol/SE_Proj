@@ -110,10 +110,12 @@ public class CustomerMainScreenController {
         imageScrollPane.setDisable(false);
         showAvailableMovies();
     }
+
     @FXML
     void setInfoLabel(String name){
         infoLabel.setText(name+ " is connected.");
     }
+
     @FXML
     private void disconnectButtonPressed(ActionEvent event) {
         askDB("disconnectCustomer "+currUserName);
@@ -292,6 +294,7 @@ public class CustomerMainScreenController {
     public void setCurrUserName(String name){
         this.currUserName=name;
     }
+
     private void askDB(String title){
         try {
             Message message = new Message(msgId++, title);

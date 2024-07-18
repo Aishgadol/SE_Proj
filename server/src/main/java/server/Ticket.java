@@ -1,4 +1,4 @@
-package server;
+/*package server;
 
 
 import javax.persistence.Entity;
@@ -27,7 +27,7 @@ public class Ticket implements Serializable {
     @ManyToOne
     @JoinColumn(name="hall_number",referencedColumnName = "hall_num")
     Hall hall;
-    
+
     @Column(name="cinema_name")
     private String cinemaName;
     @Column
@@ -46,5 +46,9 @@ public class Ticket implements Serializable {
 
     public Ticket(){}
 
-    public Ticket()
+    public Ticket(){
+
+    }
+
 }
+*/
