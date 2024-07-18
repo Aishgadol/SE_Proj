@@ -1,6 +1,9 @@
 package entities;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 
 public class UserInfo implements Serializable {
     String id;
@@ -8,6 +11,8 @@ public class UserInfo implements Serializable {
     String name;
     String password;
     int connected;
+    List<TicketInfo> ticketInfoList=new ArrayList<>();
+    
 
     public UserInfo(){}
 
@@ -40,6 +45,7 @@ public class UserInfo implements Serializable {
         this.name=u.getName();
         this.password=u.getPassword();
         this.connected=u.getConnected();
+        this.ticketInfoList=u.getticketInfoList();
     }
 
     public void setId(String id){
@@ -67,5 +73,35 @@ public class UserInfo implements Serializable {
 
     public int getConnected(){return this.connected;}
     public void setConnected(int c){this.connected=c;}
+    
+    public void setTicketInfoList(List<TicketInfo> l){this.ticketInfoList=l;}
+    public List<TicketInfo> getticketInfoList(){return this.ticketInfoList;}
+
+    public void addTicketInfo(TicketInfo ticket){
+        for(TicketInfo t : this.ticketInfoList){
+            if (t.toString().equals(ticket.toString())) {
+                return;
+            }
+        }
+        this.ticketInfoList.add(ticket);
+    }
+    public void removeTicketInfo(TicketInfo ticket){
+        boolean found=false;
+        for(TicketInfo t:this.ticketInfoList){
+            if(t.toString().equals(ticket.toString())){
+                found=true;
+                break;
+            }
+        }
+        if(found) {
+            Iterator<TicketInfo> iterator = this.ticketInfoList.iterator();
+            while (iterator.hasNext()) {
+                TicketInfo obj = iterator.next();
+                if (obj.toString().equals(ticket.toString())) {
+                    iterator.remove();
+                }
+            }
+        }
+    }
 
 }

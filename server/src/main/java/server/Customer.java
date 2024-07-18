@@ -5,6 +5,7 @@ import entities.UserInfo;
 import javax.persistence.*;
 import javax.persistence.Entity;
 import java.io.Serializable;
+import java.util.Iterator;
 import java.util.List;
 
 @Entity
@@ -28,8 +29,8 @@ public class Customer implements Serializable {
     @Column(name="is_user_connected")
     int connected;
 
-    //@OneToMany(mappedBy = "customer",cascade = CascadeType.ALL)
-    //List<Ticket> ticketList;
+    @OneToMany(mappedBy = "customer",cascade = CascadeType.ALL)
+    List<Ticket> ticketList;
 
     public Customer(){}
 
@@ -64,4 +65,35 @@ public class Customer implements Serializable {
     }
     public void setConnected(int c){this.connected=c;}
     public String getPassword(){return null;}
+
+    public void setTicketList(List<Ticket> list){this.ticketList=list;}
+    public List<Ticket> getTicketList(){return this.ticketList;}
+
+    public void addTicket(Ticket ticket){
+        for(Ticket t : this.ticketList){
+            if (t.toString().equals(ticket.toString())) {
+                return;
+            }
+        }
+        this.ticketList.add(ticket);
+    }
+    public void removeTicket(Ticket ticket){
+        boolean found=false;
+        for(Ticket t:this.ticketList){
+            if(t.toString().equals(ticket.toString())){
+                found=true;
+                break;
+            }
+        }
+        if(found) {
+            Iterator<Ticket> iterator = this.ticketList.iterator();
+            while (iterator.hasNext()) {
+                Ticket obj = iterator.next();
+                if (obj.toString().equals(ticket.toString())) {
+                    iterator.remove();
+                }
+            }
+        }
+    }
+
 }

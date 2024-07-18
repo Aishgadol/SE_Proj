@@ -3,6 +3,7 @@ package server;
 
 import entities.Message;
 import entities.MovieInfo;
+import entities.TicketInfo;
 import entities.UserInfo;
 import ocsf.AbstractServer;
 import ocsf.ConnectionToClient;
@@ -38,9 +39,11 @@ public class SimpleServer extends AbstractServer {
 	private boolean gifMode=false;
 	private List<MovieInfo> movieInfoList=new ArrayList<>(); //this list holds current movies in db at current time, keep it updated
 	private List<DisplayTime> currDisplayTimes=new ArrayList<>();
-	private List<Worker> workersList=new ArrayList<>();
-	private List<Customer> customersList=new ArrayList<>();
+	private List<Worker> workerList=new ArrayList<>();
+	private List<Customer> customerList=new ArrayList<>();
 	private List<UserInfo> userInfoList=new ArrayList<>();
+	private List<Ticket> ticketList=new ArrayList<>();
+	private List<TicketInfo> ticketInfoList=new ArrayList<>();
 
 
 	private static SessionFactory getSessionFactory() throws HibernateException{
@@ -88,8 +91,18 @@ public class SimpleServer extends AbstractServer {
 	}
 
 
-
-
+	private List<Ticket> getTicketsFromDB(){
+		CriteriaBuilder builder=session.getCriteriaBuilder();
+		CriteriaQuery<Ticket> query=builder.createQuery(Ticket.class);
+		query.from(Ticket.class);
+        return session.createQuery(query).getResultList();
+	}
+	private List<Cinema> getCinemasFromDB(){
+		CriteriaBuilder builder=session.getCriteriaBuilder();
+		CriteriaQuery<Cinema> query=builder.createQuery(Cinema.class);
+		query.from(Cinema.class);
+        return session.createQuery(query).getResultList();
+	}
 	private List<Worker> getWorkersFromDB(){
 		CriteriaBuilder builder=session.getCriteriaBuilder();
 		CriteriaQuery<Worker> query=builder.createQuery(Worker.class);
@@ -124,7 +137,23 @@ public class SimpleServer extends AbstractServer {
 		}
 		return null;
 	}
-
+	//BIG NOTE: TITLE MUST BE ALL LOWERCASE, WITH _ INSTEAD OF SPACES
+	private byte[] getImageFromFilesByTitleAsByteArray(String title){
+		Path path;
+		if(gifMode){
+			path=Paths.get("src/main/resources/"+title+".gif");
+		}
+		else {
+			path = Paths.get("src/main/resources/" + title + ".jpg");
+		}
+		byte[] imageData=null;
+		try {
+			imageData = Files.readAllBytes(path);
+		}catch(Exception e){
+			e.printStackTrace();
+		}
+		return imageData;
+	}
 	private List<DisplayTime> getDisplayTimesFromDB(){
 		CriteriaBuilder builder=session.getCriteriaBuilder();
 		CriteriaQuery<DisplayTime> query=builder.createQuery(DisplayTime.class);
@@ -163,6 +192,119 @@ public class SimpleServer extends AbstractServer {
 		return null;
 	}
 
+
+	private boolean connectCustomer(String name){
+		this.customerList=getCustomersFromDB();
+		for(Customer c:this.customerList){
+			if(c.getName().toLowerCase().equals(name)){
+				c.setConnected(1);
+				session.saveOrUpdate(c);
+				session.flush();
+				session.getTransaction().commit();
+				session.beginTransaction();
+				setUserInfoList();
+				return true;
+			}
+		}
+		return false;
+	}
+	private boolean connectWorker(String name){
+		this.workerList=getWorkersFromDB();
+		for(Worker w:this.workerList){
+			if(w.getName().toLowerCase().equals(name)){
+				w.setConnected(1);
+				session.saveOrUpdate(w);
+				session.flush();
+				session.getTransaction().commit();
+				session.beginTransaction();
+				setUserInfoList();
+				return true;
+			}
+		}
+		return false;
+	}
+	private boolean disconnectCustomer(String name){
+		this.customerList=getCustomersFromDB();
+		for(Customer c:this.customerList){
+			if (c.getName().toLowerCase().equals(name)) {
+				c.setConnected(0);
+				session.saveOrUpdate(c);
+				session.flush();
+				session.getTransaction().commit();
+				session.beginTransaction();
+				setUserInfoList();
+				return true;
+			}
+		}
+		return false;
+	}
+	private boolean disconnectWorker(String name){
+		this.workerList=getWorkersFromDB();
+		for(Worker w:this.workerList){
+			if (w.getName().toLowerCase().equals(name)) {
+				w.setConnected(0);
+				session.saveOrUpdate(w);
+				session.flush();
+				session.getTransaction().commit();
+				session.beginTransaction();
+				setUserInfoList();
+				return true;
+			}
+		}
+		return false;
+	}
+
+	private boolean addTicketToDb(Ticket ticket) throws IOException{
+		for(Ticket t:this.ticketList){
+			if(t.toString().equals(ticket.toString())){
+				return false;
+			}
+		}
+		this.ticketList.add(ticket);
+		Ticket t=new Ticket(ticket);
+		//need to add things here, for example create new TicketInfo and add to this.ticketInfoList, and more
+
+		session.save(t);
+		session.flush();
+	}
+	private boolean addWorkerToDB(Worker worker) throws IOException{
+		for(Worker w:this.workerList){
+			if(w.getName().equals(worker.getName())){
+				return false; //name exists already in db
+			}
+		}
+		worker.setConnected(1);
+		this.workerList.add(worker);
+		Worker w=new Worker(worker);
+		UserInfo u=new UserInfo(w.getId(),w.getRole(),w.getName(),w.getPassword());
+		u.setConnected(1);
+		u.setTicketInfoList(this.ticketInfoList);
+		this.userInfoList.add(u);
+		session.save(w);
+		session.flush();
+		session.getTransaction().commit();
+		session.beginTransaction();
+		return true;
+	}
+	private boolean addCustomerToDB(Customer customer) throws IOException{
+		for(Customer c:this.customerList){
+			if(c.getName().equals(customer.getName())){
+				return false; //name exists already in db
+			}
+		}
+		customer.setConnected(1);
+		this.customerList.add(customer);
+		Customer c=new Customer(customer);
+		UserInfo u=new UserInfo(c.getId(),"Customer",c.getName());
+		u.setConnected(1);
+		u.setTicketInfoList(this.ticketInfoList);
+		this.userInfoList.add(u);
+		session.save(c);
+		session.flush();
+		session.getTransaction().commit();
+		session.beginTransaction();
+		return true;
+	}
 	//this func handles adding movie object to movie table
 	private boolean addMovieToDB(MovieInfo movieInfo) throws IOException {
 		//check if movie is already in movies, no error message sent back cuz not needed
@@ -181,71 +323,6 @@ public class SimpleServer extends AbstractServer {
 		session.beginTransaction();
 		return true;
 	}
-	private boolean connectCustomer(String name){
-		this.customersList=getCustomersFromDB();
-		for(Customer c:this.customersList){
-			if(c.getName().toLowerCase().equals(name)){
-				c.setConnected(1);
-				session.saveOrUpdate(c);
-				session.flush();
-				session.getTransaction().commit();
-				session.beginTransaction();
-				setUserInfoList();
-				return true;
-			}
-		}
-		return false;
-	}
-	private boolean connectWorker(String name){
-		this.workersList=getWorkersFromDB();
-		for(Worker w:this.workersList){
-			if(w.getName().toLowerCase().equals(name)){
-				w.setConnected(1);
-				session.saveOrUpdate(w);
-				session.flush();
-				session.getTransaction().commit();
-				session.beginTransaction();
-				setUserInfoList();
-				return true;
-			}
-		}
-		return false;
-	}
-	private boolean disconnectCustomer(String name){
-		this.customersList=getCustomersFromDB();
-		for(Customer c:this.customersList){
-			if (c.getName().toLowerCase().equals(name)) {
-				c.setConnected(0);
-				session.saveOrUpdate(c);
-				session.flush();
-				session.getTransaction().commit();
-				session.beginTransaction();
-				setUserInfoList();
-				return true;
-			}
-		}
-		return false;
-	}
-	private boolean disconnectWorker(String name){
-		this.workersList=getWorkersFromDB();
-		for(Worker w:this.workersList){
-			if (w.getName().toLowerCase().equals(name)) {
-				w.setConnected(0);
-				session.saveOrUpdate(w);
-				session.flush();
-				session.getTransaction().commit();
-				session.beginTransaction();
-				setUserInfoList();
-				return true;
-			}
-		}
-		return false;
-	}
-
-
-
-
-
 	// updates display time for the current movie selected
 	public void addDisplayTimeToDB(String time){
 		this.currMovie=getMovieByTitleFromDB(this.currMovie.getName());
@@ -384,23 +461,7 @@ public class SimpleServer extends AbstractServer {
 
 
 
-	//BIG NOTE: TITLE MUST BE ALL LOWERCASE, WITH _ INSTEAD OF SPACES
-	private byte[] getImageFromFilesByTitleAsByteArray(String title){
-		Path path;
-		if(gifMode){
-			path=Paths.get("src/main/resources/"+title+".gif");
-		}
-		else {
-			path = Paths.get("src/main/resources/" + title + ".jpg");
-		}
-		byte[] imageData=null;
-		try {
-			imageData = Files.readAllBytes(path);
-		}catch(Exception e){
-			e.printStackTrace();
-		}
-		return imageData;
-	}
+
 
 	private void setMovieInfoList(){
 		this.movieInfoList=new ArrayList<>();
@@ -417,16 +478,16 @@ public class SimpleServer extends AbstractServer {
 		}
 	}
 	private void setUserInfoList(){
-		this.customersList=getCustomersFromDB();
-		this.workersList=getWorkersFromDB();
+		this.customerList=getCustomersFromDB();
+		this.workerList=getWorkersFromDB();
 		this.userInfoList=new ArrayList<>();
 		UserInfo u=null;
-		for(Customer c: customersList){
+		for(Customer c: customerList){
 			u=new UserInfo(c.getId(),c.getName());
 			u.setConnected(c.getConnected());
 			userInfoList.add(u);
 		}
-		for(Worker w: workersList){
+		for(Worker w: workerList){
 			u=new UserInfo(w.getId(),w.getRole(),w.getName(),w.getPassword());
 			u.setConnected(w.getConnected());
 			userInfoList.add(u);
@@ -660,6 +721,26 @@ public class SimpleServer extends AbstractServer {
 		while (iterator.hasNext()) {
 			Worker obj = iterator.next();
 			if (obj.getId().equals(idToRemove)) {
+				iterator.remove();
+			}
+		}
+	return list;
+	}
+	private List<Ticket> removeTicketWithToString(List<Ticket> list, String toStringToRemove) {
+		Iterator<Ticket> iterator = list.iterator();
+		while (iterator.hasNext()) {
+			Ticket obj = iterator.next();
+			if (obj.toString().equals(toStringToRemove)) {
+				iterator.remove();
+			}
+		}
+	return list;
+	}
+	private List<Cinema> removeCinemaWithName(List<Cinema> list, String nameToRemove) {
+		Iterator<Cinema> iterator = list.iterator();
+		while (iterator.hasNext()) {
+			Cinema obj = iterator.next();
+			if (obj.toString().equals(nameToRemove)) {
 				iterator.remove();
 			}
 		}
