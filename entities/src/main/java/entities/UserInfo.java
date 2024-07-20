@@ -15,6 +15,13 @@ public class UserInfo implements Serializable {
     
 
     public UserInfo(){}
+    public UserInfo(String id, String role,String name,int connected){
+        this.id=id;
+        this.role=role;
+        this.name=name;
+        this.password="";
+        this.connected=connected;
+    }
 
     public UserInfo(String id, String role,String name,String password){
         this.id=id;

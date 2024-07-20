@@ -5,6 +5,7 @@ import entities.UserInfo;
 import javax.persistence.*;
 import javax.persistence.Entity;
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
@@ -29,8 +30,16 @@ public class Customer implements Serializable {
     @Column(name="is_user_connected")
     int connected;
 
+    @ManyToMany
+    @JoinTable(
+        name = "customer_cinema",
+        joinColumns = @JoinColumn(name = "customer_name"),
+        inverseJoinColumns = @JoinColumn(name = "cinema_id")
+    )
+    List<Cinema> cinemaList=new ArrayList<>();
+
     @OneToMany(mappedBy = "customer",cascade = CascadeType.ALL)
-    List<Ticket> ticketList;
+    List<Ticket> ticketList=new ArrayList<>();
 
     public Customer(){}
 
@@ -60,6 +69,8 @@ public class Customer implements Serializable {
     public String getName(){
         return this.name;
     }
+    public void setRole(String role){this.role=role;}
+    public String getRole(){return this.role;}
     public int getConnected(){
         return this.connected;
     }
@@ -90,6 +101,35 @@ public class Customer implements Serializable {
             while (iterator.hasNext()) {
                 Ticket obj = iterator.next();
                 if (obj.toString().equals(ticket.toString())) {
+                    iterator.remove();
+                }
+            }
+        }
+    }
+    public void setCinemaList(List<Cinema> list){this.cinemaList=list;}
+    public List<Cinema> getCinemaList(){return this.cinemaList;}
+
+    public void addCinema(Cinema cinema){
+        for(Cinema c : this.cinemaList){
+            if(cinema.getName().equals(c.getName())){
+                return;
+            }
+        }
+        this.cinemaList.add(cinema);
+    }
+    public void removeCinema(Cinema cinema){
+        boolean found=false;
+        for(Cinema c : this.cinemaList){
+            if(c.getName().equals(cinema.getName())){
+                found=true;
+                break;
+            }
+        }
+        if(found) {
+            Iterator<Cinema> iterator = this.cinemaList.iterator();
+            while (iterator.hasNext()) {
+                Cinema obj = iterator.next();
+                if (obj.getName().equals(cinema.getName())) {
                     iterator.remove();
                 }
             }

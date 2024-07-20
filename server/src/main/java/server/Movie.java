@@ -208,5 +208,35 @@ public class Movie implements Serializable {
         }
     }
 
+    public void setTicketList(List<Ticket> list){this.ticketList=list;}
+    public List<Ticket> getTicketList(){return this.ticketList;}
+
+    public void addTicket(Ticket ticket){
+        for(Ticket t:this.ticketList){
+            if(t.toString().equals(ticket.toString())){
+                return;
+            }
+        }
+        this.ticketList.add(ticket);
+    }
+    public void removeTicket(Ticket ticket){
+        boolean found=false;
+        for(Ticket t:this.ticketList){
+            if(t.toString().equals(ticket.toString())){
+                found=true;
+                break;
+            }
+        }
+        if(found) {
+            Iterator<Ticket> iterator = this.ticketList.iterator();
+            while (iterator.hasNext()) {
+                Ticket obj = iterator.next();
+                if (obj.toString().equals(ticket.toString())) {
+                    iterator.remove();
+                }
+            }
+        }
+    }
+
 
 }

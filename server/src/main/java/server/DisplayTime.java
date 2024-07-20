@@ -1,7 +1,5 @@
 package server;
 
-import org.hibernate.annotations.Columns;
-
 import javax.persistence.*;
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -24,6 +22,10 @@ public class DisplayTime implements Serializable {
 
     @ManyToMany(mappedBy = "displayTimes")
     private List<Movie> movies=new ArrayList<>();
+
+     @OneToMany(mappedBy = "displayTime", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Ticket> ticketList;
+
 
     public DisplayTime(){
     }
@@ -76,4 +78,34 @@ public class DisplayTime implements Serializable {
         }
 	}
 
+    public void setTicketList(List<Ticket> ticketList){this.ticketList=ticketList;}
+    public List<Ticket> getTicketList(){return this.ticketList;}
+
+    public void addTicket(Ticket ticket){
+        for(Ticket t: this.ticketList){
+            if(ticket.toString().equals(t.toString())){
+                return;
+            }
+        }
+        this.ticketList.add(ticket);
+        ticket.setDisplayTime(this);
+    }
+    public void removeTicket(Ticket ticket){
+        boolean found=false;
+        for(Ticket t:this.ticketList){
+            if(t.toString().equals(ticket.toString())){
+                found=true;
+                break;
+            }
+        }
+        if(found) {
+            Iterator<Ticket> iterator = this.ticketList.iterator();
+            while (iterator.hasNext()) {
+                Ticket obj = iterator.next();
+                if (obj.toString().equals(ticket.toString())) {
+                    iterator.remove();
+                }
+            }
+        }
+    }
 }

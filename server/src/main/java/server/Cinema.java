@@ -18,6 +18,9 @@ public class Cinema implements Serializable {
     @Column(name="name")
     private String name;
 
+    @Column(name="number of halls")
+    private int numHalls;
+
     @ManyToMany
     @JoinTable(
         name = "cinema_displaying_movies",
@@ -28,6 +31,10 @@ public class Cinema implements Serializable {
 
     @OneToMany(mappedBy = "cinema", cascade = CascadeType.ALL,orphanRemoval = true)
     private List<Ticket> ticketList=new ArrayList<>();
+
+
+    @ManyToMany(mappedBy = "cinemas")
+    private List<Customer> customerList=new ArrayList<>();
 
 
     // Empty constructor
@@ -41,8 +48,9 @@ public class Cinema implements Serializable {
     }
 
     // Normal constructor
-    public Cinema(String name, List<Movie> movieList,List<Ticket> ticketList) {
+    public Cinema(String name, int numHalls, List<Movie> movieList,List<Ticket> ticketList) {
         this.name = name;
+        this.numHalls=numHalls;
         this.movieList = movieList;
         this.ticketList=ticketList;
     }
@@ -54,6 +62,9 @@ public class Cinema implements Serializable {
     public void setName(String name) {
         this.name = name;
     }
+
+    public void setNumHalls(int numHalls){this.numHalls=numHalls;}
+    public int getNumHalls(){return this.numHalls;}
 
     public List<Movie> getMovieList() {
         return movieList;
@@ -116,6 +127,37 @@ public class Cinema implements Serializable {
             while (iterator.hasNext()) {
                 Ticket obj = iterator.next();
                 if (obj.toString().equals(ticket.toString())) {
+                    iterator.remove();
+                }
+            }
+        }
+    }
+
+    public List<Customer> getCustomerList(){return this.customerList;}
+    public void setCustomerList(List<Customer> list){this.customerList=list;}
+
+    public void addCustomer(Customer customer){
+        for(Customer c:this.customerList){
+            if(c.getName().equals(customer.getName())){
+                return;
+            }
+        }
+        this.customerList.add(customer);
+        return;
+    }
+    public void removeCustomer(Customer customer){
+        boolean found=false;
+        for(Customer c : this.customerList){
+            if(customer.getName().equals(c.getName())){
+                found=true;
+                break;
+            }
+        }
+        if(found) {
+            Iterator<Customer> iterator = this.customerList.iterator();
+            while (iterator.hasNext()) {
+                Customer obj = iterator.next();
+                if (obj.toString().equals(customer.toString())) {
                     iterator.remove();
                 }
             }

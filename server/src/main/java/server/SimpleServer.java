@@ -1,10 +1,7 @@
 package server;
 
 
-import entities.Message;
-import entities.MovieInfo;
-import entities.TicketInfo;
-import entities.UserInfo;
+import entities.*;
 import ocsf.AbstractServer;
 import ocsf.ConnectionToClient;
 import ocsf.SubscribedClient;
@@ -38,13 +35,14 @@ public class SimpleServer extends AbstractServer {
 	private Movie currMovie;
 	private boolean gifMode=false;
 	private List<MovieInfo> movieInfoList=new ArrayList<>(); //this list holds current movies in db at current time, keep it updated
-	private List<DisplayTime> currDisplayTimes=new ArrayList<>();
+	private List<DisplayTime> displayTimeList=new ArrayList<>();
 	private List<Worker> workerList=new ArrayList<>();
 	private List<Customer> customerList=new ArrayList<>();
 	private List<UserInfo> userInfoList=new ArrayList<>();
 	private List<Ticket> ticketList=new ArrayList<>();
 	private List<TicketInfo> ticketInfoList=new ArrayList<>();
-
+	private List<Cinema> cinemaList=new ArrayList<>();
+	private List<CinemaInfo> cinemaInfoList=new ArrayList<>();
 
 	private static SessionFactory getSessionFactory() throws HibernateException{
 		Configuration configuration=new Configuration();
@@ -254,7 +252,27 @@ public class SimpleServer extends AbstractServer {
 		return false;
 	}
 
+	private boolean addCinemaToDB(Cinema cinema) throws IOException{
+		for(Cinema c:this.cinemaList){
+			if(c.getName().equals(cinema.getName())){
+				return false;
+			}
+		}
+		this.cinemaList.add(cinema);
+		Cinema c=new Cinema(cinema);
+		//need to make sure to update cinemainfo list, and also (MAYBE) update the corresponding entities with the existence, even tough this function
+		//solely add the entity to the db
+		//im going to bed now, its 1 am
+
+		session.save(c);
+		session.flush();
+		session.getTransaction().commit();
+		session.beginTransaction();
+		return true;
+	}
 	private boolean addTicketToDb(Ticket ticket) throws IOException{
+		CinemaInfo cinemaInfo=null;
+		MovieInfo movieInfo=null;
 		for(Ticket t:this.ticketList){
 			if(t.toString().equals(ticket.toString())){
 				return false;
@@ -262,14 +280,31 @@ public class SimpleServer extends AbstractServer {
 		}
 		this.ticketList.add(ticket);
 		Ticket t=new Ticket(ticket);
+		for(MovieInfo m:this.movieInfoList){
+			if(m.getName().equals(t.getMovie().getName())){
+				movieInfo=new MovieInfo(m);
+				break;
+			}
+		}
+		Customer c=t.getCustomer();
+		Cinema c1=t.getCinema();
+		for(CinemaInfo cz:this.cinemaInfoList){
+			if(cz.getName().equals(t.getCinema().getName())){
+				cinemaInfo=new CinemaInfo(cz);
+				break;
+			}
+		}
 		//need to add things here, for example create new TicketInfo and add to this.ticketInfoList, and more
-
+		UserInfo userInfo=new UserInfo(c.getId(),c.getRole(),c.getName(),c.getConnected());
+		TicketInfo ticketInfo=new TicketInfo(userInfo,movieInfo,t.getDisplayTime().getDisplayTime(),cinemaInfo,t.getHallNum(),t.getRow(),t.getCol(),t.getPurchaseTime());
+		this.ticketInfoList.add(ticketInfo);
 		session.save(t);
 		session.flush();
 		session.getTransaction().commit();
 		session.beginTransaction();
 		return true;
 	}
+
 	private boolean addWorkerToDB(Worker worker) throws IOException{
 		for(Worker w:this.workerList){
 			if(w.getName().equals(worker.getName())){
@@ -414,13 +449,13 @@ public class SimpleServer extends AbstractServer {
 		else{
 			return;
 		}
-		this.currDisplayTimes = getDisplayTimesFromDB();
+		this.displayTimeList = getDisplayTimesFromDB();
 		boolean found = false;
 		boolean found2 = false; // if displaytime is in table of displaytimes
 		DisplayTime d_movie=null;
 		DisplayTime d_table=null;
 		try {
-			for (DisplayTime d : this.currDisplayTimes) {
+			for (DisplayTime d : this.displayTimeList) {
 				if (d.getDisplayTime().equals(displayTime)) {
 					found2 = true;
 					d_table=d;
@@ -444,7 +479,7 @@ public class SimpleServer extends AbstractServer {
 				this.currMovieInfo.removeDisplayTime(d_movie.getDisplayTime());
 				if (found2){
 					if(d_table.getMovies().isEmpty()){
-						this.currDisplayTimes=removeDisplayTimeWithName(currDisplayTimes, d_table.getDisplayTime());
+						this.displayTimeList=removeDisplayTimeWithName(displayTimeList, d_table.getDisplayTime());
 						session.delete(d_table);
 					}
 					else{

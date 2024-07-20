@@ -35,6 +35,13 @@ public class Ticket implements Serializable {
     @JoinColumn(name="customer_name",referencedColumnName = "Full_Name")
     private Customer customer;
 
+    @Column(name="Purchase time")
+    private String purchaseTime;
+
+    @ManyToOne
+    @JoinColumn(name = "display_time_id")
+    private DisplayTime displayTime;
+
 
     public Ticket(){}
 
@@ -65,6 +72,9 @@ public class Ticket implements Serializable {
     public int getHallNum() {
         return hallNum;
     }
+
+    public String getPurchaseTime(){return this.purchaseTime;}
+    public void setPurchaseTime(String purchaseTime){this.purchaseTime=purchaseTime;}
 
     public void setHallNum(int hallNum) {
         this.hallNum = hallNum;
@@ -101,6 +111,9 @@ public class Ticket implements Serializable {
     public void setCustomer(Customer customer) {
         this.customer = customer;
     }
+
+    public void setDisplayTime(DisplayTime displayTime){this.displayTime=displayTime;}
+    public DisplayTime getDisplayTime(){return this.displayTime;}
 
     @Override
     public String toString(){
