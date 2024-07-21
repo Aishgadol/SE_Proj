@@ -441,7 +441,10 @@ public class SimpleServer extends AbstractServer {
 	}
 
 	private void removeTicketFromDB(String ticketToString){
-		
+		//the message sent from client comes with TicketInfo obj, so we pass ticketinfo.toString()
+		//get the ticket itself by the tostring (preferably from db, can from list)
+		//  and remove it from all displaytimes/cinemas/customers/movies
+		//and then we can delete it from db
 
 	}
 
