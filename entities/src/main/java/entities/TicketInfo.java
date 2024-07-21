@@ -90,4 +90,14 @@ public class TicketInfo implements Serializable {
     public void setHallNum(int hallNum) {
         this.hallNum=hallNum;
     }
+
+    @Override
+    public String toString(){
+        return "Ticket: \n" +
+                "Movie: "+movieInfo.getName()+"\n"+
+                "Hall Num: "+hallNum+"\n"+
+                "Seat located at: ("+col+","+row+")\n"+
+                "Cinema: "+cinemaInfo.getName()+"\n"+
+                "Owner of this ticket: "+userInfo.getName()+".";
+    }
 }

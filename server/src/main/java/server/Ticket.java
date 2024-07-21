@@ -27,6 +27,9 @@ public class Ticket implements Serializable {
     @Column
     private int row;
 
+    @Column(name="is_ticket_active")
+    private int active;
+
     @ManyToOne
     @JoinColumn(name="cinema_name",referencedColumnName = "cinema_name")
     private Cinema cinema;
@@ -51,6 +54,7 @@ public class Ticket implements Serializable {
         this.row=ticket.getRow();
         this.cinema=ticket.getCinema();
         this.customer=ticket.getCustomer();
+        this.active=ticket.getActive();
     }
 
     public Ticket(Movie movie,int col, int row, Cinema cinema, Customer customer){
@@ -59,6 +63,7 @@ public class Ticket implements Serializable {
         this.row=row;
         this.cinema=cinema;
         this.customer=customer;
+        this.active=1;
     }
 
     public Movie getMovie() {
@@ -115,6 +120,9 @@ public class Ticket implements Serializable {
     public void setDisplayTime(DisplayTime displayTime){this.displayTime=displayTime;}
     public DisplayTime getDisplayTime(){return this.displayTime;}
 
+    public void setActive(int active){this.active=active;}
+    public int getActive(){return this.active;}
+
     @Override
     public String toString(){
         return "Ticket: \n" +
@@ -122,7 +130,8 @@ public class Ticket implements Serializable {
                 "Hall Num: "+hallNum+"\n"+
                 "Seat located at: ("+col+","+row+")\n"+
                 "Cinema: "+cinema.getName()+"\n"+
-                "Owner of this ticket: "+customer.getName()+".";
+                "Owner of this ticket: "+customer.getName()+"\n"+
+                "Is the ticket active: "+active+".";
     }
 
 }

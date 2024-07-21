@@ -440,6 +440,10 @@ public class SimpleServer extends AbstractServer {
 
 	}
 
+	private void removeTicketFromDB(String ticketToString){
+		
+
+	}
 
 	private void removeDisplayTimeFromMovieFromDB(String displayTime) {
 		if(this.currMovie!=null){
