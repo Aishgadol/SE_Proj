@@ -84,12 +84,14 @@ public class StartingScreenController {
             //change to worker login
             statusLabel.setText("Current Login Mode: Worker Login");
             passwordField.setVisible(true);
+            this.nameTextField.setPromptText("Enter Worker name");
             customerLoginModeEnabled=false;
         }
         else{
             //change to customer login
             statusLabel.setText("Current Login Mode: Customer Login");
             passwordField.setVisible(false);
+            this.nameTextField.setPromptText("Enter Customer ID");
             customerLoginModeEnabled=true;
         }
     }

@@ -18,24 +18,25 @@ public class Cinema implements Serializable {
     @Column(name="name")
     private String name;
 
-    @Column(name="number of halls")
+    @Column(name="num_of_halls")
     private int numHalls;
 
     @ManyToMany
     @JoinTable(
         name = "cinema_displaying_movies",
-        joinColumns = @JoinColumn(name = "Cinema_Location", referencedColumnName = "location"),
+        joinColumns = @JoinColumn(name = "cinema_name", referencedColumnName = "name"),
         inverseJoinColumns = @JoinColumn(name = "Movie_name", referencedColumnName = "name")
     )
     private List<Movie> movieList=new ArrayList<>();
 
-    @OneToMany(mappedBy = "cinema", cascade = CascadeType.ALL,orphanRemoval = true)
-    private List<Ticket> ticketList=new ArrayList<>();
 
 
-    @ManyToMany(mappedBy = "cinemas")
+
+    @ManyToMany(mappedBy = "cinemaList")
     private List<Customer> customerList=new ArrayList<>();
 
+    //@OneToMany(mappedBy = "cinema")
+    //private List<Ticket> ticketList=new ArrayList<>();
 
     // Empty constructor
     public Cinema() {}
@@ -43,16 +44,24 @@ public class Cinema implements Serializable {
     // Copy constructor
     public Cinema(Cinema cinema) {
         this.name = cinema.getName();
+        this.numHalls=cinema.getNumHalls();
         this.movieList = cinema.getMovieList();
-        this.ticketList=cinema.getTicketList();
+       // this.ticketList=cinema.getTicketList();
+        this.customerList=cinema.getCustomerList();
     }
 
     // Normal constructor
-    public Cinema(String name, int numHalls, List<Movie> movieList,List<Ticket> ticketList) {
+    public Cinema(String name, int numHalls, List<Movie> movieList,List<Ticket> ticketList,List<Customer> customerList) {
         this.name = name;
         this.numHalls=numHalls;
         this.movieList = movieList;
-        this.ticketList=ticketList;
+        //this.ticketList=ticketList;
+        this.customerList=customerList;
+    }
+
+    public Cinema(String name, int numHalls){
+        this.name=name;
+        this.numHalls=numHalls;
     }
 
      public String getName() {
@@ -101,7 +110,7 @@ public class Cinema implements Serializable {
             }
         }
 	}
-
+/*
     public void setTicketList(List<Ticket> l){this.ticketList=l;}
     public List<Ticket> getTicketList(){return this.ticketList;}
 
@@ -131,7 +140,7 @@ public class Cinema implements Serializable {
                 }
             }
         }
-    }
+    }*/
 
     public List<Customer> getCustomerList(){return this.customerList;}
     public void setCustomerList(List<Customer> list){this.customerList=list;}

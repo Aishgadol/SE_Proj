@@ -1,23 +1,23 @@
 package server;
 
 
-import javax.persistence.Entity;
+
 import javax.persistence.*;
 import java.io.Serializable;
 
 @Entity
 @Table(name="Tickets")
 public class Ticket implements Serializable {
+
     private static final long serialVersionUID=1L;
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int id;
-
+    int id;
 
     @ManyToOne
     @JoinColumn(name="movie_name",referencedColumnName = "name")
-    private Movie movie;
+    private Movie movie=null;
 
     @Column(name="hall_num")
     private int hallNum;
@@ -31,19 +31,19 @@ public class Ticket implements Serializable {
     private int active;
 
     @ManyToOne
-    @JoinColumn(name="cinema_name",referencedColumnName = "cinema_name")
-    private Cinema cinema;
+    @JoinColumn(name="cinema",referencedColumnName = "name")
+    private Cinema cinema=null;
 
     @ManyToOne
-    @JoinColumn(name="customer_name",referencedColumnName = "Full_Name")
-    private Customer customer;
+    @JoinColumn(name="customer_id",referencedColumnName = "User_ID")
+    private Customer customer=null;
 
     @Column(name="Purchase time")
     private String purchaseTime;
 
     @ManyToOne
-    @JoinColumn(name = "display_time_id")
-    private DisplayTime displayTime;
+    @JoinColumn(name = "display_time",referencedColumnName ="Display_Time_And_Date" )
+    private DisplayTime displayTime=null;
 
 
     public Ticket(){}
@@ -51,17 +51,23 @@ public class Ticket implements Serializable {
     public Ticket(Ticket ticket){
         this.movie=ticket.getMovie();
         this.col=ticket.getCol();
+        this.hallNum=ticket.getHallNum();
         this.row=ticket.getRow();
         this.cinema=ticket.getCinema();
         this.customer=ticket.getCustomer();
+        this.displayTime=ticket.getDisplayTime();
+        this.purchaseTime=this.displayTime.getDisplayTime();
         this.active=ticket.getActive();
     }
 
-    public Ticket(Movie movie,int col, int row, Cinema cinema, Customer customer){
+    public Ticket(Movie movie,int col, int row,int hallNum, Cinema cinema, Customer customer,DisplayTime displayTime){
         this.movie=movie;
         this.col=col;
         this.row=row;
+        this.hallNum=hallNum;
         this.cinema=cinema;
+        this.purchaseTime=displayTime.getDisplayTime();
+        this.displayTime=displayTime;
         this.customer=customer;
         this.active=1;
     }

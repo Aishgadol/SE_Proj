@@ -23,7 +23,6 @@ import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
 import org.hibernate.cfg.Configuration;
-import org.hibernate.jdbc.Work;
 import org.hibernate.service.ServiceRegistry;
 
 
@@ -47,14 +46,13 @@ public class SimpleServer extends AbstractServer {
 	private static SessionFactory getSessionFactory() throws HibernateException{
 		Configuration configuration=new Configuration();
 
+		//configuration.addAnnotatedClass(Ticket.class);
 		configuration.addAnnotatedClass(Msg.class);
 		configuration.addAnnotatedClass(Movie.class);
 		configuration.addAnnotatedClass(DisplayTime.class);
 		configuration.addAnnotatedClass(Worker.class);
 		configuration.addAnnotatedClass(Customer.class);
 		configuration.addAnnotatedClass(Cinema.class);
-		configuration.addAnnotatedClass(Ticket.class);
-
 
 		ServiceRegistry serviceRegistry=new StandardServiceRegistryBuilder().applySettings(configuration.getProperties()).build();
 		return configuration.buildSessionFactory(serviceRegistry);
@@ -85,6 +83,23 @@ public class SimpleServer extends AbstractServer {
 			session.save(w1);
 			Customer c1=new Customer("000000000","bo");
 			session.save(c1);
+			Cinema cinema1=new Cinema("YisPlanit",5);
+			session.save(cinema1);
+			DisplayTime d=new DisplayTime("10:30, 10/10/2024");
+			session.save(d);
+			System.out.println("everything good till here0");
+			/*Ticket ti=new Ticket(movie6,1,1,1,cinema1,c1,d);
+			System.out.println("everything good till here1");
+			session.save(ti);
+			System.out.println("everything good till here2");
+			d.addTicket(ti);
+			movie6.addTicket(ti);
+			cinema1.addTicket(ti);
+			c1.addTicket(ti);
+			session.saveOrUpdate(movie6);
+			session.saveOrUpdate(cinema1);
+			session.saveOrUpdate(d);
+			session.saveOrUpdate(c1);*/
             session.flush();
 	}
 
@@ -191,10 +206,10 @@ public class SimpleServer extends AbstractServer {
 	}
 
 
-	private boolean connectCustomer(String name){
+	private boolean connectCustomer(String id){
 		this.customerList=getCustomersFromDB();
 		for(Customer c:this.customerList){
-			if(c.getName().toLowerCase().equals(name)){
+			if(c.getId().equals(id)){
 				c.setConnected(1);
 				session.saveOrUpdate(c);
 				session.flush();
@@ -270,7 +285,7 @@ public class SimpleServer extends AbstractServer {
 		session.beginTransaction();
 		return true;
 	}
-	private boolean addTicketToDb(Ticket ticket) throws IOException{
+	private boolean addTicketToDB(Ticket ticket) throws IOException{
 		CinemaInfo cinemaInfo=null;
 		MovieInfo movieInfo=null;
 		for(Ticket t:this.ticketList){
@@ -294,6 +309,7 @@ public class SimpleServer extends AbstractServer {
 				break;
 			}
 		}
+
 		//need to add things here, for example create new TicketInfo and add to this.ticketInfoList, and more
 		UserInfo userInfo=new UserInfo(c.getId(),c.getRole(),c.getName(),c.getConnected());
 		TicketInfo ticketInfo=new TicketInfo(userInfo,movieInfo,t.getDisplayTime().getDisplayTime(),cinemaInfo,t.getHallNum(),t.getRow(),t.getCol(),t.getPurchaseTime());
@@ -513,7 +529,7 @@ public class SimpleServer extends AbstractServer {
 		byte[] movieImageByteArray=null;
 		List<Movie> movies=getMoviesFromDB();
 		for(Movie m: movies){
-			MovieInfo mi=new MovieInfo(m.getName(),m.getReleasedate(),m.getGenre(),m.getProducer(),m.getActors(),m.getSummary(),m.getStatus());
+			MovieInfo mi=new MovieInfo(m.getName(),m.getReleaseDate(),m.getGenre(),m.getProducer(),m.getActors(),m.getSummary(),m.getStatus());
 			mi.setImageData(m.getImageData());
 			//add display times from movie to movieinfo
 			for(DisplayTime d: m.getDisplayTimes()){
@@ -624,7 +640,7 @@ public class SimpleServer extends AbstractServer {
 			}
 			else if(request.startsWith("connectCustomer")){
 				String[] splitted=request.split(" ",2);
-				if(connectCustomer(splitted[1].toLowerCase())){
+				if(connectCustomer(splitted[1])){
 					message.setMessage("Customer succesfully connected");
 					message.setUserInfoList(this.userInfoList);
 					sendToAllClients(message);
@@ -640,7 +656,7 @@ public class SimpleServer extends AbstractServer {
 			}
 			else if(request.startsWith("disconnectCustomer")){
 				String[] splitted=request.split(" ",2);
-				if(disconnectCustomer(splitted[1].toLowerCase())){
+				if(disconnectCustomer(splitted[1])){
 					message.setMessage("Customer succesfully disconnected");
 					message.setUserInfoList(this.userInfoList);
 					sendToAllClients(message);
@@ -704,6 +720,9 @@ public class SimpleServer extends AbstractServer {
 			generateData();
 			setMovieInfoList();
 			setUserInfoList();
+			//setCinemaInfoList();
+			//setTicketInfoList();
+
 		}catch(Exception e) {
 			e.printStackTrace();
 		}
