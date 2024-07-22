@@ -46,7 +46,7 @@ public class SimpleServer extends AbstractServer {
 	private static SessionFactory getSessionFactory() throws HibernateException{
 		Configuration configuration=new Configuration();
 
-		//configuration.addAnnotatedClass(Ticket.class);
+		configuration.addAnnotatedClass(Ticket.class);
 		configuration.addAnnotatedClass(Msg.class);
 		configuration.addAnnotatedClass(Movie.class);
 		configuration.addAnnotatedClass(DisplayTime.class);
@@ -90,7 +90,7 @@ public class SimpleServer extends AbstractServer {
 			DisplayTime d=new DisplayTime("10:30, 10/10/2024");
 			session.save(d);
 			System.out.println("everything good till here0");
-			/*Ticket ti=new Ticket(movie6,1,1,1,cinema1,c1,d);
+			Ticket ti=new Ticket(movie6,1,1,1,cinema1,c1,d);
 			System.out.println("everything good till here1");
 			session.save(ti);
 			System.out.println("everything good till here2");
@@ -101,7 +101,7 @@ public class SimpleServer extends AbstractServer {
 			session.saveOrUpdate(movie6);
 			session.saveOrUpdate(cinema1);
 			session.saveOrUpdate(d);
-			session.saveOrUpdate(c1);*/
+			session.saveOrUpdate(c1);
             session.flush();
 	}
 
@@ -772,7 +772,7 @@ public class SimpleServer extends AbstractServer {
 			generateData();
 			setMovieInfoList();
 			setUserInfoList();
-			//setCinemaInfoList();
+			setCinemaInfoList();
 			//setTicketInfoList();
 
 		}catch(Exception e) {

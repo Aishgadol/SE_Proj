@@ -38,8 +38,8 @@ public class Cinema implements Serializable {
     )
     private List<Customer> customerList=new ArrayList<>();
 
-    //@OneToMany(mappedBy = "cinema")
-    //private List<Ticket> ticketList=new ArrayList<>();
+    @OneToMany(mappedBy = "cinema")
+    private List<Ticket> ticketList=new ArrayList<>();
 
     // Empty constructor
     public Cinema() {}
@@ -49,7 +49,7 @@ public class Cinema implements Serializable {
         this.name = cinema.getName();
         this.numHalls=cinema.getNumHalls();
         this.movieList = cinema.getMovieList();
-       // this.ticketList=cinema.getTicketList();
+        this.ticketList=cinema.getTicketList();
         this.customerList=cinema.getCustomerList();
     }
 
@@ -122,7 +122,7 @@ public class Cinema implements Serializable {
             }
         }
 	}
-/*
+
     public void setTicketList(List<Ticket> l){this.ticketList=l;}
     public List<Ticket> getTicketList(){return this.ticketList;}
 
@@ -152,7 +152,7 @@ public class Cinema implements Serializable {
                 }
             }
         }
-    }*/
+    }
 
     public List<Customer> getCustomerList(){return this.customerList;}
     public void setCustomerList(List<Customer> list){this.customerList=list;}

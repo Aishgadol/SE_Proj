@@ -33,8 +33,8 @@ public class Customer implements Serializable {
     @ManyToMany(mappedBy = "customerList")
     List<Cinema> cinemaList=new ArrayList<>();
 
-    //@OneToMany(mappedBy = "customer")
-    //List<Ticket> ticketList=new ArrayList<>();
+    @OneToMany(mappedBy = "customer")
+    List<Ticket> ticketList=new ArrayList<>();
 
     public Customer(){}
 
@@ -49,7 +49,7 @@ public class Customer implements Serializable {
         this.userID=c.getId();
         this.role="Customer";
         this.name=c.getName();
-        //this.ticketList=c.getTicketList();
+        this.ticketList=c.getTicketList();
         this.connected=c.getConnected();
     }
 
@@ -73,7 +73,7 @@ public class Customer implements Serializable {
     public void setConnected(int c){this.connected=c;}
     public String getPassword(){return null;}
 
-   /* public void setTicketList(List<Ticket> list){this.ticketList=list;}
+    public void setTicketList(List<Ticket> list){this.ticketList=list;}
     public List<Ticket> getTicketList(){return this.ticketList;}
 
     public void addTicket(Ticket ticket){
@@ -101,7 +101,7 @@ public class Customer implements Serializable {
                 }
             }
         }
-    }*/
+    }
     public void setCinemaList(List<Cinema> list){this.cinemaList=list;}
     public List<Cinema> getCinemaList(){return this.cinemaList;}
 

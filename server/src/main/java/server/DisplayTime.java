@@ -23,8 +23,8 @@ public class DisplayTime implements Serializable {
     @ManyToMany(mappedBy = "displayTimes")
     private List<Movie> movies=new ArrayList<>();
 
-     //@OneToMany(mappedBy = "displayTime")
-    //private List<Ticket> ticketList=new ArrayList<>();
+    @OneToMany(mappedBy = "displayTime")
+    private List<Ticket> ticketList=new ArrayList<>();
 
 
     public DisplayTime(){
@@ -78,7 +78,7 @@ public class DisplayTime implements Serializable {
         }
 	}
 
-   /* public void setTicketList(List<Ticket> ticketList){this.ticketList=ticketList;}
+    public void setTicketList(List<Ticket> ticketList){this.ticketList=ticketList;}
     public List<Ticket> getTicketList(){return this.ticketList;}
 
     public void addTicket(Ticket ticket){
@@ -107,5 +107,5 @@ public class DisplayTime implements Serializable {
                 }
             }
         }
-    }*/
+    }
 }

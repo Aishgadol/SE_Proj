@@ -55,8 +55,8 @@ public class Movie implements Serializable {
     @ManyToMany(mappedBy = "movieList")
     private List<Cinema> cinemaList=new ArrayList<>();
 
-    //@OneToMany(mappedBy = "movie")
-    //private List<Ticket> ticketList=new ArrayList<>();
+    @OneToMany(mappedBy = "movie")
+    private List<Ticket> ticketList=new ArrayList<>();
 
 
 
@@ -207,7 +207,7 @@ public class Movie implements Serializable {
             }
         }
     }
-    /*
+
     public void setTicketList(List<Ticket> list){this.ticketList=list;}
     public List<Ticket> getTicketList(){return this.ticketList;}
 
@@ -236,7 +236,7 @@ public class Movie implements Serializable {
                 }
             }
         }
-    }*/
+    }
 
 
 }

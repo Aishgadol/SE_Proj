@@ -1,4 +1,4 @@
-/*package server;
+package server;
 
 
 
@@ -17,7 +17,7 @@ public class Ticket implements Serializable {
 
     @ManyToOne
     @JoinColumn(name="movie_name",referencedColumnName = "name")
-    private Movie movie=null;
+    private Movie movie;
 
     @Column(name="hall_num")
     private int hallNum;
@@ -32,18 +32,18 @@ public class Ticket implements Serializable {
 
     @ManyToOne
     @JoinColumn(name="cinema",referencedColumnName = "name")
-    private Cinema cinema=null;
+    private Cinema cinema;
 
     @ManyToOne
     @JoinColumn(name="customer_id",referencedColumnName = "User_ID")
-    private Customer customer=null;
+    private Customer customer;
 
-    @Column(name="Purchase time")
+    @Column(name="Purchase_time")
     private String purchaseTime;
 
     @ManyToOne
     @JoinColumn(name = "display_time",referencedColumnName ="Display_Time_And_Date" )
-    private DisplayTime displayTime=null;
+    private DisplayTime displayTime;
 
 
     public Ticket(){}
@@ -141,4 +141,3 @@ public class Ticket implements Serializable {
     }
 
 }
-*/
