@@ -133,13 +133,13 @@ public class StartingScreenController {
         this.availableMoviesButton.setDisable(true);
         clearDisplay();
         displayMovies(getAvailableMovieInfoList());
-    }
+    }/*
     @FXML
     void showFilteredMovies(){
         clearDisplay();
         displayMovies(getFilteredMovieInfoList()); // havent wrote this funcion yet
         
-    }
+    }*/
     @FXML
     void changeModeButtonPressed(ActionEvent event){
         if(customerLoginModeEnabled){

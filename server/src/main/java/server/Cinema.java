@@ -30,7 +30,12 @@ public class Cinema implements Serializable {
     private List<Movie> movieList=new ArrayList<>();
 
 
-    @ManyToMany(mappedBy = "cinemaList")
+    @ManyToMany
+    @JoinTable(
+            name="customer_Cinema",
+            joinColumns = @JoinColumn(name="cinema_name",referencedColumnName = "name"),
+            inverseJoinColumns = @JoinColumn(name="customer_id", referencedColumnName = "user_id")
+    )
     private List<Customer> customerList=new ArrayList<>();
 
     //@OneToMany(mappedBy = "cinema")

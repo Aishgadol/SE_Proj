@@ -30,12 +30,7 @@ public class Customer implements Serializable {
     @Column(name="is_user_connected")
     int connected;
 
-    @ManyToMany
-    @JoinTable(
-        name = "customer_cinema",
-        joinColumns = @JoinColumn(name = "customer_name"),
-        inverseJoinColumns = @JoinColumn(name = "cinema_name")
-    )
+    @ManyToMany(mappedBy = "customerList")
     List<Cinema> cinemaList=new ArrayList<>();
 
     //@OneToMany(mappedBy = "customer")
