@@ -23,7 +23,7 @@ public class PurchaseTicketScreenController {
     private Stage stage;
     private Scene scene;
     private Parent root;
-    private String currUserName;
+    private String currUserID;
     private HBox imageContainer;
 
 
@@ -36,8 +36,8 @@ public class PurchaseTicketScreenController {
     @FXML
     private ImageView backgroundImageView;
 
-    public void setCurrUserName(String name){
-        this.currUserName=name;
+    public void setCurrUserID(String name){
+        this.currUserID =name;
     }
     public void setImageContainer(HBox imageContainer){
         this.imageContainer=imageContainer;
@@ -50,13 +50,13 @@ public class PurchaseTicketScreenController {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/customerMainScreen.fxml"));
             Parent root = loader.load();
             CustomerMainScreenController controller = loader.getController();
-            controller.setCurrUserName(currUserName);
-            controller.setInfoLabel(currUserName);
+            controller.setCurrUserID(currUserID);
+            controller.setInfoLabel(currUserID);
             stage=(Stage) ((Node)event.getSource()).getScene().getWindow();
             scene=new Scene(root,1280,800);
             stage.setScene(scene);
             stage.setResizable(false);
-            stage.setOnCloseRequest(some_event->handleClose(currUserName));
+            stage.setOnCloseRequest(some_event->handleClose(currUserID));
             stage.setTitle("Customer Main Screen");
             stage.show();
         }catch(Exception e){

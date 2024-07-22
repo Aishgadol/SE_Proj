@@ -30,8 +30,6 @@ public class Cinema implements Serializable {
     private List<Movie> movieList=new ArrayList<>();
 
 
-
-
     @ManyToMany(mappedBy = "cinemaList")
     private List<Customer> customerList=new ArrayList<>();
 
@@ -51,13 +49,22 @@ public class Cinema implements Serializable {
     }
 
     // Normal constructor
+    public Cinema(String name, int numHalls, List<Movie> movieList,List<Customer> customerList) {
+        this.name = name;
+        this.numHalls=numHalls;
+        this.movieList = movieList;
+        this.customerList=customerList;
+    }
+
+    /*
+    // Normal constructor
     public Cinema(String name, int numHalls, List<Movie> movieList,List<Ticket> ticketList,List<Customer> customerList) {
         this.name = name;
         this.numHalls=numHalls;
         this.movieList = movieList;
         //this.ticketList=ticketList;
         this.customerList=customerList;
-    }
+    }*/
 
     public Cinema(String name, int numHalls){
         this.name=name;

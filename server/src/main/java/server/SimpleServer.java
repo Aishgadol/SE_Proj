@@ -38,7 +38,7 @@ public class SimpleServer extends AbstractServer {
 	private List<Worker> workerList=new ArrayList<>();
 	private List<Customer> customerList=new ArrayList<>();
 	private List<UserInfo> userInfoList=new ArrayList<>();
-	private List<Ticket> ticketList=new ArrayList<>();
+	//private List<Ticket> ticketList=new ArrayList<>();
 	private List<TicketInfo> ticketInfoList=new ArrayList<>();
 	private List<Cinema> cinemaList=new ArrayList<>();
 	private List<CinemaInfo> cinemaInfoList=new ArrayList<>();
@@ -85,6 +85,8 @@ public class SimpleServer extends AbstractServer {
 			session.save(c1);
 			Cinema cinema1=new Cinema("YisPlanit",5);
 			session.save(cinema1);
+			Cinema cinema2=new Cinema("NoPlanit",9);
+			session.save(cinema2);
 			DisplayTime d=new DisplayTime("10:30, 10/10/2024");
 			session.save(d);
 			System.out.println("everything good till here0");
@@ -104,12 +106,12 @@ public class SimpleServer extends AbstractServer {
 	}
 
 
-	private List<Ticket> getTicketsFromDB(){
+	/*private List<Ticket> getTicketsFromDB(){
 		CriteriaBuilder builder=session.getCriteriaBuilder();
 		CriteriaQuery<Ticket> query=builder.createQuery(Ticket.class);
 		query.from(Ticket.class);
         return session.createQuery(query).getResultList();
-	}
+	}*/
 	private List<Cinema> getCinemasFromDB(){
 		CriteriaBuilder builder=session.getCriteriaBuilder();
 		CriteriaQuery<Cinema> query=builder.createQuery(Cinema.class);
@@ -183,6 +185,29 @@ public class SimpleServer extends AbstractServer {
 		}
 		return null;
 	}
+	private UserInfo getUserInfoByName(String name){
+		int count=0;
+		UserInfo i=null;
+		for(UserInfo u:this.userInfoList){
+			if(u.getName().equals(name)){
+				count++;
+				i=new UserInfo(u);
+			}
+		}
+		if(count>1){
+			System.out.println("Found more than one UserInfo with name: "+name);
+		}
+		return i;
+	}
+
+	private UserInfo getUserInfoByID(String id){
+		for(UserInfo u:this.userInfoList){
+			if(u.getId().equals(id)){
+				return new UserInfo((u));
+			}
+		}
+		return null;
+	}
 
 	private List<Msg> getMsgs(){
 		CriteriaBuilder builder=session.getCriteriaBuilder();
@@ -236,10 +261,10 @@ public class SimpleServer extends AbstractServer {
 		}
 		return false;
 	}
-	private boolean disconnectCustomer(String name){
+	private boolean disconnectCustomer(String id){
 		this.customerList=getCustomersFromDB();
 		for(Customer c:this.customerList){
-			if (c.getName().toLowerCase().equals(name)) {
+			if (c.getId().equals(id)) {
 				c.setConnected(0);
 				session.saveOrUpdate(c);
 				session.flush();
@@ -285,7 +310,7 @@ public class SimpleServer extends AbstractServer {
 		session.beginTransaction();
 		return true;
 	}
-	private boolean addTicketToDB(Ticket ticket) throws IOException{
+	/*private boolean addTicketToDB(Ticket ticket) throws IOException{
 		CinemaInfo cinemaInfo=null;
 		MovieInfo movieInfo=null;
 		for(Ticket t:this.ticketList){
@@ -319,7 +344,7 @@ public class SimpleServer extends AbstractServer {
 		session.getTransaction().commit();
 		session.beginTransaction();
 		return true;
-	}
+	}*/
 
 	private boolean addWorkerToDB(Worker worker) throws IOException{
 		for(Worker w:this.workerList){
@@ -522,7 +547,28 @@ public class SimpleServer extends AbstractServer {
 
 
 
+	private void setCinemaInfoList(){
+		this.cinemaInfoList=new ArrayList<>();
+		List<Cinema> cinemas=getCinemasFromDB();
+		for(Cinema c: cinemas){
+			CinemaInfo ci=new CinemaInfo(c.getName(),c.getNumHalls());
+			List<MovieInfo> movieInfos=new ArrayList<>();
+			for(Movie m:c.getMovieList()){
+				movieInfos.add(getMovieInfoByTitle(m.getName()));
+			}
+			ci.setMovieInfoList(movieInfos);
+			List<UserInfo> customerInfos=new ArrayList<>();
+			for(Customer c1:c.getCustomerList()){
+				customerInfos.add(getUserInfoByID(c1.getId()));
+			}
+			ci.setCustomerInfoList(customerInfos);
 
+			//might need to add stuff here
+
+
+			this.cinemaInfoList.add(ci);
+		}
+	}
 
 	private void setMovieInfoList(){
 		this.movieInfoList=new ArrayList<>();
@@ -591,6 +637,12 @@ public class SimpleServer extends AbstractServer {
 				message.setMovieInfoList(this.movieInfoList);
 				message.setMessage("ListOfMovieInfos");
 				client.sendToClient(message);
+			}
+			else if(request.startsWith("getCinemas")){
+				setCinemaInfoList();
+				message.setCinemaInfoList(this.cinemaInfoList);
+				message.setMessage("cinemaInfoList");
+				sendToAllClients(message); //maybe change to only send to specific client
 			}
 			else if (request.startsWith("addtime")) {
 				addDisplayTimeToDB(request.substring(8));
@@ -790,7 +842,7 @@ public class SimpleServer extends AbstractServer {
 		}
 	return list;
 	}
-	private List<Ticket> removeTicketWithToString(List<Ticket> list, String toStringToRemove) {
+	/*private List<Ticket> removeTicketWithToString(List<Ticket> list, String toStringToRemove) {
 		Iterator<Ticket> iterator = list.iterator();
 		while (iterator.hasNext()) {
 			Ticket obj = iterator.next();
@@ -799,7 +851,7 @@ public class SimpleServer extends AbstractServer {
 			}
 		}
 	return list;
-	}
+	}*/
 	private List<Cinema> removeCinemaWithName(List<Cinema> list, String nameToRemove) {
 		Iterator<Cinema> iterator = list.iterator();
 		while (iterator.hasNext()) {

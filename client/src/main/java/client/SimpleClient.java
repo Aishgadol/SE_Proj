@@ -66,6 +66,9 @@ public class SimpleClient extends AbstractClient {
 		else if(message.getMessage().startsWith("Customer succesfully disconnected")){
 			EventBus.getDefault().post(new UserInfoListEvent(message));
 		}
+		else if(message.getMessage().startsWith("cinemaInfoList")){
+			EventBus.getDefault().post(new CinemaInfoListEvent(message));
+		}
 		else {
 			EventBus.getDefault().post(new MessageEvent(message));
 		}

@@ -52,7 +52,7 @@ public class UserInfo implements Serializable {
         this.name=u.getName();
         this.password=u.getPassword();
         this.connected=u.getConnected();
-        this.ticketInfoList=u.getticketInfoList();
+        this.ticketInfoList=u.getTicketInfoList();
     }
 
     public void setId(String id){
@@ -82,7 +82,7 @@ public class UserInfo implements Serializable {
     public void setConnected(int c){this.connected=c;}
     
     public void setTicketInfoList(List<TicketInfo> l){this.ticketInfoList=l;}
-    public List<TicketInfo> getticketInfoList(){return this.ticketInfoList;}
+    public List<TicketInfo> getTicketInfoList(){return this.ticketInfoList;}
 
     public void addTicketInfo(TicketInfo ticket){
         for(TicketInfo t : this.ticketInfoList){

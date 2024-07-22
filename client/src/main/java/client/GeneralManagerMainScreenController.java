@@ -14,4 +14,5 @@ public class GeneralManagerMainScreenController {
     public void setCurrUserName(String name){
         this.currUserName=name;
     }
+
 }

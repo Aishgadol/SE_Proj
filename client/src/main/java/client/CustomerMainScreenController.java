@@ -35,7 +35,7 @@ public class CustomerMainScreenController {
     private List<MovieInfo> movieInfoList;
     private MovieInfo selectedMovieInfo=null;
     private List<UserInfo> userInfoList;
-    private String currUserName;
+    private String currUserID;
     private HBox chosenImageContainer=null;
     private MovieInfo currMovieInfo;
 
@@ -76,13 +76,13 @@ public class CustomerMainScreenController {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/purchaseTicketScreen.fxml"));
             root = loader.load();
             PurchaseTicketScreenController controller = loader.getController();
-            controller.setCurrUserName(this.currUserName);
+            controller.setCurrUserID(this.currUserID);
             controller.setImageContainer(this.chosenImageContainer);
             stage=(Stage) ((Node)event.getSource()).getScene().getWindow();
             scene=new Scene(root,800,800);
             stage.setScene(scene);
             stage.setResizable(false);
-            stage.setOnCloseRequest(some_event->handleClose(currUserName));
+            stage.setOnCloseRequest(some_event->handleClose(currUserID));
             stage.setTitle("Purchase Ticket");
             stage.show();
         }catch(Exception e){
@@ -112,13 +112,13 @@ public class CustomerMainScreenController {
     }
 
     @FXML
-    void setInfoLabel(String name){
-        infoLabel.setText(name+ " is connected.");
+    void setInfoLabel(String id){
+        infoLabel.setText(id+ " is connected.");
     }
 
     @FXML
     private void disconnectButtonPressed(ActionEvent event) {
-        askDB("disconnectCustomer "+currUserName);
+        askDB("disconnectCustomer "+currUserID);
         try {
             EventBus.getDefault().unregister(this);
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/startingScreen.fxml"));
@@ -291,8 +291,8 @@ public class CustomerMainScreenController {
         this.userInfoList=event.getMessage().getUserInfoList();
     }
 
-    public void setCurrUserName(String name){
-        this.currUserName=name;
+    public void setCurrUserID(String id){
+        this.currUserID=id;
     }
 
     private void askDB(String title){
@@ -303,8 +303,8 @@ public class CustomerMainScreenController {
             e.printStackTrace();
         }
     }
-    private void handleClose(String name){
-        askDB("disconnectCustomer "+name);
+    private void handleClose(String id){
+        askDB("disconnectCustomer "+id);
         stage.close();
     }
 

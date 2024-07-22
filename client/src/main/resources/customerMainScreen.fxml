@@ -27,7 +27,7 @@
                   <HBox fx:id="imageHBox" alignment="CENTER" prefHeight="329.0" prefWidth="1124.0" spacing="25.0" visible="false" />
                </content>
             </ScrollPane>
-            <Button fx:id="cancelSelectionButton" layoutX="546.0" layoutY="694.0" mnemonicParsing="false" onAction="#cancelSelection" prefHeight="47.0" prefWidth="232.0" text="Cancel Selection">
+            <Button fx:id="cancelSelectionButton" layoutX="547.0" layoutY="727.0" mnemonicParsing="false" onAction="#cancelSelection" prefHeight="47.0" prefWidth="232.0" text="Cancel Selection">
                <font>
                   <Font name="Sitka Text" size="24.0" />
                </font>
