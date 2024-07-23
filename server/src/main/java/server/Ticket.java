@@ -15,6 +15,7 @@ public class Ticket implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     int id;
 
+    
     @ManyToOne
     @JoinColumn(name="movie_name",referencedColumnName = "name")
     private Movie movie;
