@@ -13,47 +13,47 @@ public class Ticket implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    int id;
+    private int id;
 
     
     @ManyToOne
     @JoinColumn(name="movie_name",referencedColumnName = "name")
-    private Movie movie;
+    Movie movie;
 
     @Column(name="hall_num")
     private int hallNum;
 
     @Column
-    private int col;
+    private int seatCol;
     @Column
-    private int row;
+    private int seatRow;
 
     @Column(name="is_ticket_active")
     private int active;
 
     @ManyToOne
     @JoinColumn(name="cinema",referencedColumnName = "name")
-    private Cinema cinema;
+    Cinema cinema;
 
     @ManyToOne
     @JoinColumn(name="customer_id",referencedColumnName = "User_ID")
-    private Customer customer;
+    Customer customer;
 
     @Column(name="Purchase_time")
     private String purchaseTime;
 
     @ManyToOne
     @JoinColumn(name = "display_time",referencedColumnName ="Display_Time_And_Date" )
-    private DisplayTime displayTime;
+    DisplayTime displayTime;
 
 
     public Ticket(){}
 
     public Ticket(Ticket ticket){
         this.movie=ticket.getMovie();
-        this.col=ticket.getCol();
+        this.seatCol=ticket.getSeatCol();
         this.hallNum=ticket.getHallNum();
-        this.row=ticket.getRow();
+        this.seatRow=ticket.getSeatRow();
         this.cinema=ticket.getCinema();
         this.customer=ticket.getCustomer();
         this.displayTime=ticket.getDisplayTime();
@@ -61,10 +61,10 @@ public class Ticket implements Serializable {
         this.active=ticket.getActive();
     }
 
-    public Ticket(Movie movie,int col, int row,int hallNum, Cinema cinema, Customer customer,DisplayTime displayTime){
+    public Ticket(Movie movie,int seatCol, int seatRow,int hallNum, Cinema cinema, Customer customer,DisplayTime displayTime){
         this.movie=movie;
-        this.col=col;
-        this.row=row;
+        this.seatCol=seatCol;
+        this.seatRow=seatRow;
         this.hallNum=hallNum;
         this.cinema=cinema;
         this.purchaseTime=displayTime.getDisplayTime();
@@ -92,20 +92,20 @@ public class Ticket implements Serializable {
         this.hallNum = hallNum;
     }
 
-    public int getCol() {
-        return col;
+    public int getSeatCol() {
+        return seatCol;
     }
 
-    public void setCol(int col) {
-        this.col = col;
+    public void setSeatCol(int seatCol) {
+        this.seatCol = seatCol;
     }
 
-    public int getRow() {
-        return row;
+    public int getSeatRow() {
+        return seatRow;
     }
 
-    public void setRow(int row) {
-        this.row = row;
+    public void setSeatRow(int seatRow) {
+        this.seatRow = seatRow;
     }
 
     public Cinema getCinema() {
@@ -135,7 +135,7 @@ public class Ticket implements Serializable {
         return "Ticket: \n" +
                 "Movie: "+movie.getName()+"\n"+
                 "Hall Num: "+hallNum+"\n"+
-                "Seat located at: ("+col+","+row+")\n"+
+                "Seat located at: ("+seatCol+","+seatRow+")\n"+
                 "Cinema: "+cinema.getName()+"\n"+
                 "Owner of this ticket: "+customer.getName()+"\n"+
                 "Is the ticket active: "+active+".";

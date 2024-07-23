@@ -7,18 +7,18 @@ public class TicketInfo implements Serializable {
     private MovieInfo movieInfo;
     private String displayTime;
     private CinemaInfo cinemaInfo;
-    private int row;
-    private int col;
+    private int seatRow;
+    private int seatCol;
     private int hallNum;
     private String purchaseTime;
 
-    public TicketInfo(UserInfo userInfo, MovieInfo movieInfo, String displayTime, CinemaInfo cinemaInfo,int hallNum,int row, int col,String purchaseTime) {
+    public TicketInfo(UserInfo userInfo, MovieInfo movieInfo, String displayTime, CinemaInfo cinemaInfo,int hallNum,int seatRow, int seatCol,String purchaseTime) {
         this.userInfo = userInfo;
         this.movieInfo = movieInfo;
         this.displayTime = displayTime;
         this.cinemaInfo = cinemaInfo;
-        this.row=row;
-        this.col=col;
+        this.seatRow=seatRow;
+        this.seatCol=seatCol;
         this.purchaseTime=purchaseTime;
         this.hallNum = hallNum;
     }
@@ -27,8 +27,8 @@ public class TicketInfo implements Serializable {
         this.movieInfo = other.getMovieInfo();
         this.displayTime = other.getDisplayTime();
         this.cinemaInfo = other.getCinemaInfo();
-        this.row=other.getRow();
-        this.col=other.getCol();
+        this.seatRow=other.getSeatRow();
+        this.seatCol=other.getSeatCol();
         this.purchaseTime=other.getPurchaseTime();
         this.hallNum = other.getHallNum();
     }
@@ -52,20 +52,20 @@ public class TicketInfo implements Serializable {
         this.movieInfo = movieInfo;
     }
 
-     public int getCol() {
-        return col;
+     public int getSeatCol() {
+        return seatCol;
     }
 
-    public void setCol(int col) {
-        this.col = col;
+    public void setSeatCol(int seatCol) {
+        this.seatCol = seatCol;
     }
 
-    public int getRow() {
-        return row;
+    public int getSeatRow() {
+        return seatRow;
     }
 
-    public void setRow(int row) {
-        this.row = row;
+    public void setSeatRow(int seatRow) {
+        this.seatRow = seatRow;
     }
     public String getDisplayTime() {
         return displayTime;
@@ -96,7 +96,7 @@ public class TicketInfo implements Serializable {
         return "Ticket: \n" +
                 "Movie: "+movieInfo.getName()+"\n"+
                 "Hall Num: "+hallNum+"\n"+
-                "Seat located at: ("+col+","+row+")\n"+
+                "Seat located at: ("+seatCol+","+seatRow+")\n"+
                 "Cinema: "+cinemaInfo.getName()+"\n"+
                 "Owner of this ticket: "+userInfo.getName()+".";
     }

@@ -46,13 +46,13 @@ public class SimpleServer extends AbstractServer {
 	private static SessionFactory getSessionFactory() throws HibernateException{
 		Configuration configuration=new Configuration();
 
+		configuration.addAnnotatedClass(Ticket.class);
 		configuration.addAnnotatedClass(Msg.class);
 		configuration.addAnnotatedClass(Movie.class);
 		configuration.addAnnotatedClass(DisplayTime.class);
 		configuration.addAnnotatedClass(Worker.class);
 		configuration.addAnnotatedClass(Customer.class);
 		configuration.addAnnotatedClass(Cinema.class);
-		configuration.addAnnotatedClass(Ticket.class);
 
 
 		ServiceRegistry serviceRegistry=new StandardServiceRegistryBuilder().applySettings(configuration.getProperties()).build();
@@ -62,7 +62,7 @@ public class SimpleServer extends AbstractServer {
 	//only use these functions if protoype database gets deleted, it should not happen.
 
 	public void generateData() throws Exception {
-			/*Movie movie1=new Movie("Margol","1973","Romance","Zohar Argov","Margalit Tzanany, Eyal Golan, Shimi Tavory","MARGOL!","Upcoming");
+			Movie movie1=new Movie("Margol","1973","Romance","Zohar Argov","Margalit Tzanany, Eyal Golan, Shimi Tavory","MARGOL!","Upcoming");
 			movie1.setImageData(getImageFromFilesByTitleAsByteArray("margol"));
 			session.save(movie1);
 			Movie movie2=new Movie("The Boys","2018","Action","Billy Butcher","God","A bunch of no-good people trying to steal the country, will homelander be able to stop them?","Available");
@@ -88,29 +88,28 @@ public class SimpleServer extends AbstractServer {
 			session.save(cinema1);
 			Cinema cinema2=new Cinema("NoPlanit",9);
 			session.save(cinema2);
-
 			DisplayTime d=new DisplayTime("10:30, 10/10/2024");
 			session.save(d);
-*/
-
-			System.out.println("everything good till here0");
-			Ticket ti=new Ticket(getMovieByTitleFromDB("margol"),1,1,1,getCinemasFromDB().get(0),getCustomersFromDB().get(0),displayTimeList.get(0));
-			System.out.println("everything good till here1");
+			Ticket ti=new Ticket(movie1,1,1,1,cinema1,c1,d);
 			session.save(ti);
-			System.out.println("everything good till here2");
-
-			session.saveOrUpdate(ti);
-
-            session.flush();
+            d.addTicket(ti);
+			session.saveOrUpdate(d);
+			movie1.addTicket(ti);
+			session.saveOrUpdate(movie1);
+			c1.addTicket(ti);
+			session.saveOrUpdate(c1);
+			cinema1.addTicket(ti);
+			session.saveOrUpdate(cinema1);
+			session.flush();
 	}
 
 
-	/*private List<Ticket> getTicketsFromDB(){
+	private List<Ticket> getTicketsFromDB(){
 		CriteriaBuilder builder=session.getCriteriaBuilder();
 		CriteriaQuery<Ticket> query=builder.createQuery(Ticket.class);
 		query.from(Ticket.class);
         return session.createQuery(query).getResultList();
-	}*/
+	}
 	private List<Cinema> getCinemasFromDB(){
 		CriteriaBuilder builder=session.getCriteriaBuilder();
 		CriteriaQuery<Cinema> query=builder.createQuery(Cinema.class);
