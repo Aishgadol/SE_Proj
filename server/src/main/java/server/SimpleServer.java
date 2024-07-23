@@ -60,7 +60,7 @@ public class SimpleServer extends AbstractServer {
 	}
 
 	//only use these functions if protoype database gets deleted, it should not happen.
-
+/*
 	public void generateData() throws Exception {
 			Movie movie1=new Movie("Margol","1973","Romance","Zohar Argov","Margalit Tzanany, Eyal Golan, Shimi Tavory","MARGOL!","Upcoming");
 			movie1.setImageData(getImageFromFilesByTitleAsByteArray("margol"));
@@ -101,7 +101,7 @@ public class SimpleServer extends AbstractServer {
 			cinema1.addTicket(ti);
 			session.saveOrUpdate(cinema1);
 			session.flush();
-	}
+	}*/
 
 
 	private List<Ticket> getTicketsFromDB(){
@@ -758,15 +758,15 @@ public class SimpleServer extends AbstractServer {
 			sessionFactory=getSessionFactory();
 			session=sessionFactory.openSession();
 			session.beginTransaction();
-			//setMovieInfoList(); //uncomment this when hibernate is on update mode
-			//setUserInfoList();
+			setMovieInfoList(); //uncomment this when hibernate is on update mode
+			setUserInfoList();
 		} catch(Exception e) {
 			if(session!=null){
 				session.getTransaction().rollback();
 			}
 			e.printStackTrace();
 		}//uncomment this section when running server for the first time
-		try{
+		/*try{
 			generateData();
 			setMovieInfoList();
 			setUserInfoList();
@@ -775,7 +775,7 @@ public class SimpleServer extends AbstractServer {
 
 		}catch(Exception e) {
 			e.printStackTrace();
-		}
+		}*/
 		session.getTransaction().commit();
 		session.beginTransaction();
 	}
