@@ -26,6 +26,7 @@ import javafx.stage.Stage;
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 
+import javax.swing.*;
 import java.io.ByteArrayInputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -39,6 +40,7 @@ public class StartingScreenController {
     private int msgId;
     private List<MovieInfo> movieInfoList=new ArrayList<>();
     boolean customerLoginModeEnabled=true;
+    boolean signupModeEnabled=false;
     boolean userConnected;
     private String selectedGenre;
     private String selectedDate;
@@ -66,7 +68,16 @@ public class StartingScreenController {
     private Button selectFiltersButton;
     @FXML
     private HBox imageHBox;
-
+    @FXML
+    private Label signupLabel1;
+    @FXML
+    private Label signupLabel2;
+    @FXML
+    private Label loginHeadLabel;
+    @FXML
+    private Button signupButton;
+    @FXML
+    private TextField signupNameTextField;
     @FXML
     private ScrollPane imageScrollPane;
     @FXML
@@ -150,6 +161,11 @@ public class StartingScreenController {
             this.passwordField.clear();
             this.nameTextField.clear();
             customerLoginModeEnabled=false;
+            this.signupLabel1.setVisible(false);
+            this.signupLabel2.setVisible(false);
+            this.signupButton.setDisable(true);
+            this.signupButton.setVisible(false);
+            this.passwordField.setDisable(false);
         }
         else{
             //change to customer login
@@ -159,17 +175,22 @@ public class StartingScreenController {
             passwordField.setVisible(false);
             this.nameTextField.setPromptText("Enter Customer ID");
             customerLoginModeEnabled=true;
+            this.signupLabel1.setVisible(true);
+            this.signupLabel2.setVisible(true);
+            this.signupButton.setDisable(false);
+            this.signupButton.setVisible(true);
         }
     }
     @FXML
     void loginButtonPressed(ActionEvent event) {
-        if(nameTextField.getText().isEmpty()){
+        if(nameTextField.getText().length()!=9){
             Platform.runLater(()->{
                 Alert alert=new Alert(Alert.AlertType.ERROR);
-                alert.setTitle("Name error");
-                alert.setHeaderText("Name inserted is too short");
+                alert.setTitle("Name or ID error");
+                alert.setHeaderText("Name or ID inserted is too short");
                 alert.show();
             });
+            return;
         }
         else{
             //check user exists, then transfer to customer/worker page (update that the custoemr/worker has connected too)
@@ -185,6 +206,24 @@ public class StartingScreenController {
                         break;
                     }
                 }
+                if(u0==null && signupModeEnabled){
+                    //check name given is not empty
+                    if(signupNameTextField.getText().isEmpty()){
+                        Platform.runLater(()->{
+                            Alert alert=new Alert(Alert.AlertType.ERROR);
+                            alert.setTitle("Name error");
+                            alert.setHeaderText("Name inserted is too short");
+                            alert.show();
+                        });
+                        return;
+                    }
+                    //we checked user customer doesnt exist so we need to sign him up and then log him in
+                    Message message=new Message(msgId++,"addCustomer");
+                    u0=new UserInfo(this.nameTextField.getText(),this.signupNameTextField.getText());
+                    this.userInfoList.add(u0);
+                    message.setUserInfo(u0);
+                    askDB(message);
+                }
             }
             //if worker mode
             else{
@@ -196,7 +235,7 @@ public class StartingScreenController {
                     }
                 }
             }
-            if(u0==null){
+            if(u0==null && !signupModeEnabled){
                 popUserDoesntExistMessage(nameTextField.getText());
                 return;
             }
@@ -204,6 +243,7 @@ public class StartingScreenController {
                 if(u0.getRole().equals("Customer")){
                     if(u0.getConnected()==0) {
                         askDB("connectCustomer " + chosenID);
+                        u0.setConnected(1);
                         changeToCustomerScreen(chosenID, event);
                         return;
                     }
@@ -299,7 +339,7 @@ public class StartingScreenController {
                     break;
                 default:
                     System.out.println("Illegal role");
-                    break;
+                    return;
             }
             stage=(Stage) ((Node)event.getSource()).getScene().getWindow();
             scene=new Scene(root,1280,800);
@@ -320,6 +360,24 @@ public class StartingScreenController {
             a.setHeaderText("User "+name+" is already connected.");
             a.show();
         });
+    }
+    @FXML
+    private void popUserFailedToRegister(){
+        Platform.runLater(()->{
+            Alert a=new Alert(Alert.AlertType.ERROR);
+                        a.setTitle("Failed to register user");
+                        a.setHeaderText("I failed :(");
+                        a.show();
+        });
+    }
+    @FXML
+    private void popUserSuccesfullyAdded(String name, String id) {
+        Platform.runLater(()->{
+                        Alert a=new Alert(Alert.AlertType.INFORMATION);
+                        a.setTitle("User successfully added!");
+                        a.setHeaderText("User "+name+" with ID: "+id+" has been succefully added, moving to Customer screen!");
+                        a.show();
+                    });
     }
     @FXML
     private void popUserDoesntExistMessage(String name){
@@ -417,6 +475,52 @@ public class StartingScreenController {
         }
     }
     @FXML
+    private void signupButtonPressed(ActionEvent event){
+        if(signupModeEnabled){ //this is we're already in the signup mode and we press the button to go back
+            this.signupModeEnabled=false;
+            this.signupButton.setText("Sign up");
+            this.passwordField.setVisible(false);
+            this.passwordField.setDisable(true);
+            this.nameTextField.clear();
+            this.passwordField.clear();
+            this.signupLabel1.setVisible(true);
+            this.signupLabel2.setVisible(true);
+            this.loginButton.setText("Login");
+            this.changeModeButton.setDisable(false);
+            this.changeModeButton.setVisible(true);
+            this.signupNameTextField.setDisable(true);
+            this.signupNameTextField.setVisible(false);
+            this.statusLabel.setVisible(true);
+            this.signupNameTextField.clear();
+            this.loginHeadLabel.setText("Login");
+        }
+        else { //this is the case where its in normal custoemr login and goes into signup mode
+            this.signupModeEnabled = true;
+            this.loginButton.setText("Signup and Login"); //need to add check that this user is not already registerd, by id
+            this.passwordField.setVisible(false);
+            this.passwordField.setDisable(true);
+            this.signupLabel1.setVisible(false);
+            this.signupLabel2.setVisible(false);
+            this.nameTextField.clear();
+            this.signupNameTextField.setDisable(false);
+            this.signupNameTextField.setVisible(true);
+            this.signupNameTextField.clear();
+            this.signupNameTextField.setPromptText("Enter name");
+            this.loginHeadLabel.setText("Sign up");
+            this.passwordField.clear();
+            this.signupButton.setText("Cancel");
+            this.loginButton.setText("Complete Signup and Login");
+            this.loginButton.setWrapText(true);
+            this.changeModeButton.setDisable(true);
+            this.changeModeButton.setVisible(false);
+            this.statusLabel.setVisible(false);
+        }
+    }
+    @FXML
+    private void cancelSignup(ActionEvent event){
+
+    }
+    @FXML
     private void clearDisplay(){
         try{
             Platform.runLater(()->{
@@ -469,9 +573,24 @@ public class StartingScreenController {
     public void catchCinemaInfoList(CinemaInfoListEvent event){
         this.cinemaInfoList=event.getMessage().getCinemaInfoList();
         for(CinemaInfo c:this.cinemaInfoList){
+            this.cinemaFilter.getItems().clear();
             this.cinemaFilter.getItems().add(c.getName());
         }
     }
+    @Subscribe
+    public void catchNewUserInfo(CustomerAddedEvent event){
+        if (event.getMessage().getMessage().contains("wasnt")){
+            popUserFailedToRegister();
+        }
+        else{
+            UserInfo u=event.getMessage().getUserInfo();
+            this.userInfoList.add(u);
+            popUserSuccesfullyAdded(u.getName(),u.getId());
+        }
+    }
+
+    
+
     @Subscribe
     public void catchMovieInfoList(MovieInfoListEvent event){
         this.movieInfoList=event.getMessage().getMovieInfoList();
@@ -512,6 +631,13 @@ public class StartingScreenController {
             e.printStackTrace();
         }
     }
+    private void askDB(Message message){
+        try{
+            SimpleClient.getClient().sendToServer(message);
+        }catch(Exception e){
+            e.printStackTrace();
+        }
+    }
 
     private void handleCustomerClose(String id){
         askDB("disconnectCustomer "+id);
@@ -529,8 +655,18 @@ public class StartingScreenController {
         askDB("getBackgroundImage");
         askDB("getTitles");
         askDB("getUsers");
+        this.nameTextField.setPromptText("Enter Customer ID");
         this.passwordField.setVisible(false);
         this.availableMoviesButton.setDisable(true);
+        //listner for signupNameTextField to take only characters and spaces up to length 30
+        this.signupNameTextField.textProperty().addListener((observable, oldValue, newValue) -> {
+               if (newValue.length() > 30) {
+                    this.signupNameTextField.setText(oldValue); // revert to old value if exceeds max length
+                }
+                if (!newValue.matches("[a-zA-z ']*")) {
+                    this.signupNameTextField.setText(oldValue);
+                }
+        });
         //listener to limit inputID length and allowed characters
         this.nameTextField.textProperty().addListener((observable, oldValue, newValue) -> {
             if (customerLoginModeEnabled) {

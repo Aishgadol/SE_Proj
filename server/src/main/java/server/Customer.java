@@ -44,6 +44,12 @@ public class Customer implements Serializable {
         this.name=name;
         this.connected=0;
     }
+    public Customer(UserInfo u){
+        this.userID=u.getId();
+        this.role="Customer";
+        this.name=u.getName();
+        this.connected=u.getConnected();
+    }
 
     public Customer(Customer c){
         this.userID=c.getId();

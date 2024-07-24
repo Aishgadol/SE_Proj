@@ -364,18 +364,15 @@ public class SimpleServer extends AbstractServer {
 		return true;
 	}
 	private boolean addCustomerToDB(Customer customer) throws IOException{
+		this.customerList=getCustomersFromDB();
 		for(Customer c:this.customerList){
-			if(c.getName().equals(customer.getName())){
+			if(c.getId().equals(customer.getId())){
 				return false; //name exists already in db
 			}
 		}
 		customer.setConnected(1);
 		this.customerList.add(customer);
 		Customer c=new Customer(customer);
-		UserInfo u=new UserInfo(c.getId(),"Customer",c.getName());
-		u.setConnected(1);
-		u.setTicketInfoList(this.ticketInfoList);
-		this.userInfoList.add(u);
 		session.save(c);
 		session.flush();
 		session.getTransaction().commit();
@@ -695,6 +692,19 @@ public class SimpleServer extends AbstractServer {
 					message.setUserInfoList(this.userInfoList);
 					sendToAllClients(message);
 				}
+			}
+			else if(request.startsWith("addCustomer")){
+				UserInfo u=message.getUserInfo();
+				u.setConnected(1);
+				this.userInfoList.add(u);
+				if(addCustomerToDB(new Customer(u))){
+					message.setMessage("customer added");
+				}
+				else{
+					message.setMessage("customer wasnt added");
+				}
+				sendToAllClients(message);
+
 			}
 			else if(request.startsWith("connectWorker")){
 				String[] splitted=request.split(" ",2);

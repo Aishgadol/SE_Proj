@@ -34,7 +34,7 @@ public class CustomerMainScreenController {
     private Parent root;
     private List<MovieInfo> movieInfoList;
     private MovieInfo selectedMovieInfo=null;
-    private List<UserInfo> userInfoList;
+    private UserInfo myUserInfo;
     private String currUserID;
     private HBox chosenImageContainer=null;
     private MovieInfo currMovieInfo;
@@ -82,7 +82,7 @@ public class CustomerMainScreenController {
             scene=new Scene(root,800,800);
             stage.setScene(scene);
             stage.setResizable(false);
-            stage.setOnCloseRequest(some_event->handleClose(currUserID));
+            stage.setOnCloseRequest(some_event->handleCustomerClose(currUserID));
             stage.setTitle("Purchase Ticket");
             stage.show();
         }catch(Exception e){
@@ -286,10 +286,6 @@ public class CustomerMainScreenController {
         byte[] data=event.getMessage().getImageData();
         setBackground(data);
     }
-    @Subscribe
-    public void catchUserInfoList(UserInfoListEvent event){
-        this.userInfoList=event.getMessage().getUserInfoList();
-    }
 
     public void setCurrUserID(String id){
         this.currUserID=id;
@@ -303,8 +299,12 @@ public class CustomerMainScreenController {
             e.printStackTrace();
         }
     }
-    private void handleClose(String id){
+    private void handleCustomerClose(String id){
         askDB("disconnectCustomer "+id);
+        stage.close();
+    }
+    private void handleWorkerClose(String name){
+        askDB("disconnectWorker "+name);
         stage.close();
     }
 
