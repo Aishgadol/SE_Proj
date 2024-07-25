@@ -1,6 +1,7 @@
 package client;
 
 import entities.Message;
+import entities.UserInfo;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -23,7 +24,7 @@ public class PurchaseTicketScreenController {
     private Stage stage;
     private Scene scene;
     private Parent root;
-    private String currUserID;
+    private UserInfo currUserInfo;
     private HBox imageContainer;
 
 
@@ -36,8 +37,8 @@ public class PurchaseTicketScreenController {
     @FXML
     private ImageView backgroundImageView;
 
-    public void setCurrUserID(String name){
-        this.currUserID =name;
+    public void setCurrUserInfo(UserInfo u){
+        this.currUserInfo=u;
     }
     public void setImageContainer(HBox imageContainer){
         this.imageContainer=imageContainer;
@@ -50,13 +51,13 @@ public class PurchaseTicketScreenController {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/customerMainScreen.fxml"));
             Parent root = loader.load();
             CustomerMainScreenController controller = loader.getController();
-            controller.setCurrUserID(currUserID);
-            controller.setInfoLabel(currUserID);
+            controller.setCurrUserInfo(currUserInfo);
+            controller.setInfoLabel(currUserInfo.getId());
             stage=(Stage) ((Node)event.getSource()).getScene().getWindow();
             scene=new Scene(root,1280,800);
             stage.setScene(scene);
             stage.setResizable(false);
-            stage.setOnCloseRequest(some_event->handleClose(currUserID));
+            stage.setOnCloseRequest(some_event->handleClose(currUserInfo.getId()));
             stage.setTitle("Customer Main Screen");
             stage.show();
         }catch(Exception e){

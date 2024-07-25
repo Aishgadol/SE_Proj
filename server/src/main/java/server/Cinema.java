@@ -15,7 +15,7 @@ public class Cinema implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
-    @Column(name="name")
+    @Column(name="name", unique=true,nullable = false)
     private String name;
 
     @Column(name="num_of_halls")
@@ -29,6 +29,8 @@ public class Cinema implements Serializable {
     )
     private List<Movie> movieList=new ArrayList<>();
 
+    @OneToMany(mappedBy = "cinema")
+    private List<DisplayTime> displayTimeList=new ArrayList<>();
 
     @ManyToMany
     @JoinTable(
@@ -51,16 +53,17 @@ public class Cinema implements Serializable {
         this.movieList = cinema.getMovieList();
         this.ticketList=cinema.getTicketList();
         this.customerList=cinema.getCustomerList();
+        this.displayTimeList=cinema.getDisplayTimeList();
     }
 
     // Normal constructor
-    public Cinema(String name, int numHalls, List<Movie> movieList,List<Customer> customerList) {
+    public Cinema(String name, int numHalls, List<Movie> movieList,List<Customer> customerList,List<DisplayTime> displayTimeList) {
         this.name = name;
         this.numHalls=numHalls;
         this.movieList = movieList;
         this.customerList=customerList;
+        this.displayTimeList=displayTimeList;
     }
-
     /*
     // Normal constructor
     public Cinema(String name, int numHalls, List<Movie> movieList,List<Ticket> ticketList,List<Customer> customerList) {
@@ -86,13 +89,41 @@ public class Cinema implements Serializable {
 
     public void setNumHalls(int numHalls){this.numHalls=numHalls;}
     public int getNumHalls(){return this.numHalls;}
-
+    public void setDisplayTimeList(List<DisplayTime> l){this.displayTimeList=l;}
+    public List<DisplayTime> getDisplayTimeList(){return this.displayTimeList;}
     public List<Movie> getMovieList() {
         return movieList;
     }
 
     public void setMovieList(List<Movie> movieList) {
         this.movieList = movieList;
+    }
+
+    public void addDisplayTime(DisplayTime d){
+        for(DisplayTime dis:this.displayTimeList){
+            if(dis.getDisplayTime().equals(d.getDisplayTime())){
+                return;
+            }
+        }
+        this.displayTimeList.add(d);
+    }
+    public void removeDisplayTime(DisplayTime d){
+        boolean found=false;
+        for(DisplayTime dis:this.displayTimeList){
+            if(d.getDisplayTime().equals(dis.getDisplayTime())){
+                found=true;
+                break;
+            }
+        }
+        if(found) {
+            Iterator<DisplayTime> iterator = this.displayTimeList.iterator();
+            while (iterator.hasNext()) {
+                DisplayTime obj = iterator.next();
+                if (obj.getDisplayTime().equals(d.getDisplayTime())) {
+                    iterator.remove();
+                }
+            }
+        }
     }
 
     public void addMovie(Movie m){

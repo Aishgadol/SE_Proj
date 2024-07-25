@@ -153,6 +153,7 @@ public class StartingScreenController {
     }*/
     @FXML
     void changeModeButtonPressed(ActionEvent event){
+        askDB("getUsers");
         if(customerLoginModeEnabled){
             //change to worker login
             statusLabel.setText("Current Login Mode: Worker Login");
@@ -183,7 +184,7 @@ public class StartingScreenController {
     }
     @FXML
     void loginButtonPressed(ActionEvent event) {
-        if(nameTextField.getText().length()!=9){
+        if(nameTextField.getText().length()!=9 && customerLoginModeEnabled){
             Platform.runLater(()->{
                 Alert alert=new Alert(Alert.AlertType.ERROR);
                 alert.setTitle("Name or ID error");
@@ -196,13 +197,15 @@ public class StartingScreenController {
             //check user exists, then transfer to customer/worker page (update that the custoemr/worker has connected too)
             askDB("getUsers");
             UserInfo u0=null;
+            boolean customerExists=false;
             String chosenID="";
             String chosenName="";
             if(customerLoginModeEnabled){
                 chosenID=nameTextField.getText();
                 for(UserInfo u:this.userInfoList){
-                    if(u.getId().equals(chosenID)){
+                    if(u.getId().equals(chosenID) && u.getRole().equals("Customer")){
                         u0=u;
+                        customerExists=true;
                         break;
                     }
                 }
@@ -240,19 +243,24 @@ public class StartingScreenController {
                 return;
             }
             if(customerLoginModeEnabled){
+                if(customerExists && signupModeEnabled){
+                    popUserAlreadyExistsMessage(chosenID);
+                    return;
+                }
                 if(u0.getRole().equals("Customer")){
                     if(u0.getConnected()==0) {
+
                         askDB("connectCustomer " + chosenID);
                         u0.setConnected(1);
-                        changeToCustomerScreen(chosenID, event);
+                        changeToCustomerScreen(u0, event);
                         return;
                     }
                     else{
-                        popUserAlreadyConnectedMessage(chosenName);
+                        popUserAlreadyConnectedMessage(chosenID);
                     }
                 }
                 else{
-                    popUserDoesntExistMessage(chosenName);
+                    popUserDoesntExistMessage(chosenID);
                 }
             }
             else{
@@ -264,7 +272,8 @@ public class StartingScreenController {
                 if(passwordField.getText().equals(u0.getPassword())) {
                     if(u0.getConnected()==0) {
                         askDB("connectWorker " + chosenName);
-                        changeToWorkerScreen(chosenName, u0.getRole(), event); //same issue here
+                        u0.setConnected(1);
+                        changeToWorkerScreen(u0, event); //same issue here
                     }
                     else{
                         popUserAlreadyConnectedMessage(chosenName);
@@ -282,20 +291,23 @@ public class StartingScreenController {
             }
         }
     }
+
+
+
     @FXML
-    private void changeToCustomerScreen(String id,ActionEvent event){
+    private void changeToCustomerScreen(UserInfo userInfo,ActionEvent event){
         try {
             EventBus.getDefault().unregister(this);
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/customerMainScreen.fxml"));
             Parent root = loader.load();
             CustomerMainScreenController controller = loader.getController();
-            controller.setCurrUserID(id);
-            controller.setInfoLabel(id);
+            controller.setCurrUserInfo(userInfo);
+            controller.setInfoLabel(userInfo.getId());
             stage=(Stage) ((Node)event.getSource()).getScene().getWindow();
             scene=new Scene(root,1280,800);
             stage.setScene(scene);
             stage.setResizable(false);
-            stage.setOnCloseRequest(some_event->handleCustomerClose(id));
+            stage.setOnCloseRequest(some_event->handleCustomerClose(userInfo.getId()));
             stage.setTitle("Customer Main Screen");
             stage.show();
         }catch(Exception e){
@@ -303,39 +315,39 @@ public class StartingScreenController {
         }
     }
     @FXML
-    private void changeToWorkerScreen(String name,String role,ActionEvent event){
+    private void changeToWorkerScreen(UserInfo userInfo,ActionEvent event){
         try {
             EventBus.getDefault().unregister(this);
             FXMLLoader loader=null;
             String title="";
-            switch(role){
+            switch(userInfo.getRole()){
                 case "General Manager":
                     title="General Manager";
                     loader=new FXMLLoader(getClass().getResource("/generalManagerMainScreen.fxml"));
                     root = loader.load();
                     GeneralManagerMainScreenController controller=loader.getController();
-                    controller.setCurrUserName(name);
+                    controller.setCurrUserInfo(userInfo);
                     break;
                 case "Cinema Manager":
                     title="Cinema Manager";
                     loader=new FXMLLoader(getClass().getResource("/cinemaManagerMainScreen.fxml"));
                     root = loader.load();
                     CinemaManagerMainScreenController controller1=loader.getController();
-                    controller1.setCurrUserName(name);
+                    controller1.setCurrUserInfo(userInfo);
                     break;
                 case "Content Manager":
                     title="Content Manager";
                     loader=new FXMLLoader(getClass().getResource("/contentManagerMainScreen.fxml"));
                     root = loader.load();
                     ContentManagerMainScreenController controller2=loader.getController();
-                    controller2.setCurrUserName(name);
+                    controller2.setCurrUserInfo(userInfo);
                     break;
                 case "Customer Complaint Worker":
                     title="Customer Complaint Worker";
                     loader=new FXMLLoader(getClass().getResource("/ccwMainScreen.fxml"));
                     root = loader.load();
                     CCWMainScreenController controller3=loader.getController();
-                    controller3.setCurrUserName(name);
+                    controller3.setCurrUserInfo(userInfo);
                     break;
                 default:
                     System.out.println("Illegal role");
@@ -345,12 +357,21 @@ public class StartingScreenController {
             scene=new Scene(root,1280,800);
             stage.setScene(scene);
             stage.setResizable(false);
-            stage.setOnCloseRequest(some_event->handleWorkerClose(name));
+            stage.setOnCloseRequest(some_event->handleWorkerClose(userInfo.getName()));
             stage.setTitle(title+" Main Screen");
             stage.show();
         }catch(Exception e){
             e.printStackTrace();
         }
+    }
+    @FXML
+    private void popUserAlreadyExistsMessage(String chosenID) {
+        Platform.runLater(()->{
+            Alert a=new Alert(Alert.AlertType.ERROR);
+            a.setTitle("User already exists!");
+            a.setHeaderText("User "+chosenID+" already exists.");
+            a.show();
+        });
     }
     @FXML
     private void popUserAlreadyConnectedMessage(String name){

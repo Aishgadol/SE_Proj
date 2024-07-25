@@ -44,12 +44,7 @@ public class Movie implements Serializable {
     @Lob
     byte[] imageData;
 
-    @ManyToMany
-    @JoinTable(
-        name = "movie_display_times",
-        joinColumns = @JoinColumn(name = "Movie_name", referencedColumnName = "name"),
-        inverseJoinColumns = @JoinColumn(name = "Display_Time_And_Date", referencedColumnName = "Display_Time_And_Date")
-    )
+    @OneToMany(mappedBy = "movie")
     private List<DisplayTime> displayTimes=new ArrayList<>();
 
     @ManyToMany(mappedBy = "movieList")

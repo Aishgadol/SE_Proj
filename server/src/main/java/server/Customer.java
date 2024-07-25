@@ -27,6 +27,9 @@ public class Customer implements Serializable {
     @Column(name="Full_Name")
     String name;
 
+    @Column(name="has_ticket_pass")
+    boolean hasTicketPass;
+
     @Column(name="is_user_connected")
     int connected;
 
@@ -42,11 +45,13 @@ public class Customer implements Serializable {
         this.userID=Id;
         this.role="Customer";
         this.name=name;
+        this.hasTicketPass=false;
         this.connected=0;
     }
     public Customer(UserInfo u){
         this.userID=u.getId();
         this.role="Customer";
+        this.hasTicketPass=u.hasTicketPass();
         this.name=u.getName();
         this.connected=u.getConnected();
     }
@@ -57,6 +62,7 @@ public class Customer implements Serializable {
         this.name=c.getName();
         this.ticketList=c.getTicketList();
         this.connected=c.getConnected();
+        this.hasTicketPass=c.hasTicketPass();
     }
 
     public void setId(String id){
@@ -78,7 +84,8 @@ public class Customer implements Serializable {
     }
     public void setConnected(int c){this.connected=c;}
     public String getPassword(){return null;}
-
+    public boolean hasTicketPass(){return this.hasTicketPass;}
+    public void setHasTicketPass(boolean h){this.hasTicketPass=h;}
     public void setTicketList(List<Ticket> list){this.ticketList=list;}
     public List<Ticket> getTicketList(){return this.ticketList;}
 

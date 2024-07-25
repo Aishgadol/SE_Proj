@@ -10,6 +10,7 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.image.Image;
+import javafx.scene.control.Label;
 import javafx.scene.image.ImageView;
 import javafx.stage.Stage;
 import org.greenrobot.eventbus.EventBus;
@@ -18,6 +19,7 @@ import org.greenrobot.eventbus.Subscribe;
 import javax.swing.*;
 import java.awt.*;
 import java.io.ByteArrayInputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -26,16 +28,31 @@ public class GeneralManagerMainScreenController {
     private Stage stage;
     private Scene scene;
     private Parent root;
-    private String currUserName;
-    private ImageView backgroundImageView;
+    private UserInfo currUserInfo;
     private List<UserInfo> userInfoList=new ArrayList<>();
     private List<MovieInfo> movieInfoList=new ArrayList<>();
     private List<TicketInfo> ticketInfoList=new ArrayList<>();
     private List<CinemaInfo> cinemaInfoList=new ArrayList<>();
     @FXML
     private Button disconnectButton;
+    @FXML
+    private ImageView backgroundImageView;
+    @FXML
+    private Label connectedAsLabel;
 
     //subscribe methods
+    @Subscribe
+    public void catchMovieRemoved(MovieRemovedSuccesfullyEvent event){
+        askDB("getTitles");
+    }
+    @Subscribe
+    public void catchMovieAdded(MovieAddedSuccesfullyEvent event){
+        askDB("getTitles");
+    }
+    @Subscribe
+    public void catchTicketInfoList(TicketInfoListEvent event){
+        this.ticketInfoList=event.getMessage().getTicketInfoList();
+    }
     @Subscribe
     public void catchCinemaInfoList(CinemaInfoListEvent event){
         this.cinemaInfoList=event.getMessage().getCinemaInfoList();
@@ -77,8 +94,9 @@ public class GeneralManagerMainScreenController {
 
 
     //setters
-    public void setCurrUserName(String name){
-        this.currUserName=name;
+    public void setCurrUserInfo(UserInfo u){
+        this.currUserInfo=u;
+        this.connectedAsLabel.setText(currUserInfo.getName());
     }
 
      @FXML
@@ -117,9 +135,30 @@ public class GeneralManagerMainScreenController {
 
 
     //FXML stuff
+
+    @FXML
+    void updateTimesButtonPressed(ActionEvent event) throws IOException {
+        EventBus.getDefault().unregister(this);
+        try {
+            FXMLLoader loader=new FXMLLoader(getClass().getResource("/updateTimeScreen.fxml"));
+            Parent root = loader.load();
+            UpdateController c=loader.getController();
+            c.setCurrUserInfo(currUserInfo);
+            stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
+            scene = new Scene(root, 1280, 800);
+            stage.setScene(scene);
+            stage.setOnCloseRequest(some_event->handleWorkerClose(currUserInfo.getName()));
+            stage.setResizable(false);
+            stage.setTitle("Update Screen");
+            stage.show();
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+    }
     @FXML
     private void disconnectButtonPressed(ActionEvent event) {
-        askDB("disconnectWorker "+currUserName);
+        askDB("disconnectWorker "+currUserInfo.getName());
         try {
             EventBus.getDefault().unregister(this);
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/startingScreen.fxml"));
@@ -150,8 +189,8 @@ public class GeneralManagerMainScreenController {
             e.printStackTrace();
         }
     }
-    private void handleClose(String id){
-        askDB("disconnectCustomer "+id);
+    private void handleWorkerClose(String name){
+        askDB("disconnectWorker "+name);
         stage.close();
     }
 

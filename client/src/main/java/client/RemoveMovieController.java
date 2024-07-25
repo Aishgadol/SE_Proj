@@ -2,6 +2,7 @@ package client;
 
 import entities.Message;
 import entities.MovieInfo;
+import entities.UserInfo;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -32,7 +33,7 @@ public class RemoveMovieController {
     private Scene scene;
     private List<MovieInfo> movieInfos=new ArrayList<>();
     private MovieInfo chosenMovie;
-
+    private UserInfo currUserInfo;
 
     @FXML
     private ImageView backgroundImageView;
@@ -46,6 +47,10 @@ public class RemoveMovieController {
     private HBox imageHBox;
     @FXML
     private Label selectMovieLabel;
+    @FXML
+    private Label connectedAsLabel;
+
+    public void setCurrUserInfo(UserInfo u){this.currUserInfo=u;this.connectedAsLabel.setText(currUserInfo.getName());}
 
     void askDB(String title){
         try {
@@ -86,11 +91,15 @@ public class RemoveMovieController {
     private void goBackButtonPressed(ActionEvent event){
         EventBus.getDefault().unregister(this);
         try {
-            Parent root = FXMLLoader.load(getClass().getResource("/updateTimeScreen.fxml"));
+            FXMLLoader loader=new FXMLLoader(getClass().getResource("/updateTimeScreen.fxml"));
+            Parent root = loader.load();
+            UpdateController c=loader.getController();
+            c.setCurrUserInfo(currUserInfo);
             stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
             scene = new Scene(root, 1280, 800);
             stage.setScene(scene);
             stage.setResizable(false);
+            stage.setOnCloseRequest(some_event->handleWorkerClose(currUserInfo.getName()));
             stage.setTitle("Update Screen");
             stage.show();
         } catch (IOException e) {
@@ -218,7 +227,10 @@ public class RemoveMovieController {
             }
         }
     }
-
+    private void handleWorkerClose(String name){
+        askDB("disconnectWorker "+name);
+        stage.close();
+    }
     @FXML
     void initialize(){
         EventBus.getDefault().register(this);

@@ -5,32 +5,36 @@ import java.io.Serializable;
 public class TicketInfo implements Serializable {
     private UserInfo userInfo;
     private MovieInfo movieInfo;
-    private String displayTime;
+    private DisplayTimeInfo displayTimeInfo;
     private CinemaInfo cinemaInfo;
     private int seatRow;
     private int seatCol;
     private int hallNum;
     private String purchaseTime;
+    private int active;
 
-    public TicketInfo(UserInfo userInfo, MovieInfo movieInfo, String displayTime, CinemaInfo cinemaInfo,int hallNum,int seatRow, int seatCol,String purchaseTime) {
+    public TicketInfo(UserInfo userInfo, MovieInfo movieInfo, DisplayTimeInfo displayTimeInfo, CinemaInfo cinemaInfo,int hallNum,int seatRow, int seatCol,String purchaseTime) {
         this.userInfo = userInfo;
         this.movieInfo = movieInfo;
-        this.displayTime = displayTime;
+        this.displayTimeInfo = displayTimeInfo;
         this.cinemaInfo = cinemaInfo;
         this.seatRow=seatRow;
         this.seatCol=seatCol;
         this.purchaseTime=purchaseTime;
         this.hallNum = hallNum;
+        this.active=1;
     }
+
     public TicketInfo(TicketInfo other) {
         this.userInfo = other.getUserInfo();
         this.movieInfo = other.getMovieInfo();
-        this.displayTime = other.getDisplayTime();
+        this.displayTimeInfo = other.getDisplayTimeInfo();
         this.cinemaInfo = other.getCinemaInfo();
         this.seatRow=other.getSeatRow();
         this.seatCol=other.getSeatCol();
         this.purchaseTime=other.getPurchaseTime();
         this.hallNum = other.getHallNum();
+        this.active=other.getActive();
     }
 
     public String getPurchaseTime(){return this.purchaseTime;}
@@ -67,12 +71,12 @@ public class TicketInfo implements Serializable {
     public void setSeatRow(int seatRow) {
         this.seatRow = seatRow;
     }
-    public String getDisplayTime() {
-        return displayTime;
+    public DisplayTimeInfo getDisplayTimeInfo() {
+        return displayTimeInfo;
     }
 
-    public void setDisplayTime(String displayTime) {
-        this.displayTime = displayTime;
+    public void setDisplayTimeInfo(DisplayTimeInfo displayTimeInfo) {
+        this.displayTimeInfo = displayTimeInfo;
     }
 
     public CinemaInfo getCinemaInfo() {
@@ -90,6 +94,9 @@ public class TicketInfo implements Serializable {
     public void setHallNum(int hallNum) {
         this.hallNum=hallNum;
     }
+
+    public int getActive() {return active;}
+    public void setActive(int active) {this.active = active;}
 
     @Override
     public String toString(){

@@ -76,7 +76,7 @@
                      <children>
                         <Label fx:id="movieInfoLabel" alignment="TOP_CENTER" prefHeight="534.0" prefWidth="338.0" text="INFORMATION ABOUT MOVIE" textAlignment="CENTER" wrapText="true">
                            <font>
-                              <Font size="16.0" />
+                              <Font size="14.0" />
                            </font>
                         </Label>
                      </children>

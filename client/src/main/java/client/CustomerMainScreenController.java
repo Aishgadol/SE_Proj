@@ -35,7 +35,7 @@ public class CustomerMainScreenController {
     private List<MovieInfo> movieInfoList;
     private MovieInfo selectedMovieInfo=null;
     private UserInfo myUserInfo;
-    private String currUserID;
+    private UserInfo currUserInfo;
     private HBox chosenImageContainer=null;
     private MovieInfo currMovieInfo;
 
@@ -76,13 +76,13 @@ public class CustomerMainScreenController {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/purchaseTicketScreen.fxml"));
             root = loader.load();
             PurchaseTicketScreenController controller = loader.getController();
-            controller.setCurrUserID(this.currUserID);
+            controller.setCurrUserInfo(this.currUserInfo);
             controller.setImageContainer(this.chosenImageContainer);
             stage=(Stage) ((Node)event.getSource()).getScene().getWindow();
             scene=new Scene(root,800,800);
             stage.setScene(scene);
             stage.setResizable(false);
-            stage.setOnCloseRequest(some_event->handleCustomerClose(currUserID));
+            stage.setOnCloseRequest(some_event->handleCustomerClose(currUserInfo.getId()));
             stage.setTitle("Purchase Ticket");
             stage.show();
         }catch(Exception e){
@@ -118,7 +118,7 @@ public class CustomerMainScreenController {
 
     @FXML
     private void disconnectButtonPressed(ActionEvent event) {
-        askDB("disconnectCustomer "+currUserID);
+        askDB("disconnectCustomer "+currUserInfo.getId());
         try {
             EventBus.getDefault().unregister(this);
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/startingScreen.fxml"));
@@ -287,9 +287,8 @@ public class CustomerMainScreenController {
         setBackground(data);
     }
 
-    public void setCurrUserID(String id){
-        this.currUserID=id;
-    }
+    public void setCurrUserInfo(UserInfo u){this.currUserInfo=u;}
+
 
     private void askDB(String title){
         try {

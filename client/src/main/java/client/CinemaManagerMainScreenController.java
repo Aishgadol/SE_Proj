@@ -1,5 +1,6 @@
 package client;
 
+import entities.UserInfo;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
@@ -9,9 +10,9 @@ public class CinemaManagerMainScreenController {
     private Stage stage;
     private Scene scene;
     private Parent root;
-    private String currUserName;
+    private UserInfo currUserInfo;
 
-    public void setCurrUserName(String name){
-        this.currUserName=name;
+    public void setCurrUserInfo(UserInfo u){
+        this.currUserInfo=u;
     }
 }

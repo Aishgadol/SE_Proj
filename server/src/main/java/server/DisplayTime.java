@@ -17,14 +17,19 @@ public class DisplayTime implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     int id;
 
-    @Column(name="Display_Time_And_Date", unique=true,nullable = false)
-    String displayTime; //in the format of HH:MM, DD/MM/YYYY
+    @Column(name="Time_Date_Movie_Cinema", unique=true,nullable = false)
+    String displayTime; //in the format of HH:MM, DD/MM/YYYY, Movie: <movieName>, Cinema: <cinemaName>
 
-    @ManyToMany(mappedBy = "displayTimes")
-    private List<Movie> movies=new ArrayList<>();
+    @ManyToOne
+    @JoinColumn(name="movie_name",referencedColumnName = "name")
+    private Movie movie;
 
     @OneToMany(mappedBy = "displayTime")
     private List<Ticket> ticketList=new ArrayList<>();
+
+    @ManyToOne
+    @JoinColumn(name="Cinema_name",referencedColumnName = "name")
+    private Cinema cinema;
 
 
     public DisplayTime(){
@@ -33,50 +38,35 @@ public class DisplayTime implements Serializable {
     public DisplayTime(String displayTime){
         this.displayTime=displayTime;
     }
-
-    /*public DisplayTime(DisplayTime displayTime){
+    public DisplayTime(String displayTime,Movie movie,Cinema cinema,List<Ticket> list){
+        this.displayTime=displayTime+", Movie: "+movie.getName()+", Cinema: "+cinema.getName();
+        this.movie=movie;
+        this.cinema=cinema;
+        this.ticketList=list;
+    }
+    public DisplayTime(String displayTime,Movie movie,Cinema cinema){
+        this.displayTime=displayTime+", Movie: "+movie.getName()+", Cinema: "+cinema.getName();
+        this.movie=movie;
+        this.cinema=cinema;
+    }
+    public DisplayTime(DisplayTime displayTime){
         this.displayTime=displayTime.getDisplayTime();
-        this.movies=displayTime.getMovies();
-    }*/
+        this.movie=displayTime.getMovie();
+        this.cinema=displayTime.getCinema();
+        this.ticketList=displayTime.getTicketList();
+    }
 
+
+    public  Cinema getCinema(){return this.cinema;}
+    public void setCinema(Cinema list){this.cinema=list;}
     public String getDisplayTime(){
         return this.displayTime;
     }
-
     public void setDisplayTime(String displayTime){
         this.displayTime=displayTime;
     }
-    public List<Movie> getMovies(){return this.movies;}
-    public void setMovies(List<Movie> movies){this.movies=movies;}
-
-    public void addMovie(Movie movie){
-        for(Movie m: this.movies){
-            if(m.getName().equals(movie.getName())){
-                return;
-            }
-        }
-        this.movies.add(movie);
-        movie.addDisplayTime(this);
-    }
-
-    public void removeMovie(Movie movie) {
-        boolean found=false;
-        for(Movie m:this.movies){
-            if(m.getName().equals(movie.getName())){
-                found=true;
-                break;
-            }
-        }
-        if(found) {
-            Iterator<Movie> iterator = this.movies.iterator();
-            while (iterator.hasNext()) {
-                Movie obj = iterator.next();
-                if (obj.getName().equals(movie.getName())) {
-                    iterator.remove();
-                }
-            }
-        }
-	}
+    public Movie getMovie(){return this.movie;}
+    public void setMovie(Movie movies){this.movie=movies;}
 
     public void setTicketList(List<Ticket> ticketList){this.ticketList=ticketList;}
     public List<Ticket> getTicketList(){return this.ticketList;}

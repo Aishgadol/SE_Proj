@@ -16,6 +16,8 @@ public class Message implements Serializable {
     TicketInfo ticketInfo;
     List<TicketInfo> ticketInfoList;
     List<CinemaInfo> cinemaInfoList;
+    DisplayTimeInfo displayTimeInfo;
+    List<DisplayTimeInfo> displayTimeInfoList;
 
 
     public Message(int id, LocalDateTime timeStamp, String message) {
@@ -77,6 +79,10 @@ public class Message implements Serializable {
         this.movieInfo=m;
     }
 
+    public List<DisplayTimeInfo> getDisplayTimeInfoList() {return displayTimeInfoList;}
+    public void setDisplayTimeInfoList(List<DisplayTimeInfo> displayTimeInfoList) {this.displayTimeInfoList = displayTimeInfoList;}
+    public DisplayTimeInfo getDisplayTimeInfo() {return displayTimeInfo;}
+    public void setDisplayTimeInfo(DisplayTimeInfo displayTimeInfo) {    }
     public List<MovieInfo> getMovieInfoList(){
         return this.movieInfoList;
     }

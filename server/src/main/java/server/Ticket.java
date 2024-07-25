@@ -1,7 +1,8 @@
 package server;
 
 
-
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import javax.persistence.*;
 import java.io.Serializable;
 
@@ -43,7 +44,7 @@ public class Ticket implements Serializable {
     private String purchaseTime;
 
     @ManyToOne
-    @JoinColumn(name = "display_time",referencedColumnName ="Display_Time_And_Date" )
+    @JoinColumn(name = "Time_Date_Movie_Cinema",referencedColumnName ="Time_Date_Movie_Cinema" )
     DisplayTime displayTime;
 
 
@@ -57,7 +58,7 @@ public class Ticket implements Serializable {
         this.cinema=ticket.getCinema();
         this.customer=ticket.getCustomer();
         this.displayTime=ticket.getDisplayTime();
-        this.purchaseTime=this.displayTime.getDisplayTime();
+        this.purchaseTime=LocalDateTime.now().format(DateTimeFormatter.ofPattern("HH:mm, dd/MM/yyyy"));
         this.active=ticket.getActive();
     }
 
@@ -67,7 +68,7 @@ public class Ticket implements Serializable {
         this.seatRow=seatRow;
         this.hallNum=hallNum;
         this.cinema=cinema;
-        this.purchaseTime=displayTime.getDisplayTime();
+        this.purchaseTime=LocalDateTime.now().format(DateTimeFormatter.ofPattern("HH:mm, dd/MM/yyyy"));
         this.displayTime=displayTime;
         this.customer=customer;
         this.active=1;
@@ -130,6 +131,12 @@ public class Ticket implements Serializable {
     public void setActive(int active){this.active=active;}
     public int getActive(){return this.active;}
 
+    public void clear(){
+        this.movie=null;
+        this.customer=null;
+        this.displayTime=null;
+        this.cinema=null;
+    }
     @Override
     public String toString(){
         return "Ticket: \n" +

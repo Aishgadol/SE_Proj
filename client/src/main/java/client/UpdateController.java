@@ -1,7 +1,6 @@
 package client;
 
-import entities.MovieInfo;
-import entities.Message;
+import entities.*;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -37,10 +36,13 @@ public class UpdateController{
     private Parent root;
     private MovieInfo movieInfo;
     private List<MovieInfo> movieInfos=new ArrayList<>();
-    private List<String> displayTimes=new ArrayList<>();
-
+    private List<DisplayTimeInfo> displayTimeInfoList=new ArrayList<>();
+    private UserInfo currUserInfo;
     private boolean isMovieSelected=false;
+    private List<CinemaInfo> cinemaInfoList=new ArrayList<>();
 
+    @FXML
+    private Label connectedAsLabel;
     @FXML
     private Button backButton;
     @FXML
@@ -69,11 +71,17 @@ public class UpdateController{
     private Button removeMovieButton;
     @FXML
     private Button addMovieButton;
+    @FXML
+    private ComboBox<String> cinemaPicker;
 
     @FXML
     void timeToAddWasChosen(){}
     @FXML
     void dateToAddWasChosen(){}
+
+    public void setCurrUserInfo(UserInfo u){
+        this.currUserInfo=u;this.connectedAsLabel.setText(currUserInfo.getName());
+    }
 
     @FXML
     void removeTimeButtonPressed(ActionEvent event){
@@ -90,7 +98,8 @@ public class UpdateController{
     void addTimeButtonPressed(ActionEvent event){
         String hour=timePicker.getValue();
         String date=datePicker.getValue().format(DateTimeFormatter.ofPattern("dd/MM/yyyy"));
-        askDB("addtime "+hour+", "+date);
+        String cinemaName=cinemaPicker.getValue();
+        askDB("addtime "+hour+", "+date+", Movie: "+titlesComboBox.getValue()+", Cinema: "+cinemaName);
         resetAll();
         updateAll();
     }
@@ -102,10 +111,14 @@ public class UpdateController{
     private void removeMovieButtonPressed(ActionEvent event){
         EventBus.getDefault().unregister(this);
         try {
-            Parent root = FXMLLoader.load(getClass().getResource("/removeMovieScreen.fxml"));
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/removeMovieScreen.fxml"));
+            Parent root = loader.load();
+            RemoveMovieController controller = loader.getController();
+            controller.setCurrUserInfo(currUserInfo);
             stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
             scene = new Scene(root, 600, 600);
             stage.setScene(scene);
+            stage.setOnCloseRequest(some_event2->handleWorkerClose(currUserInfo.getName()));
             stage.setResizable(false);
             stage.setTitle("Remove Movie");
             stage.show();
@@ -122,10 +135,14 @@ public class UpdateController{
     private void addMovieButtonPressed(ActionEvent event){
         EventBus.getDefault().unregister(this);
         try {
-            Parent root = FXMLLoader.load(getClass().getResource("/addMovieScreen.fxml"));
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/addMovieScreen.fxml"));
+            Parent root = loader.load();
+            AddMovieController controller = loader.getController();
+            controller.setCurrUserInfo(currUserInfo);
             stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
             scene = new Scene(root, 600, 600);
             stage.setScene(scene);
+            stage.setOnCloseRequest(some_event->handleWorkerClose(currUserInfo.getName()));
             stage.setResizable(false);
             stage.setTitle("Add Movie");
             stage.show();
@@ -142,13 +159,18 @@ public class UpdateController{
         Platform.runLater(() -> {
             datePicker.setValue(LocalDate.now());
             timePicker.setValue("10:00");
+            cinemaPicker.setValue(null);
         });
     }
     @FXML
     void updateAll() {
         Platform.runLater(() -> {
-            myListView.getItems().setAll(this.displayTimes);
-            availableTimesComboBox.getItems().setAll(this.displayTimes);
+            myListView.getItems().clear();
+            availableTimesComboBox.getItems().clear();
+            for(DisplayTimeInfo di: this.movieInfo.getDisplayTimeInfoList()){
+                myListView.getItems().add(di.getDisplayTime());
+                availableTimesComboBox.getItems().add(di.getDisplayTime());
+            }
         });
     }
 
@@ -170,6 +192,7 @@ public class UpdateController{
             isMovieSelected = true;
             addLabel.setVisible(true);
             addTimeButton.setVisible(true);
+            cinemaPicker.setVisible(true);
             datePicker.setVisible(true);
             timePicker.setVisible(true);
             myListView.setVisible(true);
@@ -180,13 +203,13 @@ public class UpdateController{
     }
 
     @FXML
-    void MovieHasBeenSelected() {
+    void MovieHasBeenSelected(ActionEvent event) {
         askDB("getMovieInfo " + titlesComboBox.getValue());
         if (!isMovieSelected) {
             showThings();
         }
         resetAll();
-        updateAll();
+        //updateAll();
     }
 
     @FXML
@@ -214,12 +237,44 @@ public class UpdateController{
     @FXML
     void goBackButton(ActionEvent event) throws IOException {
         EventBus.getDefault().unregister(this);
+        String role=currUserInfo.getRole();
+        Parent root=null;
+        FXMLLoader loader;
         try {
-            Parent root = FXMLLoader.load(getClass().getResource("/mainScreen.fxml"));
+            switch(role){
+                case "General Manager":
+                    loader=new FXMLLoader(getClass().getResource("/generalManagerMainScreen.fxml"));
+                    root = loader.load();
+                    GeneralManagerMainScreenController controller=loader.getController();
+                    controller.setCurrUserInfo(currUserInfo);
+                    break;
+                case "Customer Complaint Worker":
+                    loader=new FXMLLoader(getClass().getResource("/ccwMainScreen.fxml"));
+                    root = loader.load();
+                    CCWMainScreenController controller3=loader.getController();
+                    controller3.setCurrUserInfo(currUserInfo);
+                    break;
+                case "Content Manager":
+                    loader=new FXMLLoader(getClass().getResource("/contentManagerMainScreen.fxml"));
+                    root = loader.load();
+                    ContentManagerMainScreenController controller2=loader.getController();
+                    controller2.setCurrUserInfo(currUserInfo);
+                    break;
+                case "Cinema Manager":
+                    loader=new FXMLLoader(getClass().getResource("/cinemaManagerMainScreen.fxml"));
+                    root = loader.load();
+                    CinemaManagerMainScreenController controller1=loader.getController();
+                    controller1.setCurrUserInfo(currUserInfo);
+                    break;
+                default:
+                    root=FXMLLoader.load(getClass().getResource("/startingScreen.fxml"));
+                    break;
+            }
             stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
             scene = new Scene(root, 1280, 800);
             stage.setScene(scene);
             stage.setTitle("Cinema");
+            stage.setOnCloseRequest(some_event->handleWorkerClose(this.currUserInfo.getName()));
             stage.setResizable(false);
             stage.show();
         } catch (Exception e) {
@@ -238,7 +293,7 @@ public class UpdateController{
         Message message = event.getMessage();
         this.movieInfos = message.getMovieInfoList();
         resetAll();
-        updateAll();
+        //updateAll();
         Platform.runLater(() -> {
             titlesComboBox.getItems().clear();
             for (MovieInfo movieInfo : movieInfos) {
@@ -246,11 +301,12 @@ public class UpdateController{
             }
         });
     }
-     @FXML
+    @FXML
     @Subscribe
     public void getMovieInfoFromDB(MovieInfoEvent event){
         this.movieInfo=event.getMessage().getMovieInfo();
-        this.displayTimes=this.movieInfo.getDisplayTimes();
+        this.displayTimeInfoList=this.movieInfo.getDisplayTimeInfoList();
+
         resetAll(); //already runs in platform.runlater();
         updateAll(); //same
     }
@@ -263,7 +319,7 @@ public class UpdateController{
             return;
         }
         this.movieInfo = event.getMessage().getMovieInfo();
-        this.displayTimes = this.movieInfo.getDisplayTimes();
+        this.displayTimeInfoList = this.movieInfo.getDisplayTimeInfoList();
         resetAll();
         updateAll();
     }
@@ -279,22 +335,34 @@ public class UpdateController{
         resetAll();
         updateAll();
     }
+    @FXML
+    @Subscribe
+    public void catchCinemaInfoList(CinemaInfoListEvent event){
+        this.cinemaInfoList=event.getMessage().getCinemaInfoList();
+        for(CinemaInfo ci: this.cinemaInfoList){
+            cinemaPicker.getItems().add(ci.getName());
+        }
+    }
+
+
     private List<String> generateTimeSlots(){
         List<String> times=new ArrayList<>();
-        LocalTime startTime= LocalTime.of(10,0);
+        LocalTime startTime= LocalTime.of(11,0);
         LocalTime endTime=LocalTime.of(1,0);
         while(!startTime.equals(endTime)){
             times.add(startTime.toString());
-            startTime=startTime.plusMinutes(30);
+            startTime=startTime.plusMinutes(15);
         }
         return times;
     }
-
+    private void handleWorkerClose(String name){
+        askDB("disconnectWorker "+name);
+        stage.close();
+    }
     @FXML
     void initialize(){
         EventBus.getDefault().register(this);
         msgId=0;
-
         //initialization of datepicker
         LocalDate minDate=LocalDate.now();
         LocalDate maxDate=minDate.plusYears(1);
@@ -319,9 +387,8 @@ public class UpdateController{
         timePicker.getItems().addAll(times);
 
         askDB("getBackgroundImage");
-
-
         askDB("getTitles");
+        askDB("getCinemas");
     }
 }
 

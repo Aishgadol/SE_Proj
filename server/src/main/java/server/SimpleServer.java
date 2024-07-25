@@ -32,19 +32,21 @@ public class SimpleServer extends AbstractServer {
 	private static SessionFactory sessionFactory;
 	private MovieInfo currMovieInfo;
 	private Movie currMovie;
-	private boolean gifMode=false;
-	private List<MovieInfo> movieInfoList=new ArrayList<>(); //this list holds current movies in db at current time, keep it updated
-	private List<DisplayTime> displayTimeList=new ArrayList<>();
-	private List<Worker> workerList=new ArrayList<>();
-	private List<Customer> customerList=new ArrayList<>();
-	private List<UserInfo> userInfoList=new ArrayList<>();
-	//private List<Ticket> ticketList=new ArrayList<>();
-	private List<TicketInfo> ticketInfoList=new ArrayList<>();
-	private List<Cinema> cinemaList=new ArrayList<>();
-	private List<CinemaInfo> cinemaInfoList=new ArrayList<>();
+	private boolean gifMode = false;
+	private List<Movie> movieList=new ArrayList<>();
+	private List<MovieInfo> movieInfoList = new ArrayList<>(); //this list holds current movies in db at current time, keep it updated
+	private List<DisplayTime> displayTimeList = new ArrayList<>();
+	private List<DisplayTimeInfo> displayTimeInfoList = new ArrayList<>();
+	private List<Worker> workerList = new ArrayList<>();
+	private List<Customer> customerList = new ArrayList<>();
+	private List<UserInfo> userInfoList = new ArrayList<>();
+	private List<Ticket> ticketList=new ArrayList<>();
+	private List<TicketInfo> ticketInfoList = new ArrayList<>();
+	private List<Cinema> cinemaList = new ArrayList<>();
+	private List<CinemaInfo> cinemaInfoList = new ArrayList<>();
 
-	private static SessionFactory getSessionFactory() throws HibernateException{
-		Configuration configuration=new Configuration();
+	private static SessionFactory getSessionFactory() throws HibernateException {
+		Configuration configuration = new Configuration();
 
 		configuration.addAnnotatedClass(Ticket.class);
 		configuration.addAnnotatedClass(Msg.class);
@@ -55,12 +57,12 @@ public class SimpleServer extends AbstractServer {
 		configuration.addAnnotatedClass(Cinema.class);
 
 
-		ServiceRegistry serviceRegistry=new StandardServiceRegistryBuilder().applySettings(configuration.getProperties()).build();
+		ServiceRegistry serviceRegistry = new StandardServiceRegistryBuilder().applySettings(configuration.getProperties()).build();
 		return configuration.buildSessionFactory(serviceRegistry);
 	}
 
 	//only use these functions if protoype database gets deleted, it should not happen.
-/*
+
 	public void generateData() throws Exception {
 			Movie movie1=new Movie("Margol","1973","Romance","Zohar Argov","Margalit Tzanany, Eyal Golan, Shimi Tavory","MARGOL!","Upcoming");
 			movie1.setImageData(getImageFromFilesByTitleAsByteArray("margol"));
@@ -82,15 +84,21 @@ public class SimpleServer extends AbstractServer {
 			session.save(movie6);
 			Worker w1=new Worker("111111111","General Manager","Kobi Kobi","123456");
 			session.save(w1);
+			Worker w2=new Worker("000000000", "General Manager", "k","1");
+			session.save(w2);
 			Customer c1=new Customer("000000000","bo");
 			session.save(c1);
 			Cinema cinema1=new Cinema("YisPlanit",5);
 			session.save(cinema1);
 			Cinema cinema2=new Cinema("NoPlanit",9);
 			session.save(cinema2);
-			DisplayTime d=new DisplayTime("10:30, 10/10/2024");
+			DisplayTime d=new DisplayTime("10:30, 10/10/2024",movie5,cinema1);
+			movie5.addDisplayTime(d);
+			cinema1.addDisplayTime(d);
+			session.saveOrUpdate(movie5);
+			session.saveOrUpdate(cinema1);
 			session.save(d);
-			Ticket ti=new Ticket(movie1,1,1,1,cinema1,c1,d);
+			Ticket ti=new Ticket(movie5,1,1,1,cinema1,c1,d);
 			session.save(ti);
             d.addTicket(ti);
 			session.saveOrUpdate(d);
@@ -101,138 +109,201 @@ public class SimpleServer extends AbstractServer {
 			cinema1.addTicket(ti);
 			session.saveOrUpdate(cinema1);
 			session.flush();
-	}*/
+
+	}
 
 
-	private List<Ticket> getTicketsFromDB(){
-		CriteriaBuilder builder=session.getCriteriaBuilder();
-		CriteriaQuery<Ticket> query=builder.createQuery(Ticket.class);
+	private List<Ticket> getTicketsFromDB() {
+		CriteriaBuilder builder = session.getCriteriaBuilder();
+		CriteriaQuery<Ticket> query = builder.createQuery(Ticket.class);
 		query.from(Ticket.class);
-        return session.createQuery(query).getResultList();
+		return session.createQuery(query).getResultList();
 	}
-	private List<Cinema> getCinemasFromDB(){
-		CriteriaBuilder builder=session.getCriteriaBuilder();
-		CriteriaQuery<Cinema> query=builder.createQuery(Cinema.class);
+
+	private List<Cinema> getCinemasFromDB() {
+		CriteriaBuilder builder = session.getCriteriaBuilder();
+		CriteriaQuery<Cinema> query = builder.createQuery(Cinema.class);
 		query.from(Cinema.class);
-        return session.createQuery(query).getResultList();
+		return session.createQuery(query).getResultList();
 	}
-	private List<Worker> getWorkersFromDB(){
-		CriteriaBuilder builder=session.getCriteriaBuilder();
-		CriteriaQuery<Worker> query=builder.createQuery(Worker.class);
+
+	private List<Worker> getWorkersFromDB() {
+		CriteriaBuilder builder = session.getCriteriaBuilder();
+		CriteriaQuery<Worker> query = builder.createQuery(Worker.class);
 		query.from(Worker.class);
-        return session.createQuery(query).getResultList();
+		return session.createQuery(query).getResultList();
 	}
-	private List<Customer> getCustomersFromDB(){
-		CriteriaBuilder builder=session.getCriteriaBuilder();
-		CriteriaQuery<Customer> query=builder.createQuery(Customer.class);
+
+	private List<Customer> getCustomersFromDB() {
+		CriteriaBuilder builder = session.getCriteriaBuilder();
+		CriteriaQuery<Customer> query = builder.createQuery(Customer.class);
 		query.from(Customer.class);
-        return session.createQuery(query).getResultList();
+		return session.createQuery(query).getResultList();
 	}
 
-	private List<Movie> getMoviesFromDB(){
-		CriteriaBuilder builder=session.getCriteriaBuilder();
-		CriteriaQuery<Movie> query=builder.createQuery(Movie.class);
+	private List<Movie> getMoviesFromDB() {
+		CriteriaBuilder builder = session.getCriteriaBuilder();
+		CriteriaQuery<Movie> query = builder.createQuery(Movie.class);
 		query.from(Movie.class);
-        return session.createQuery(query).getResultList();
+		return session.createQuery(query).getResultList();
 	}
 
-	private Movie getMovieByTitleFromDB(String title){
-		CriteriaBuilder builder=session.getCriteriaBuilder();
-		CriteriaQuery<Movie> query=builder.createQuery(Movie.class);
-		Root<Movie> root=query.from(Movie.class);
-		Predicate titlePredicate=builder.equal(root.get("name"),title);
+	private Movie getMovieByTitleFromDB(String title) {
+		CriteriaBuilder builder = session.getCriteriaBuilder();
+		CriteriaQuery<Movie> query = builder.createQuery(Movie.class);
+		Root<Movie> root = query.from(Movie.class);
+		Predicate titlePredicate = builder.equal(root.get("name"), title);
 		query.where(titlePredicate);
-		List<Movie> movies=session.createQuery(query).getResultList();
-		if(movies!=null && !movies.isEmpty()){
-			this.currMovie=movies.get(0);
-			this.currMovieInfo=getMovieInfoByTitle(this.currMovie.getName());
+		List<Movie> movies = session.createQuery(query).getResultList();
+		if (movies != null && !movies.isEmpty()) {
+			this.currMovie = movies.get(0);
+			this.currMovieInfo = getMovieInfoByTitle(this.currMovie.getName());
 			return this.currMovie;
 		}
 		return null;
 	}
-	//BIG NOTE: TITLE MUST BE ALL LOWERCASE, WITH _ INSTEAD OF SPACES
-	private byte[] getImageFromFilesByTitleAsByteArray(String title){
-		Path path;
-		if(gifMode){
-			path=Paths.get("src/main/resources/"+title+".gif");
+	private Cinema getCinemaByNameFromDB(String name) {
+		CriteriaBuilder builder = session.getCriteriaBuilder();
+		CriteriaQuery<Cinema> query = builder.createQuery(Cinema.class);
+		Root<Cinema> root = query.from(Cinema.class);
+		Predicate titlePredicate = builder.equal(root.get("name"), name);
+		query.where(titlePredicate);
+		List<Cinema> cinemas = session.createQuery(query).getResultList();
+		if (cinemas != null && !cinemas.isEmpty()) {
+			Cinema c = cinemas.get(0);
+			return c;
 		}
-		else {
+		return null;
+	}
+	private Ticket getTicketByToStringFromDB(String str){
+		this.ticketList=getTicketsFromDB();
+		for(Ticket t:this.ticketList){
+			if(t.toString().equals(str)){
+				return t;
+			}
+		}
+		return null;
+	}
+	//BIG NOTE: TITLE MUST BE ALL LOWERCASE, WITH _ INSTEAD OF SPACES
+	private byte[] getImageFromFilesByTitleAsByteArray(String title) {
+		Path path;
+		if (gifMode) {
+			path = Paths.get("src/main/resources/" + title + ".gif");
+		} else {
 			path = Paths.get("src/main/resources/" + title + ".jpg");
 		}
-		byte[] imageData=null;
+		byte[] imageData = null;
 		try {
 			imageData = Files.readAllBytes(path);
-		}catch(Exception e){
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 		return imageData;
 	}
-	private List<DisplayTime> getDisplayTimesFromDB(){
-		CriteriaBuilder builder=session.getCriteriaBuilder();
-		CriteriaQuery<DisplayTime> query=builder.createQuery(DisplayTime.class);
+
+	private List<DisplayTime> getDisplayTimesFromDB() {
+		CriteriaBuilder builder = session.getCriteriaBuilder();
+		CriteriaQuery<DisplayTime> query = builder.createQuery(DisplayTime.class);
 		query.from(DisplayTime.class);
 		return session.createQuery(query).getResultList();
 	}
+	private Customer getCustomerByIdFromDB(String id){
+		CriteriaBuilder builder = session.getCriteriaBuilder();
+		CriteriaQuery<Customer> query = builder.createQuery(Customer.class);
+		Root<Customer> root = query.from(Customer.class);
+		Predicate titlePredicate = builder.equal(root.get("User_ID"), id);
+		query.where(titlePredicate);
+		List<Customer> dis = session.createQuery(query).getResultList();
+		if (dis != null && !dis.isEmpty()) {
+			return dis.get(0);
+		}
+		return null;
+	}
+	private DisplayTime getDisplayTimeFromDB(String displayTimeString) {
+		CriteriaBuilder builder = session.getCriteriaBuilder();
+		CriteriaQuery<DisplayTime> query = builder.createQuery(DisplayTime.class);
+		Root<DisplayTime> root = query.from(DisplayTime.class);
+		Predicate titlePredicate = builder.equal(root.get("Time_Date_Movie_Cinema"), displayTimeString);
+		query.where(titlePredicate);
+		List<DisplayTime> dis = session.createQuery(query).getResultList();
+		if (dis != null && !dis.isEmpty()) {
+			return dis.get(0);
+		}
+		return null;
+	}
 
-
-	private MovieInfo getMovieInfoByTitle(String title){
-		for(MovieInfo m : movieInfoList){
-			if(m.getName().equals(title)){
+	private MovieInfo getMovieInfoByTitle(String title) {
+		setMovieInfoList();
+		for (MovieInfo m : movieInfoList) {
+			if (m.getName().equals(title)) {
 				return m;
 			}
 		}
 		return null;
 	}
-	private UserInfo getUserInfoByName(String name){
-		int count=0;
-		UserInfo i=null;
-		for(UserInfo u:this.userInfoList){
-			if(u.getName().equals(name)){
-				count++;
-				i=new UserInfo(u);
+	private TicketInfo getTicketInfoByToString(String str){
+		for(TicketInfo t:this.ticketInfoList){
+			if (t.toString().equals(str)) {
+				return t;
 			}
 		}
-		if(count>1){
-			System.out.println("Found more than one UserInfo with name: "+name);
+		return null;
+	}
+	private UserInfo getUserInfoByName(String name) {
+		int count = 0;
+		UserInfo i = null;
+		for (UserInfo u : this.userInfoList) {
+			if (u.getName().equals(name)) {
+				count++;
+				i = new UserInfo(u);
+			}
+		}
+		if (count > 1) {
+			System.out.println("Found more than one UserInfo with name: " + name);
 		}
 		return i;
 	}
 
-	private UserInfo getUserInfoByID(String id){
-		for(UserInfo u:this.userInfoList){
-			if(u.getId().equals(id)){
+	private UserInfo getUserInfoByID(String id) {
+		for (UserInfo u : this.userInfoList) {
+			if (u.getId().equals(id)) {
 				return new UserInfo((u));
 			}
 		}
 		return null;
 	}
 
-	private List<Msg> getMsgs(){
-		CriteriaBuilder builder=session.getCriteriaBuilder();
-		CriteriaQuery<Msg> query=builder.createQuery(Msg.class);
-		query.from(Msg.class);
-		List<Msg> msgs=session.createQuery(query).getResultList();
-		return msgs;
-	}
-
-	private DisplayTime getDisplayTimeFromDB(String displayTimeString){
-		CriteriaBuilder builder=session.getCriteriaBuilder();
-		CriteriaQuery<DisplayTime> query=builder.createQuery(DisplayTime.class);
-		Root<DisplayTime> root=query.from(DisplayTime.class);
-		Predicate titlePredicate=builder.equal(root.get("Display_Time_And_Date"),displayTimeString);
-		query.where(titlePredicate);
-		List<DisplayTime> dis=session.createQuery(query).getResultList();
-		if(dis!=null && !dis.isEmpty()){
-			return dis.get(0);
+	private CinemaInfo getCinemaInfoByName(String name) {
+		for (CinemaInfo c : this.cinemaInfoList) {
+			if (c.getName().equals(name)) {
+				return new CinemaInfo(c);
+			}
 		}
 		return null;
 	}
 
+	private DisplayTimeInfo getDisplayTimeInfoByDisplayTime(String displayTime) {
+		for (DisplayTimeInfo d : this.displayTimeInfoList) {
+			if (d.getDisplayTime().equals(displayTime)) {
+				return new DisplayTimeInfo(d);
+			}
+		}
+		return null;
+	}
 
-	private boolean connectCustomer(String id){
-		this.customerList=getCustomersFromDB();
-		for(Customer c:this.customerList){
-			if(c.getId().equals(id)){
+	private List<Msg> getMsgs() {
+		CriteriaBuilder builder = session.getCriteriaBuilder();
+		CriteriaQuery<Msg> query = builder.createQuery(Msg.class);
+		query.from(Msg.class);
+		List<Msg> msgs = session.createQuery(query).getResultList();
+		return msgs;
+	}
+
+
+	private boolean connectCustomer(String id) {
+		this.customerList = getCustomersFromDB();
+		for (Customer c : this.customerList) {
+			if (c.getId().equals(id)) {
 				c.setConnected(1);
 				session.saveOrUpdate(c);
 				session.flush();
@@ -244,10 +315,11 @@ public class SimpleServer extends AbstractServer {
 		}
 		return false;
 	}
-	private boolean connectWorker(String name){
-		this.workerList=getWorkersFromDB();
-		for(Worker w:this.workerList){
-			if(w.getName().toLowerCase().equals(name)){
+
+	private boolean connectWorker(String name) {
+		this.workerList = getWorkersFromDB();
+		for (Worker w : this.workerList) {
+			if (w.getName().toLowerCase().equals(name)) {
 				w.setConnected(1);
 				session.saveOrUpdate(w);
 				session.flush();
@@ -259,9 +331,10 @@ public class SimpleServer extends AbstractServer {
 		}
 		return false;
 	}
-	private boolean disconnectCustomer(String id){
-		this.customerList=getCustomersFromDB();
-		for(Customer c:this.customerList){
+
+	private boolean disconnectCustomer(String id) {
+		this.customerList = getCustomersFromDB();
+		for (Customer c : this.customerList) {
 			if (c.getId().equals(id)) {
 				c.setConnected(0);
 				session.saveOrUpdate(c);
@@ -274,9 +347,10 @@ public class SimpleServer extends AbstractServer {
 		}
 		return false;
 	}
-	private boolean disconnectWorker(String name){
-		this.workerList=getWorkersFromDB();
-		for(Worker w:this.workerList){
+
+	private boolean disconnectWorker(String name) {
+		this.workerList = getWorkersFromDB();
+		for (Worker w : this.workerList) {
 			if (w.getName().toLowerCase().equals(name)) {
 				w.setConnected(0);
 				session.saveOrUpdate(w);
@@ -290,70 +364,125 @@ public class SimpleServer extends AbstractServer {
 		return false;
 	}
 
-	private boolean addCinemaToDB(Cinema cinema) throws IOException{
-		for(Cinema c:this.cinemaList){
-			if(c.getName().equals(cinema.getName())){
+	private boolean addCinemaToDB(CinemaInfo cinemaInfo) throws IOException { //THIS FUNCTION ASSUMES A NEW CINEMA, NOT A COPY OF EXISTING ONE
+		setCinemaInfoList();
+		for (Cinema c : this.cinemaList) {
+			if (c.getName().equals(cinemaInfo.getName())) {
 				return false;
 			}
 		}
-		this.cinemaList.add(cinema);
-		Cinema c=new Cinema(cinema);
-		//need to make sure to update cinemainfo list, and also (MAYBE) update the corresponding entities with the existence, even tough this function
-		//solely add the entity to the db
-		//im going to bed now, its 1 am
-
+		Cinema c = new Cinema(cinemaInfo.getName(), cinemaInfo.getNumHalls());
+		this.cinemaList.add(c);
+		this.cinemaInfoList.add(cinemaInfo);
 		session.save(c);
 		session.flush();
 		session.getTransaction().commit();
 		session.beginTransaction();
 		return true;
 	}
-	/*private boolean addTicketToDB(Ticket ticket) throws IOException{
+
+	private boolean addTicketToDB(TicketInfo ticketInfo) throws IOException{
+		setTicketInfoList();
 		CinemaInfo cinemaInfo=null;
 		MovieInfo movieInfo=null;
+		Customer c1=null;
+		Cinema c=null;
+		Movie m=null;
+		DisplayTime d=null;
 		for(Ticket t:this.ticketList){
-			if(t.toString().equals(ticket.toString())){
-				return false;
+			if(t.toString().equals(ticketInfo.toString())){
+				if(t.getActive()!=0)
+					return false; // ticket already exists, idk if this ever should happen
+				else {
+					removeTicketFromDB(ticketInfo);
+					setTicketInfoList();
+					break;
+				}
 			}
 		}
-		this.ticketList.add(ticket);
-		Ticket t=new Ticket(ticket);
-		for(MovieInfo m:this.movieInfoList){
-			if(m.getName().equals(t.getMovie().getName())){
-				movieInfo=new MovieInfo(m);
+		for(Movie m1:this.movieList){
+			if(m1.getName().equals(ticketInfo.getDisplayTimeInfo().getDisplayTime())){
+				m=m1;
 				break;
 			}
 		}
-		Customer c=t.getCustomer();
-		Cinema c1=t.getCinema();
-		for(CinemaInfo cz:this.cinemaInfoList){
-			if(cz.getName().equals(t.getCinema().getName())){
-				cinemaInfo=new CinemaInfo(cz);
+		for(MovieInfo mi:this.movieInfoList){
+			if (mi.getName().equals(ticketInfo.getMovieInfo().getName())) {
+				mi.addTicketInfo(ticketInfo);
 				break;
 			}
 		}
-
-		//need to add things here, for example create new TicketInfo and add to this.ticketInfoList, and more
-		UserInfo userInfo=new UserInfo(c.getId(),c.getRole(),c.getName(),c.getConnected());
-		TicketInfo ticketInfo=new TicketInfo(userInfo,movieInfo,t.getDisplayTime().getDisplayTime(),cinemaInfo,t.getHallNum(),t.getRow(),t.getCol(),t.getPurchaseTime());
+		for(Cinema c0:this.cinemaList){
+			if(c0.getName().equals(ticketInfo.getCinemaInfo().getName())){
+				c=c0;
+				break;
+			}
+		}
+		for(CinemaInfo ci:this.cinemaInfoList){
+			if(ci.getName().equals(ticketInfo.getCinemaInfo().getName())){
+				ci.addTicketInfo(ticketInfo);
+				break;
+			}
+		}
+		for(Customer c2:this.customerList){
+			if(c2.getId().equals(ticketInfo.getUserInfo().getId())){
+				c1=c2;
+				break;
+			}
+		}
+		for(UserInfo ui:this.userInfoList){
+			if(ui.getRole().equals("Customer") && ui.getId().equals(ticketInfo.getUserInfo().getId())){
+				ui.addTicketInfo(ticketInfo);
+				break;
+			}
+		}
+		for(DisplayTime d1:this.displayTimeList){
+			if(d1.getTicketList().equals(ticketInfo.getDisplayTimeInfo().getDisplayTime())){
+				d=d1;
+				break;
+			}
+		}
+		for(DisplayTimeInfo di:this.displayTimeInfoList){
+			if(di.getDisplayTime().equals(ticketInfo.getDisplayTimeInfo().getDisplayTime())){
+				di.addTicketInfo(ticketInfo);
+				break;
+			}
+		}
+		ticketInfo.getDisplayTimeInfo().addTicketInfo(ticketInfo);
+		ticketInfo.getUserInfo().addTicketInfo(ticketInfo);
+		ticketInfo.getMovieInfo().addTicketInfo(ticketInfo);
+		ticketInfo.getCinemaInfo().addTicketInfo(ticketInfo);
+		Ticket t=new Ticket(m,ticketInfo.getSeatCol(),ticketInfo.getSeatRow(),ticketInfo.getHallNum(),c,c1,d);
+		m.addTicket(t);
+		c.addTicket(t);
+		c1.addTicket(t);
+		d.addTicket(t);
+		t.setActive(ticketInfo.getActive());
+		this.ticketList.add(t);
 		this.ticketInfoList.add(ticketInfo);
+		//need to add things here, for example create new TicketInfo and add to this.ticketInfoList, and more
+		session.saveOrUpdate(m);
+		session.saveOrUpdate(c);
+		session.saveOrUpdate(c1);
+		session.saveOrUpdate(d);
 		session.save(t);
 		session.flush();
 		session.getTransaction().commit();
 		session.beginTransaction();
+		setTicketInfoList();
 		return true;
-	}*/
+	}
 
-	private boolean addWorkerToDB(Worker worker) throws IOException{
-		for(Worker w:this.workerList){
-			if(w.getName().equals(worker.getName())){
+	private boolean addWorkerToDB(Worker worker) throws IOException {
+		for (Worker w : this.workerList) {
+			if (w.getName().equals(worker.getName())) {
 				return false; //name exists already in db
 			}
 		}
 		worker.setConnected(1);
 		this.workerList.add(worker);
-		Worker w=new Worker(worker);
-		UserInfo u=new UserInfo(w.getId(),w.getRole(),w.getName(),w.getPassword());
+		Worker w = new Worker(worker);
+		UserInfo u = new UserInfo(w.getId(), w.getRole(), w.getName(), w.getPassword());
 		u.setConnected(1);
 		u.setTicketInfoList(this.ticketInfoList);
 		this.userInfoList.add(u);
@@ -363,33 +492,37 @@ public class SimpleServer extends AbstractServer {
 		session.beginTransaction();
 		return true;
 	}
-	private boolean addCustomerToDB(Customer customer) throws IOException{
-		this.customerList=getCustomersFromDB();
-		for(Customer c:this.customerList){
-			if(c.getId().equals(customer.getId())){
+
+	private boolean addCustomerToDB(UserInfo userInfo) throws IOException {
+		setUserInfoList();
+		for (Customer c : this.customerList) {
+			if (c.getId().equals(userInfo.getId())) {
 				return false; //name exists already in db
 			}
 		}
-		customer.setConnected(1);
-		this.customerList.add(customer);
-		Customer c=new Customer(customer);
+		userInfo.setConnected(1);
+		Customer c=new Customer(userInfo);
+		this.customerList.add(c);
+		this.userInfoList.add(userInfo);
 		session.save(c);
 		session.flush();
 		session.getTransaction().commit();
 		session.beginTransaction();
 		return true;
 	}
+
 	//this func handles adding movie object to movie table
 	private boolean addMovieToDB(MovieInfo movieInfo) throws IOException {
+		setMovieInfoList();
 		//check if movie is already in movies, no error message sent back cuz not needed
-		for(MovieInfo m:this.movieInfoList){
-			if(m.getName().equals(movieInfo.getName())){
+		for (MovieInfo m : this.movieInfoList) {
+			if (m.getName().equals(movieInfo.getName())) {
 				//if the movie already exists in db, just dont do anything
 				return false;
 			}
 		}
 		this.movieInfoList.add(movieInfo);
-		Movie movie=new Movie(movieInfo);
+		Movie movie = new Movie(movieInfo);
 		movie.setImageData(movieInfo.getImageData());
 		session.save(movie);
 		session.flush();
@@ -397,74 +530,83 @@ public class SimpleServer extends AbstractServer {
 		session.beginTransaction();
 		return true;
 	}
+
 	// updates display time for the current movie selected
-	public void addDisplayTimeToDB(String time){
-		this.currMovie=getMovieByTitleFromDB(this.currMovie.getName());
-		this.currMovieInfo=getMovieInfoByTitle(this.currMovie.getName());
+	public void addDisplayTimeToDB(DisplayTimeInfo displayTimeInfo) {
+		this.currMovie = getMovieByTitleFromDB(displayTimeInfo.getMovieInfo().getName());
+		this.currMovieInfo = displayTimeInfo.getMovieInfo();
+		Cinema c = getCinemaByNameFromDB(displayTimeInfo.getCinemaInfo().getName());
 		try {
-			for(DisplayTime d : this.currMovie.getDisplayTimes()){
-				if(time.equals(d.getDisplayTime())){
+			for (DisplayTime d : this.currMovie.getDisplayTimes()) {
+				if (displayTimeInfo.getDisplayTime().equals(d.getDisplayTime())) {
 					//display time exists in movie so it also exists in db, nothing to do. 123
 					return;
 				}
 			}
-			List<DisplayTime> mylist = getDisplayTimesFromDB();
-			for (DisplayTime d : mylist) {
-				if (time.equals(d.getDisplayTime())) {
-
-					//displaytime exists in DB but not in movie, so only add to movie
-
-					d.addMovie(this.currMovie);
-					this.currMovie.addDisplayTime(d);
-					this.currMovieInfo.addDisplayTime(d.getDisplayTime());
-					session.saveOrUpdate(d);
-					session.saveOrUpdate(this.currMovie);
-					session.flush();
-					session.getTransaction().commit();
-					session.beginTransaction();
-					return;
+			//update movie's movieinfo that it has new displaytime :)
+			for (MovieInfo mi : movieInfoList) {
+				if (mi.getName().equals(displayTimeInfo.getMovieInfo().getName())) {
+					mi.addDisplayTimeInfo(displayTimeInfo);
+					break;
 				}
 			}
-			//we got here so the displaytime doesnt exist in db or in movie, add both
-			DisplayTime dis = new DisplayTime(time);
-			dis.addMovie(this.currMovie);
-			this.currMovie.addDisplayTime(dis);
-			this.currMovieInfo.addDisplayTime(dis.getDisplayTime());
-			session.save(dis);
+			//update movie itself (update displayTimeList)
+			for (DisplayTime d : this.currMovie.getDisplayTimes()) {
+				if (d.getDisplayTime().equals(displayTimeInfo.getDisplayTime())) { //movie already has displaytime for that movie in that cinema
+					//nothing to do
+					return;
+				}
+			}//got here so safe to add to movie new displayTime
+			DisplayTime d = new DisplayTime(displayTimeInfo.getDisplayTime().substring(0,17), this.currMovie, c);
+			this.currMovie.addDisplayTime(d);
+			this.displayTimeInfoList.add(displayTimeInfo);
+			c.addDisplayTime(d);
+			session.save(d);
 			session.saveOrUpdate(this.currMovie);
+			session.saveOrUpdate(c);
 			session.flush();
 			session.getTransaction().commit();
 			session.beginTransaction();
-		}catch(Exception e){
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 	}
 
-	public static void addMsgToDB(String text) throws Exception{
-		Msg m=new Msg(text);
+	public static void addMsgToDB(String text) throws Exception {
+		Msg m = new Msg(text);
 		session.save(m);
 		session.flush();
 		session.getTransaction().commit();
 		session.beginTransaction();
 	}
 
-
-	//this func handles both removing movie object from movie table and movieimage object from movie_images table
-	private boolean removeMovieFromDB(String name){
-		Movie movieToDelete=getMovieByTitleFromDB(name);
-		try {
-			//make sure all movie's displaytimes know the movie is gone
-			//remove all display times from movie to delete before deletding movie
-			/*for(DisplayTime d: movieToDelete.getDisplayTimes()){
-				this.currMovie=movieToDelete;
-				removeDisplayTimeFromMovieFromDB(d.getDisplayTime());
-			}*/
-			for(DisplayTime d:getDisplayTimesFromDB()){
-				removeDisplayTimeFromMovieFromDB(d.getDisplayTime());
+	private boolean removeCustomerFromDB(UserInfo userInfo){
+		try{
+			setUserInfoList();
+			Customer customerToRemove=null;
+			for(Customer c:this.customerList){
+				if(c.getId().equals(userInfo.getId())){
+					customerToRemove=c;
+					break;
+				}
 			}
-			this.movieInfoList = removeMovieInfoWithName(this.movieInfoList, movieToDelete.getName());
-			session.saveOrUpdate(movieToDelete);
-			session.delete(movieToDelete);
+			if(customerToRemove==null){
+				return false;
+			}
+			//disable all his tickets
+			for(Ticket t:customerToRemove.getTicketList()){
+				t.setActive(0);
+				t.setCustomer(null);
+				session.saveOrUpdate(t);
+			}
+			for(Cinema c: customerToRemove.getCinemaList()){
+				c.removeCustomer(customerToRemove);
+				customerToRemove.removeCinema(c);
+				session.saveOrUpdate(c);
+			}
+			this.userInfoList=removeUserInfoWithId(this.userInfoList,userInfo.getId());
+			session.saveOrUpdate(customerToRemove);
+			session.delete(customerToRemove);
 			session.flush();
 			session.getTransaction().commit();
 			session.beginTransaction();
@@ -472,111 +614,216 @@ public class SimpleServer extends AbstractServer {
 		}catch(Exception e){
 			e.printStackTrace();
 		}
-			return true;
-
+		return true;
 	}
 
-	private void removeTicketFromDB(String ticketToString){
+	private boolean removeMovieFromDB(MovieInfo movieInfo) {
+		try {
+			setMovieInfoList();
+			Movie movieToRemove = getMovieByTitleFromDB(movieInfo.getName());
+			if(movieToRemove==null){
+				return false;
+			}
+			//disable all tickets related to movie
+			for(DisplayTime d:movieToRemove.getDisplayTimes()){
+				removeDisplayTimeFromDB(getDisplayTimeInfoByDisplayTime(d.getDisplayTime()));
+			}
+			for (Ticket t : movieToRemove.getTicketList()) {
+				t.setActive(0);
+				t.setMovie(null);
+				session.saveOrUpdate(t);
+			}
+			for(Cinema c:movieToRemove.getCinemaList()){
+				c.removeMovie(movieToRemove);
+				movieToRemove.removeCinema(c);
+				session.saveOrUpdate(c);
+			}
+			this.movieInfoList=removeMovieInfoWithName(this.movieInfoList,movieToRemove.getName());
+			session.saveOrUpdate(movieToRemove);
+			session.delete(movieToRemove);
+			session.flush();
+			session.getTransaction().commit();
+			session.beginTransaction();
+			setMovieInfoList();
+		}catch(Exception e){
+			e.printStackTrace();
+		}
+		return true;
+	}
+
+	private void removeTicketFromDB(TicketInfo ticketInfo) {
 		//the message sent from client comes with TicketInfo obj, so we pass ticketinfo.toString()
 		//get the ticket itself by the tostring (preferably from db, can from list)
 		//  and remove it from all displaytimes/cinemas/customers/movies
 		//and then we can delete it from db
+		try{
+			setTicketInfoList();
+			//remove ticket from it's movie, it's cinema, it's displaytime?, it's customer
 
-	}
+			//first remove from server's lists
+			this.movieInfoList=removeMovieInfoWithName(this.movieInfoList,ticketInfo.getMovieInfo().getName());
+			this.cinemaInfoList=removeCinemaInfoWithName(this.cinemaInfoList,ticketInfo.getCinemaInfo().getName());
+			this.userInfoList=removeUserInfoWithId(this.userInfoList,ticketInfo.getUserInfo().getId());
+			this.displayTimeInfoList=removeDisplayTimeInfoWithString(this.displayTimeInfoList,ticketInfo.getDisplayTimeInfo().getDisplayTime());
 
-	private void removeDisplayTimeFromMovieFromDB(String displayTime) {
-		if(this.currMovie!=null){
-			this.currMovie = getMovieByTitleFromDB(this.currMovie.getName());
-			this.currMovieInfo = getMovieInfoByTitle(this.currMovie.getName());
-		}
-		else{
-			return;
-		}
-		this.displayTimeList = getDisplayTimesFromDB();
-		boolean found = false;
-		boolean found2 = false; // if displaytime is in table of displaytimes
-		DisplayTime d_movie=null;
-		DisplayTime d_table=null;
-		try {
-			for (DisplayTime d : this.displayTimeList) {
-				if (d.getDisplayTime().equals(displayTime)) {
-					found2 = true;
-					d_table=d;
-					break;
-				}
-			}
-			//we found the displayDate to remove in all of displaydates in table
-			//now check if our movie has it too
-			for (DisplayTime d1 : this.currMovie.getDisplayTimes()) {
-				//check if one of movie's displaytime is the one we look for
-				if (d1.getDisplayTime().equals(displayTime)) {
-					found = true; // if movie's displaytime has the displaytime
-					d_movie = d1;
-					break;
-				}
-			}
-			if (found && d_movie!=null) { //movie has it
-				this.currMovie.removeDisplayTime(d_movie);
-				this.currMovieInfo = getMovieInfoByTitle(this.currMovie.getName());
-				d_movie.removeMovie(this.currMovie);
-				this.currMovieInfo.removeDisplayTime(d_movie.getDisplayTime());
-				if (found2){
-					if(d_table.getMovies().isEmpty()){
-						this.displayTimeList=removeDisplayTimeWithName(displayTimeList, d_table.getDisplayTime());
-						session.delete(d_table);
-					}
-					else{
-						session.saveOrUpdate(d_table);
-					}
-				}
-			}
-			session.saveOrUpdate(this.currMovie);
+			//get the ticket itself from db
+			Ticket t=getTicketByToStringFromDB(ticketInfo.toString());
+			//now remove from entities in db
+			Movie m=getMovieByTitleFromDB(ticketInfo.getMovieInfo().getName());
+			m.removeTicket(t);
+			session.saveOrUpdate(m);
+			Cinema c=getCinemaByNameFromDB(ticketInfo.getCinemaInfo().getName());
+			c.removeTicket(t);
+			session.saveOrUpdate(c);
+			Customer c1=getCustomerByIdFromDB(ticketInfo.getUserInfo().getId());
+			c1.removeTicket(t);
+			session.saveOrUpdate(c1);
+			DisplayTime d=getDisplayTimeFromDB(ticketInfo.getDisplayTimeInfo().getDisplayTime());
+			d.removeTicket(t);
+			session.saveOrUpdate(d);
+
+			//clear ticket itself before dleteing, might help
+			t.clear();
+			session.saveOrUpdate(t);
+			session.delete(t);
 			session.flush();
 			session.getTransaction().commit();
 			session.beginTransaction();
-
-		} catch (Exception e) {
+		}catch(Exception e){
 			e.printStackTrace();
 		}
 	}
+
+	private void removeDisplayTimeFromDB(DisplayTimeInfo displayTimeInfo) {
+		try{
+			this.currMovie=getMovieByTitleFromDB(displayTimeInfo.getMovieInfo().getName());
+			Cinema c = getCinemaByNameFromDB(displayTimeInfo.getCinemaInfo().getName());
+
+			DisplayTime d=getDisplayTimeFromDB(displayTimeInfo.getDisplayTime());
+
+			this.currMovie.removeDisplayTime(d);
+
+			c.removeDisplayTime(d);
+			//remove remove the displaytime from all movieinfos
+			for(MovieInfo mi:this.movieInfoList){
+				if(mi.getName().equals(displayTimeInfo.getMovieInfo().getName())){
+					mi.removeDisplayTimeInfo(displayTimeInfo);
+					break;
+				}
+			}
+			//remove the display time from all cinema infos
+			for(CinemaInfo ci:this.cinemaInfoList){
+				if(ci.getName().equals(displayTimeInfo.getCinemaInfo().getName())){
+					ci.removeDisplayTimeInfo(displayTimeInfo);
+					break;
+				}
+			}
+			//remove displaytimeinfo from the server's displayTimeInfoList
+			this.displayTimeInfoList=removeDisplayTimeInfoWithString(displayTimeInfoList,displayTimeInfo.getDisplayTime());
+			//remove displaytime from the server's displayTimeList
+			this.displayTimeList=removeDisplayTimeWithString(displayTimeList,displayTimeInfo.getDisplayTime());
+
+			//once tickets have no displaytimes, they can be thrown away, but instead of throwing them away, we just set them to inactive
+			for(TicketInfo ti: this.ticketInfoList) {
+				if (ti.getDisplayTimeInfo().equals(displayTimeInfo.getDisplayTime())) {
+					ti.setDisplayTimeInfo(null);
+					ti.setActive(0);
+				}
+			}
+			for(Ticket t:this.ticketList){
+				if(t.getDisplayTime().getDisplayTime().equals(displayTimeInfo.getDisplayTime())){
+					t.setActive(0);
+					t.setDisplayTime(null);
+					d.removeTicket(t);
+					session.saveOrUpdate(t);
+				}
+			}
+			session.saveOrUpdate(c);
+			session.saveOrUpdate(this.currMovie);
+			d.setMovie(null);
+			d.setCinema(null);
+			d.setTicketList(null);
+			session.saveOrUpdate(d);
+			session.delete(d);
+			session.flush();
+			session.getTransaction().commit();
+			session.beginTransaction();
+		}catch(Exception e){
+			e.printStackTrace();
+		}
+}
+
+
+
+
 
 
 
 	private void setCinemaInfoList(){
 		this.cinemaInfoList=new ArrayList<>();
-		List<Cinema> cinemas=getCinemasFromDB();
-		for(Cinema c: cinemas){
-			CinemaInfo ci=new CinemaInfo(c.getName(),c.getNumHalls());
-			List<MovieInfo> movieInfos=new ArrayList<>();
-			for(Movie m:c.getMovieList()){
-				movieInfos.add(getMovieInfoByTitle(m.getName()));
+		this.cinemaList=getCinemasFromDB();
+		for(Cinema c: this.cinemaList){
+			List<MovieInfo> milist=new ArrayList<>();
+			List<UserInfo> cilist=new ArrayList<>();
+			List<TicketInfo> tilist= new ArrayList<>();
+			for(Ticket t: c.getTicketList()){
+				tilist.add(getTicketInfoByToString(t.toString()));
 			}
-			ci.setMovieInfoList(movieInfos);
-			List<UserInfo> customerInfos=new ArrayList<>();
-			for(Customer c1:c.getCustomerList()){
-				customerInfos.add(getUserInfoByID(c1.getId()));
+			for(Movie m: c.getMovieList()){
+				milist.add(getMovieInfoByTitle(m.getName()));
 			}
-			ci.setCustomerInfoList(customerInfos);
-
-			//might need to add stuff here
-
-
+			for(Customer c1: c.getCustomerList()){
+				cilist.add(getUserInfoByID(c1.getId()));
+			}
+			CinemaInfo ci=new CinemaInfo(c.getName(),c.getNumHalls(),milist,cilist,tilist);
 			this.cinemaInfoList.add(ci);
 		}
 	}
-
 	private void setMovieInfoList(){
+		this.movieList=getMoviesFromDB();
 		this.movieInfoList=new ArrayList<>();
 		byte[] movieImageByteArray=null;
-		List<Movie> movies=getMoviesFromDB();
-		for(Movie m: movies){
+		for(Movie m: this.movieList){
 			MovieInfo mi=new MovieInfo(m.getName(),m.getReleaseDate(),m.getGenre(),m.getProducer(),m.getActors(),m.getSummary(),m.getStatus());
 			mi.setImageData(m.getImageData());
 			//add display times from movie to movieinfo
 			for(DisplayTime d: m.getDisplayTimes()){
-				mi.addDisplayTime(d.getDisplayTime());
+				mi.addDisplayTimeInfo(getDisplayTimeInfoByDisplayTime(d.getDisplayTime()));
+			}
+			for(Ticket t:m.getTicketList()){
+				mi.addTicketInfo(getTicketInfoByToString(t.toString()));
+			}
+			for(Cinema c:m.getCinemaList()){
+				mi.addCinemaInfo(getCinemaInfoByName(c.getName()));
 			}
 			this.movieInfoList.add(mi);
+		}
+	}
+	private void setTicketInfoList(){
+		this.ticketList=getTicketsFromDB();
+		this.ticketInfoList=new ArrayList<>();
+		for(Ticket t: this.ticketList){
+			TicketInfo ti=new TicketInfo(getUserInfoByID(t.getCustomer().getId()),
+					getMovieInfoByTitle(t.getMovie().getName()),
+					getDisplayTimeInfoByDisplayTime(t.getDisplayTime().getDisplayTime()),
+					getCinemaInfoByName(t.getCinema().getName()),
+					t.getHallNum(),t.getSeatRow(),t.getSeatCol(),t.getPurchaseTime());
+			this.ticketInfoList.add(ti);
+		}
+	}
+	private void setDisplayTimeInfoList(){
+		this.displayTimeList=getDisplayTimesFromDB();
+		this.displayTimeInfoList=new ArrayList<>();
+		for(DisplayTime d: this.displayTimeList){
+			List<TicketInfo> list=new ArrayList<>();
+			for(Ticket t:d.getTicketList()){
+				list.add(getTicketInfoByToString(t.toString()));
+			}
+			DisplayTimeInfo di=new DisplayTimeInfo(d.getDisplayTime().substring(0,17),
+					getMovieInfoByTitle(d.getMovie().getName()),
+					getCinemaInfoByName(d.getCinema().getName()),list);
+
+			this.displayTimeInfoList.add(di);
 		}
 	}
 	private void setUserInfoList(){
@@ -622,9 +869,8 @@ public class SimpleServer extends AbstractServer {
 				String[] splitted=request.split(" ",2);
 				this.currMovie=getMovieByTitleFromDB(splitted[1]);
 				this.currMovieInfo=getMovieInfoByTitle(splitted[1]);
-
 				message.setMessage("MovieInfo");
-				message.setMovieInfo(getMovieInfoByTitle(splitted[1]));
+				message.setMovieInfo(this.currMovieInfo);
 				client.sendToClient(message);
 			}
 			else if(request.startsWith("getTitles")){
@@ -639,15 +885,15 @@ public class SimpleServer extends AbstractServer {
 				message.setMessage("cinemaInfoList");
 				sendToAllClients(message); //maybe change to only send to specific client
 			}
-			else if (request.startsWith("addtime")) {
-				addDisplayTimeToDB(request.substring(8));
-				message.setMovieInfo(getMovieInfoByTitle(this.currMovie.getName()));
+			else if (request.startsWith("addtime")) { //message holds DisplayInfo ,safe to assume movie and cinema already exist
+				addDisplayTimeToDB(message.getDisplayTimeInfo());
+				message.setMovieInfoList(this.movieInfoList);
 				message.setMessage("updatedtimes");
 				sendToAllClients(message);
 			}
 			else if(request.startsWith("removetime")){
-				removeDisplayTimeFromMovieFromDB(request.substring(11));
-				message.setMovieInfo(getMovieInfoByTitle(this.currMovie.getName()));
+				removeDisplayTimeFromDB(message.getDisplayTimeInfo());
+				message.setMovieInfoList(this.movieInfoList);
 				message.setMessage("updatedtimes");
 				sendToAllClients(message);
 			}
@@ -673,7 +919,7 @@ public class SimpleServer extends AbstractServer {
 				sendToAllClients(message);
 			}
 			else if(request.startsWith("removeMovie")){
-				if(removeMovieFromDB(message.getMovieInfo().getName())){
+				if(removeMovieFromDB(message.getMovieInfo())){
 					message.setMessage("movie removed succesfully");
 				}
 				sendToAllClients(message);
@@ -696,8 +942,8 @@ public class SimpleServer extends AbstractServer {
 			else if(request.startsWith("addCustomer")){
 				UserInfo u=message.getUserInfo();
 				u.setConnected(1);
-				this.userInfoList.add(u);
-				if(addCustomerToDB(new Customer(u))){
+				//this.userInfoList.add(u);
+				if(addCustomerToDB(u)){
 					message.setMessage("customer added");
 				}
 				else{
@@ -768,24 +1014,27 @@ public class SimpleServer extends AbstractServer {
 			sessionFactory=getSessionFactory();
 			session=sessionFactory.openSession();
 			session.beginTransaction();
-			setMovieInfoList(); //uncomment this when hibernate is on update mode
+			/*setMovieInfoList(); //uncomment this when hibernate is on update mode
 			setUserInfoList();
+			setCinemaInfoList();
+			setDisplayTimeInfoList();*/
 		} catch(Exception e) {
 			if(session!=null){
 				session.getTransaction().rollback();
 			}
 			e.printStackTrace();
 		}//uncomment this section when running server for the first time
-		/*try{
+		try{
 			generateData();
 			setMovieInfoList();
 			setUserInfoList();
 			setCinemaInfoList();
-			//setTicketInfoList();
+			setTicketInfoList();
+			setDisplayTimeInfoList();
 
 		}catch(Exception e) {
 			e.printStackTrace();
-		}*/
+		}
 		session.getTransaction().commit();
 		session.beginTransaction();
 	}
@@ -800,11 +1049,21 @@ public class SimpleServer extends AbstractServer {
 		}
 	}
 
-	private List<DisplayTime> removeDisplayTimeWithName(List<DisplayTime> list, String nameToRemove) {
+	private List<DisplayTime> removeDisplayTimeWithString(List<DisplayTime> list, String str) {
 		Iterator<DisplayTime> iterator = list.iterator();
 		while (iterator.hasNext()) {
 			DisplayTime obj = iterator.next();
-			if (obj.getDisplayTime().equals(nameToRemove)) {
+			if (obj.getDisplayTime().equals(str)) {
+				iterator.remove();
+			}
+		}
+		return list;
+	}
+	private List<DisplayTimeInfo> removeDisplayTimeInfoWithString(List<DisplayTimeInfo> list, String str) {
+		Iterator<DisplayTimeInfo> iterator = list.iterator();
+		while (iterator.hasNext()) {
+			DisplayTimeInfo obj = iterator.next();
+			if (obj.getDisplayTime().equals(str)) {
 				iterator.remove();
 			}
 		}
@@ -850,7 +1109,27 @@ public class SimpleServer extends AbstractServer {
 		}
 	return list;
 	}
-	/*private List<Ticket> removeTicketWithToString(List<Ticket> list, String toStringToRemove) {
+	private List<UserInfo> removeUserInfoWithId(List<UserInfo> list, String idToRemove) {
+		Iterator<UserInfo> iterator = list.iterator();
+		while (iterator.hasNext()) {
+			UserInfo obj = iterator.next();
+			if (obj.getId().equals(idToRemove) && obj.getRole().equals("Customer")) {
+				iterator.remove();
+			}
+		}
+	return list;
+	}
+	private List<UserInfo> removeUserInfoWithName(List<UserInfo> list, String nameToRemove) {
+		Iterator<UserInfo> iterator = list.iterator();
+		while (iterator.hasNext()) {
+			UserInfo obj = iterator.next();
+			if (obj.getName().equals(nameToRemove) && !obj.getRole().equals("Customer")) {
+				iterator.remove();
+			}
+		}
+	return list;
+	}
+	private List<Ticket> removeTicketWithToString(List<Ticket> list, String toStringToRemove) {
 		Iterator<Ticket> iterator = list.iterator();
 		while (iterator.hasNext()) {
 			Ticket obj = iterator.next();
@@ -859,15 +1138,54 @@ public class SimpleServer extends AbstractServer {
 			}
 		}
 	return list;
-	}*/
-	private List<Cinema> removeCinemaWithName(List<Cinema> list, String nameToRemove) {
-		Iterator<Cinema> iterator = list.iterator();
+	}
+	private List<TicketInfo> removeTicketInfoWithToString(List<TicketInfo> list, String toStringToRemove) {
+		Iterator<TicketInfo> iterator = list.iterator();
 		while (iterator.hasNext()) {
-			Cinema obj = iterator.next();
-			if (obj.toString().equals(nameToRemove)) {
+			TicketInfo obj = iterator.next();
+			if (obj.toString().equals(toStringToRemove)) {
 				iterator.remove();
 			}
 		}
 	return list;
 	}
+	private List<Cinema> removeCinemaWithName(List<Cinema> list, String nameToRemove) {
+		Iterator<Cinema> iterator = list.iterator();
+		while (iterator.hasNext()) {
+			Cinema obj = iterator.next();
+			if (obj.getName().equals(nameToRemove)) {
+				iterator.remove();
+			}
+		}
+	return list;
+	}
+	private List<CinemaInfo> removeCinemaInfoWithName(List<CinemaInfo> list, String nameToRemove) {
+		Iterator<CinemaInfo> iterator = list.iterator();
+		while (iterator.hasNext()) {
+			CinemaInfo obj = iterator.next();
+			if (obj.getName().equals(nameToRemove)) {
+				iterator.remove();
+			}
+		}
+	return list;
+	}
+	/*
+	private MovieInfo convertMovieToMovieInfo(Movie movie){
+
+	}
+	private CinemaInfo convertCinemaToCinemaInfo(Cinema cinema){
+
+	}
+	private TicketInfo convertTicketToTicketInfo(Ticket ticket){
+
+	}
+	private UserInfo convertCustomerToUserInfo(Customer customer){
+
+	}
+	private UserInfo convertWorkerToUserInfo(Worker worker){
+
+	}
+	private DisplayTimeInfo convertDisplayTimeToDisplayTimeInfo(DisplayTime displayTime){
+
+	}*/
 }

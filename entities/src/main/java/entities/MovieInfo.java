@@ -1,6 +1,5 @@
 package entities;
 
-import java.awt.*;
 import java.io.Serializable;
 import java.util.*;
 import java.util.List;
@@ -11,7 +10,9 @@ public class MovieInfo implements Serializable {
      String name;
      String releaseDate;
      byte[] imageData;
-     List<String> displayTimes=new ArrayList<>();
+     List<DisplayTimeInfo> displayTimeInfoList=new ArrayList<>();
+     List<CinemaInfo> cinemaInfoList=new ArrayList<>();
+     List<TicketInfo> ticketInfoList=new ArrayList<>();
      String genre;
      String producer;
      String summary;
@@ -36,7 +37,9 @@ public class MovieInfo implements Serializable {
         this.actors=movieInfo.getActors();
         this.producer=movieInfo.getProducer();
         this.status=movieInfo.getStatus();
-        this.displayTimes=movieInfo.getDisplayTimes();
+        this.displayTimeInfoList=movieInfo.getDisplayTimeInfoList();
+        this.cinemaInfoList=movieInfo.getCinemaInfoList();
+        this.ticketInfoList=movieInfo.getTicketInfoList();
     }
 
     public void setName(String name){
@@ -45,26 +48,101 @@ public class MovieInfo implements Serializable {
     public String getName(){
         return this.name;
     }
-
+    public List<TicketInfo> getTicketInfoList(){return  this.ticketInfoList;}
+    public void setTicketInfoList(List<TicketInfo> l){this.ticketInfoList=l;}
     public void setReleaseDate(String releaseDate){
         this.releaseDate= this.releaseDate;
     }
     public String getReleaseDate(){
         return this.releaseDate;
     }
+    public void setCinemaInfoList(List<CinemaInfo> names){this.cinemaInfoList=names;}
+    public List<CinemaInfo> getCinemaInfoList(){return this.cinemaInfoList;}
+    public void setDisplayTimeInfoList(List<DisplayTimeInfo> displayTimeInfoList){this.displayTimeInfoList=displayTimeInfoList;}
+    public List<DisplayTimeInfo> getDisplayTimeInfoList(){return this.displayTimeInfoList;}
 
-    public void setDisplayTimes(List<String> displayTimes){this.displayTimes=displayTimes;}
-    public List<String> getDisplayTimes(){return this.displayTimes;}
-    public void addDisplayTime(String displayTime){
-        for(String d : this.displayTimes){
-            if (d.equals(displayTime)) {
+
+
+
+    public void addTicketInfo(TicketInfo ticket){
+        for(TicketInfo t : this.ticketInfoList){
+            if (t.toString().equals(ticket.toString())) {
                 return;
             }
         }
-        this.displayTimes.add(displayTime);
+        this.ticketInfoList.add(ticket);
     }
-    public void removeDisplayTime(String displayTime){
-        this.displayTimes.remove(displayTime);
+    public void removeTicketInfo(TicketInfo ticketInfo){
+        boolean found=false;
+        for(TicketInfo t:this.ticketInfoList){
+            if(t.toString().equals(ticketInfo.toString())){
+                found=true;
+                break;
+            }
+        }
+        if(found) {
+            Iterator<TicketInfo> iterator = this.ticketInfoList.iterator();
+            while (iterator.hasNext()) {
+                TicketInfo obj = iterator.next();
+                if (obj.toString().equals(ticketInfo.toString())) {
+                    iterator.remove();
+                }
+            }
+        }
+    }
+    public void addCinemaInfo(CinemaInfo cinemaInfo){
+        for(CinemaInfo c : this.cinemaInfoList){
+            if (c.getName().equals(cinemaInfo.getName())) {
+                return;
+            }
+        }
+        this.cinemaInfoList.add(cinemaInfo);
+    }
+    public void removeCinemaInfo(CinemaInfo cinemaInfo){
+        boolean found=false;
+        for(CinemaInfo c : this.cinemaInfoList){
+            if(c.getName().equals(cinemaInfo.getName())){
+                found=true;
+                break;
+            }
+        }
+        if(found) {
+            Iterator<CinemaInfo> iterator = this.cinemaInfoList.iterator();
+            while (iterator.hasNext()) {
+                CinemaInfo obj = iterator.next();
+                if (obj.getName().equals(cinemaInfo.getName())) {
+                    iterator.remove();
+                }
+            }
+        }
+    }
+
+
+    public void addDisplayTimeInfo(DisplayTimeInfo displayTimeInfo){
+        for(DisplayTimeInfo d : this.displayTimeInfoList){
+            if (d.getDisplayTime().equals(displayTimeInfo.getDisplayTime())) {
+                return;
+            }
+        }
+        this.displayTimeInfoList.add(displayTimeInfo);
+    }
+    public void removeDisplayTimeInfo(DisplayTimeInfo displayTimeInfo){
+        boolean found=false;
+        for(DisplayTimeInfo di:this.displayTimeInfoList){
+            if(di.getDisplayTime().equals(displayTimeInfo.getDisplayTime())){
+                found=true;
+                break;
+            }
+        }
+        if(found) {
+            Iterator<DisplayTimeInfo> iterator = this.displayTimeInfoList.iterator();
+            while (iterator.hasNext()) {
+                DisplayTimeInfo obj = iterator.next();
+                if (obj.getDisplayTime().equals(displayTimeInfo.getDisplayTime())) {
+                    iterator.remove();
+                }
+            }
+        }
     }
 
     public void setGenre(String genre){this.genre=genre;}
@@ -97,10 +175,9 @@ public class MovieInfo implements Serializable {
         sb.append("Summary: \n").append(this.summary).append("\n\n");
 
         sb.append("Display Times:\n\n");
-        for (String dt : this.displayTimes) {
-            sb.append("  - ").append(dt).append("\n");
+        for (DisplayTimeInfo dti : this.displayTimeInfoList) {
+            sb.append("  - ").append(dti.getDisplayTime()).append("\n");
         }
-
         return sb.toString();
     }
 

@@ -143,6 +143,7 @@
             <ComboBox fx:id="genreComboBox" layoutX="334.0" layoutY="302.0" prefHeight="25.0" prefWidth="206.0" promptText="Choose Genre" />
             <TextArea fx:id="summaryTextArea" layoutX="340.0" layoutY="343.0" prefHeight="120.0" prefWidth="200.0" promptText="Enter a short summary" wrapText="true" />
             <ComboBox fx:id="statusComboBox" layoutX="362.0" layoutY="474.0" prefWidth="150.0" />
+            <Label fx:id="connectedAsLabel" alignment="CENTER_RIGHT" contentDisplay="RIGHT" layoutX="382.0" layoutY="8.0" prefHeight="26.0" prefWidth="211.0" text="Label" textAlignment="RIGHT" />
          </children>
       </AnchorPane>
    </children>
