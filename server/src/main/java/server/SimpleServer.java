@@ -533,6 +533,7 @@ public class SimpleServer extends AbstractServer {
 
 	// updates display time for the current movie selected
 	public void addDisplayTimeToDB(DisplayTimeInfo displayTimeInfo) {
+		setDisplayTimeInfoList();
 		this.currMovie = getMovieByTitleFromDB(displayTimeInfo.getMovieInfo().getName());
 		this.currMovieInfo = displayTimeInfo.getMovieInfo();
 		Cinema c = getCinemaByNameFromDB(displayTimeInfo.getCinemaInfo().getName());
@@ -1014,17 +1015,17 @@ public class SimpleServer extends AbstractServer {
 			sessionFactory=getSessionFactory();
 			session=sessionFactory.openSession();
 			session.beginTransaction();
-			/*setMovieInfoList(); //uncomment this when hibernate is on update mode
+			setMovieInfoList(); //uncomment this when hibernate is on update mode
 			setUserInfoList();
 			setCinemaInfoList();
-			setDisplayTimeInfoList();*/
+			setDisplayTimeInfoList();
 		} catch(Exception e) {
 			if(session!=null){
 				session.getTransaction().rollback();
 			}
 			e.printStackTrace();
 		}//uncomment this section when running server for the first time
-		try{
+		/*try{
 			generateData();
 			setMovieInfoList();
 			setUserInfoList();
@@ -1034,7 +1035,7 @@ public class SimpleServer extends AbstractServer {
 
 		}catch(Exception e) {
 			e.printStackTrace();
-		}
+		}*/
 		session.getTransaction().commit();
 		session.beginTransaction();
 	}

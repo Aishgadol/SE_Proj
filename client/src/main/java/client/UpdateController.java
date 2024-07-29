@@ -99,11 +99,29 @@ public class UpdateController{
         String hour=timePicker.getValue();
         String date=datePicker.getValue().format(DateTimeFormatter.ofPattern("dd/MM/yyyy"));
         String cinemaName=cinemaPicker.getValue();
-        askDB("addtime "+hour+", "+date+", Movie: "+titlesComboBox.getValue()+", Cinema: "+cinemaName);
+        if(cinemaName==null){
+            popCinemaNotChosenMessage();
+            return;
+        }
+        CinemaInfo ci=getCinemaInfoByName(cinemaName);
+        MovieInfo mi=getMovieInfoByName(titlesComboBox.getValue());
+        DisplayTimeInfo d=new DisplayTimeInfo(hour+", "+date+", Movie: "+mi.getName()+", Cinema: "+ci.getName(),mi,ci);
+        Message msg=new Message(msgId++,d.getDisplayTime());
+        msg.setDisplayTimeInfo(d);
+        askDB(msg);
         resetAll();
         updateAll();
     }
 
+    @FXML
+    private void popCinemaNotChosenMessage(){
+            Platform.runLater(()->{
+                Alert alert=new Alert(Alert.AlertType.ERROR);
+                alert.setTitle("Cinema name is null");
+                alert.setHeaderText("CINEMA NAME IS NULL");
+                alert.show();
+            });
+    }
     @FXML
     void timeToRemoveSelected(ActionEvent event){}
 
@@ -174,7 +192,13 @@ public class UpdateController{
         });
     }
 
-
+    void askDB(Message msg){
+        try{
+            SimpleClient.getClient().sendToServer(msg);
+        }catch(Exception e){
+            e.printStackTrace();
+        }
+    }
 
     void askDB(String title){
         try{
@@ -344,7 +368,36 @@ public class UpdateController{
         }
     }
 
-
+    private DisplayTimeInfo getDisplayTimeInfoByDisplayTime(String displayTime){
+        DisplayTimeInfo d=null;
+        for(DisplayTimeInfo di:this.displayTimeInfoList){
+            if(di.getDisplayTime().equals(displayTime)){
+                d=di;
+                break;
+            }
+        }
+        return d;
+    }
+    private CinemaInfo getCinemaInfoByName(String name){
+        CinemaInfo c=null;
+        for(CinemaInfo ci:cinemaInfoList){
+            if (ci.getName().equals(name)) {
+                c=ci;
+                break;
+            }
+        }
+        return c;
+    }
+    private MovieInfo getMovieInfoByName(String name){
+        MovieInfo m=null;
+        for(MovieInfo mi:this.movieInfos){
+            if(mi.getName().equals(name)){
+                m=mi;
+                break;
+            }
+        }
+        return m;
+    }
     private List<String> generateTimeSlots(){
         List<String> times=new ArrayList<>();
         LocalTime startTime= LocalTime.of(11,0);
