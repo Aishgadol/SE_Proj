@@ -12,12 +12,12 @@ public class Message implements Serializable {
     List<MovieInfo> movieInfoList;
     byte[] imageData;
     UserInfo userInfo;
-    List<UserInfo> userInfoList;
+    DisplayTimeInfo displayTimeInfo;
     TicketInfo ticketInfo;
     List<TicketInfo> ticketInfoList;
     List<CinemaInfo> cinemaInfoList;
-    DisplayTimeInfo displayTimeInfo;
     List<DisplayTimeInfo> displayTimeInfoList;
+    List<UserInfo> userInfoList;
 
 
     public Message(int id, LocalDateTime timeStamp, String message) {
@@ -81,8 +81,8 @@ public class Message implements Serializable {
 
     public List<DisplayTimeInfo> getDisplayTimeInfoList() {return displayTimeInfoList;}
     public void setDisplayTimeInfoList(List<DisplayTimeInfo> displayTimeInfoList) {this.displayTimeInfoList = displayTimeInfoList;}
-    public DisplayTimeInfo getDisplayTimeInfo() {return displayTimeInfo;}
-    public void setDisplayTimeInfo(DisplayTimeInfo displayTimeInfo) {    }
+    public DisplayTimeInfo getDisplayTimeInfo() {return this.displayTimeInfo;}
+    public void setDisplayTimeInfo(DisplayTimeInfo displayTimeInfo) { this.displayTimeInfo=displayTimeInfo;  }
     public List<MovieInfo> getMovieInfoList(){
         return this.movieInfoList;
     }

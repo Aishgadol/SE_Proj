@@ -96,10 +96,38 @@ public class UpdateController{
 
     @FXML
     void addTimeButtonPressed(ActionEvent event){
+        if(this.cinemaPicker.getValue()==null || this.cinemaPicker.getValue().isEmpty()){
+            Platform.runLater(()->{
+                Alert alert=new Alert(Alert.AlertType.ERROR);
+                alert.setTitle("Missing cinema name");
+                alert.setHeaderText("missing cinema name");
+                alert.show();
+
+            });
+            return;
+        }
         String hour=timePicker.getValue();
         String date=datePicker.getValue().format(DateTimeFormatter.ofPattern("dd/MM/yyyy"));
         String cinemaName=cinemaPicker.getValue();
-        askDB("addtime "+hour+", "+date+", Movie: "+titlesComboBox.getValue()+", Cinema: "+cinemaName);
+        Message msg=new Message(msgId++,"addtime "+hour+", "+date+", Movie: "+titlesComboBox.getValue()+", Cinema: "+cinemaName);
+        CinemaInfo ci=null;
+        for(CinemaInfo c:this.cinemaInfoList){
+            if(c.getName().equals(cinemaName)){
+                ci=c;
+                break;
+            }
+        }
+        MovieInfo mi=null;
+        for(MovieInfo m : this.movieInfos){
+            if(m.getName().equals(titlesComboBox.getValue())){
+                mi=m;
+                break;
+            }
+        }
+        DisplayTimeInfo di=new DisplayTimeInfo(hour+", "+date, mi, ci);
+        msg.setDisplayTimeInfo(di);
+        System.out.println("About to ask db to add time: "+di.getDisplayTime());
+        askDB(msg);
         resetAll();
         updateAll();
     }
@@ -175,7 +203,13 @@ public class UpdateController{
     }
 
 
-
+    void askDB(Message message){
+        try{
+            SimpleClient.getClient().sendToServer(message);
+        }catch(Exception e){
+            e.printStackTrace();
+        }
+    }
     void askDB(String title){
         try{
             Message message=new Message(msgId++,title);
@@ -388,6 +422,7 @@ public class UpdateController{
 
         askDB("getBackgroundImage");
         askDB("getTitles");
+        askDB("getDisplayTimes");
         askDB("getCinemas");
     }
 }
