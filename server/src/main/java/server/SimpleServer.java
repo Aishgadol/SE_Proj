@@ -495,12 +495,72 @@ public class SimpleServer extends AbstractServer {
 
 	private boolean addCustomerToDB(UserInfo userInfo) throws IOException {
 		setUserInfoList();
+		setCinemaInfoList();
+		setMovieInfoList();
+		setTicketInfoList();
 		for (Customer c : this.customerList) {
 			if (c.getId().equals(userInfo.getId())) {
 				return false; //name exists already in db
 			}
 		}
 		userInfo.setConnected(1);
+		boolean found = false;
+		for (CinemaInfo ci : userInfo.getCinemaInfoList()) {
+			found = false;
+			for (CinemaInfo cinemaInfo : this.cinemaInfoList) {
+				if (cinemaInfo.getName().equals(ci.getName())) {
+					found=true;
+					break;
+				}
+			}
+			if (!found) {
+				this.cinemaInfoList.add(ci);
+			}
+			found=false;
+			for(Cinema cinema:this.cinemaList){
+				if(cinema.getName().equals(ci.getName())){
+					found=true;
+					break;
+				}
+			}
+			if(!found){
+					Cinema cx=new Cinema(ci.getName(),ci.getNumHalls());
+					this.cinemaList.add(cx);
+					session.save(cx);
+					session.flush();
+					session.getTransaction().commit();
+					session.beginTransaction();
+			}
+		}
+		for (TicketInfo ti : userInfo.getTicketInfoList()) {
+			found = false;
+			for (TicketInfo ticketInfo : this.ticketInfoList) {
+				if (ticketInfo.toString().equals(ti.toString())) {
+					found = true;
+					break;
+				}
+			}
+			if (!found) {
+				this.ticketInfoList.add(ti);
+			}
+			found = false;
+			for (Ticket ticket : this.ticketList) {
+				if (ticket.toString().equals(ti.toString())) {
+					found = true;
+					break;
+				}
+			}
+			if (!found) {
+				Ticket tx=new Ticket(getMovieByTitleFromDB(ti.getMovieInfo().getName()) , ti.getSeatCol(),ti.getSeatRow(),ti.getHallNum(), getCinemaByNameFromDB(ti.getCinemaInfo().getName()), getCustomerByIdFromDB(ti.getUserInfo().getId()),getDisplayTimeFromDB(ti.getDisplayTimeInfo().getDisplayTime()));
+				this.ticketList.add(tx);
+				session.save(tx);
+				session.flush();
+				session.getTransaction().commit();
+				session.beginTransaction();
+			}
+
+
+		}
 		Customer c=new Customer(userInfo);
 		this.customerList.add(c);
 		this.userInfoList.add(userInfo);
@@ -513,7 +573,11 @@ public class SimpleServer extends AbstractServer {
 
 	//this func handles adding movie object to movie table
 	private boolean addMovieToDB(MovieInfo movieInfo) throws IOException {
+		setUserInfoList();
+		setCinemaInfoList();
 		setMovieInfoList();
+		setTicketInfoList();
+		setDisplayTimeInfoList();
 		//check if movie is already in movies, no error message sent back cuz not needed
 		for (MovieInfo m : this.movieInfoList) {
 			if (m.getName().equals(movieInfo.getName())) {
@@ -521,6 +585,91 @@ public class SimpleServer extends AbstractServer {
 				return false;
 			}
 		}
+		boolean found=false;
+		for (CinemaInfo ci : movieInfo.getCinemaInfoList()) {
+			found = false;
+			for (CinemaInfo cinemaInfo : this.cinemaInfoList) {
+				if (cinemaInfo.getName().equals(ci.getName())) {
+					found=true;
+					break;
+				}
+			}
+			if (!found) {
+				this.cinemaInfoList.add(ci);
+			}
+			found=false;
+			for(Cinema cinema:this.cinemaList){
+				if(cinema.getName().equals(ci.getName())){
+					found=true;
+					break;
+				}
+			}
+			if(!found){
+					Cinema cx=new Cinema(ci.getName(),ci.getNumHalls());
+					this.cinemaList.add(cx);
+					session.save(cx);
+					session.flush();
+					session.getTransaction().commit();
+					session.beginTransaction();
+			}
+		}
+		found=false;
+		for (TicketInfo ti : movieInfo.getTicketInfoList()) {
+			found = false;
+			for (TicketInfo ticketInfo : this.ticketInfoList) {
+				if (ticketInfo.toString().equals(ti.toString())) {
+					found = true;
+					break;
+				}
+			}
+			if (!found) {
+				this.ticketInfoList.add(ti);
+			}
+			found = false;
+			for (Ticket ticket : this.ticketList) {
+				if (ticket.toString().equals(ti.toString())) {
+					found = true;
+					break;
+				}
+			}
+			if (!found) {
+				Ticket tx=new Ticket(getMovieByTitleFromDB(ti.getMovieInfo().getName()) , ti.getSeatCol(),ti.getSeatRow(),ti.getHallNum(), getCinemaByNameFromDB(ti.getCinemaInfo().getName()), getCustomerByIdFromDB(ti.getUserInfo().getId()),getDisplayTimeFromDB(ti.getDisplayTimeInfo().getDisplayTime()));
+				this.ticketList.add(tx);
+				session.save(tx);
+				session.flush();
+				session.getTransaction().commit();
+				session.beginTransaction();
+			}
+		}
+		found=false;
+		for (DisplayTimeInfo di : movieInfo.getDisplayTimeInfoList()) {
+			found = false;
+			for (DisplayTimeInfo displayTimeInfo : this.displayTimeInfoList) {
+				if (displayTimeInfo.getDisplayTime().equals(di.getDisplayTime())) {
+					found=true;
+					break;
+				}
+			}
+			if (!found) {
+				this.displayTimeInfoList.add(di);
+			}
+			found=false;
+			for(DisplayTimeInfo displayTimeInfo :this.displayTimeInfoList){
+				if(displayTimeInfo.getDisplayTime().equals(di.getDisplayTime())){
+					found=true;
+					break;
+				}
+			}
+			if(!found){
+					DisplayTime cx=new DisplayTime(getDisplayTimeFromDB(di.getDisplayTime()));
+					this.displayTimeList.add(cx);
+					session.save(cx);
+					session.flush();
+					session.getTransaction().commit();
+					session.beginTransaction();
+			}
+		}
+		found=false;
 		this.movieInfoList.add(movieInfo);
 		Movie movie = new Movie(movieInfo);
 		movie.setImageData(movieInfo.getImageData());
@@ -531,6 +680,73 @@ public class SimpleServer extends AbstractServer {
 		return true;
 	}
 
+	public boolean addDisplayTimeToDB(DisplayTimeInfo displayTimeInfo){
+		setUserInfoList();
+		setCinemaInfoList();
+		setMovieInfoList();
+		setTicketInfoList();
+		setDisplayTimeInfoList();
+		//check if movie is already in movies, no error message sent back cuz not needed
+		for (DisplayTime d : this.displayTimeList) {
+			if (d.getDisplayTime().equals(displayTimeInfo.getDisplayTime())) {
+				//if the movie already exists in db, just dont do anything
+				return false;
+			}
+		}
+		try{
+		boolean found=false;
+		for (TicketInfo ti : displayTimeInfo.getTicketInfoList()) {
+			found = false;
+			for (TicketInfo ticketInfo : this.ticketInfoList) {
+				if (ticketInfo.toString().equals(ti.toString())) {
+					found = true;
+					break;
+				}
+			}
+			if (!found) {
+				this.ticketInfoList.add(ti);
+			}
+			found = false;
+			for (Ticket ticket : this.ticketList) {
+				if (ticket.toString().equals(ti.toString())) {
+					found = true;
+					break;
+				}
+			}
+			if (!found) {
+				Ticket tx=new Ticket(getMovieByTitleFromDB(ti.getMovieInfo().getName()) , ti.getSeatCol(),ti.getSeatRow(),ti.getHallNum(), getCinemaByNameFromDB(ti.getCinemaInfo().getName()), getCustomerByIdFromDB(ti.getUserInfo().getId()),getDisplayTimeFromDB(ti.getDisplayTimeInfo().getDisplayTime()));
+				this.ticketList.add(tx);
+				session.save(tx);
+				session.flush();
+				session.getTransaction().commit();
+				session.beginTransaction();
+			}
+		}
+		found=false;
+
+		Movie mx=getMovieByTitleFromDB(displayTimeInfo.getMovieInfo().getName());
+		Cinema c = getCinemaByNameFromDB(displayTimeInfo.getCinemaInfo().getName());
+
+		DisplayTime d = new DisplayTime(displayTimeInfo.getDisplayTime().substring(0,17),mx , c);
+			this.currMovie.addDisplayTime(d);
+			mx.addDisplayTime(d);
+			c.addDisplayTime(d);
+			session.saveOrUpdate(c);
+			session.saveOrUpdate(mx);
+			this.displayTimeInfoList.add(displayTimeInfo);
+			session.save(d);
+			session.saveOrUpdate(this.currMovie);
+			session.saveOrUpdate(c);
+			session.flush();
+			session.getTransaction().commit();
+			session.beginTransaction();
+			return true;
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return false;
+	}
+	/*
 	// updates display time for the current movie selected
 	public void addDisplayTimeToDB(DisplayTimeInfo displayTimeInfo) {
 		this.currMovie = getMovieByTitleFromDB(displayTimeInfo.getMovieInfo().getName());
@@ -571,7 +787,7 @@ public class SimpleServer extends AbstractServer {
 			e.printStackTrace();
 		}
 	}
-
+	*/
 	public static void addMsgToDB(String text) throws Exception {
 		Msg m = new Msg(text);
 		session.save(m);
@@ -886,15 +1102,24 @@ public class SimpleServer extends AbstractServer {
 				sendToAllClients(message); //maybe change to only send to specific client
 			}
 			else if (request.startsWith("addtime")) { //message holds DisplayInfo ,safe to assume movie and cinema already exist
-				addDisplayTimeToDB(message.getDisplayTimeInfo());
-				message.setMovieInfoList(this.movieInfoList);
-				message.setMessage("updatedtimes");
+				if(addDisplayTimeToDB(message.getDisplayTimeInfo())){
+					message.setMessage("displaytime added");
+				}
+				else{
+					message.setMessage("displaytime exists");
+				}
 				sendToAllClients(message);
 			}
 			else if(request.startsWith("removetime")){
 				removeDisplayTimeFromDB(message.getDisplayTimeInfo());
 				message.setMovieInfoList(this.movieInfoList);
 				message.setMessage("updatedtimes");
+				sendToAllClients(message);
+			}
+			else if(request.startsWith("getDisplayTimes")){
+				setDisplayTimeInfoList();
+				message.setDisplayTimeInfoList(this.displayTimeInfoList);
+				message.setMessage("ListOfDisplayTimes");
 				sendToAllClients(message);
 			}
 			else if(request.startsWith("getBackgroundImage")){
@@ -1014,17 +1239,18 @@ public class SimpleServer extends AbstractServer {
 			sessionFactory=getSessionFactory();
 			session=sessionFactory.openSession();
 			session.beginTransaction();
-			/*setMovieInfoList(); //uncomment this when hibernate is on update mode
+			setMovieInfoList(); //uncomment this when hibernate is on update mode
 			setUserInfoList();
 			setCinemaInfoList();
-			setDisplayTimeInfoList();*/
+			setDisplayTimeInfoList();
+			setTicketInfoList();
 		} catch(Exception e) {
 			if(session!=null){
 				session.getTransaction().rollback();
 			}
 			e.printStackTrace();
 		}//uncomment this section when running server for the first time
-		try{
+		/*try{
 			generateData();
 			setMovieInfoList();
 			setUserInfoList();
@@ -1034,7 +1260,7 @@ public class SimpleServer extends AbstractServer {
 
 		}catch(Exception e) {
 			e.printStackTrace();
-		}
+		}*/
 		session.getTransaction().commit();
 		session.beginTransaction();
 	}
