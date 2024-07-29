@@ -3,10 +3,7 @@ package client;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 
-import entities.CinemaInfo;
-import entities.Message;
-import entities.MovieInfo;
-import entities.UserInfo;
+import entities.*;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -41,6 +38,8 @@ public class StartingScreenController {
     private List<MovieInfo> movieInfoList=new ArrayList<>();
     boolean customerLoginModeEnabled=true;
     boolean signupModeEnabled=false;
+    boolean filtersEnabled=false;
+    boolean filterSelectionEnabled=false;
     boolean userConnected;
     private String selectedGenre;
     private String selectedDate;
@@ -56,6 +55,8 @@ public class StartingScreenController {
     private Pane filterPane;
     @FXML
     private ComboBox<String> cinemaFilter;
+    @FXML
+    private Button clearFilterButton;
     @FXML
     private Button upcomingMoviesButton;
     @FXML
@@ -96,7 +97,33 @@ public class StartingScreenController {
     private List<CinemaInfo> cinemaInfoList=new ArrayList<>();
 
     @FXML
+    private void clearFilterButtonPressed(ActionEvent event){
+        this.genreFilter.setValue(null);
+        this.genreFilter.setPromptText("Genre");
+        this.dateFilter.setValue(null);
+        this.dateFilter.setPromptText("Date");
+        this.cinemaFilter.setValue(null);
+        this.cinemaFilter.setPromptText("Cinema");
+        askDB("getTitles");
+        this.clearFilterButton.setVisible(false);
+        this.clearFilterButton.setDisable(true);
+        clearDisplay();
+        displayMovies(getAvailableMovieInfoList());
+
+    }
+    @FXML
     private void selectFiltersButtonPressed(ActionEvent event){
+        if(filterSelectionEnabled){
+            filterSelectionEnabled=false;
+            this.upcomingMoviesButton.setDisable(false);
+
+        }
+        else{
+            filterSelectionEnabled=true;
+            this.upcomingMoviesButton.setDisable(true);
+            this.availableMoviesButton.setDisable(false);
+
+        }
         this.imageHBox.setVisible(false);
         this.imageScrollPane.setVisible(false);
         this.imageHBox.setDisable(true);
@@ -128,6 +155,25 @@ public class StartingScreenController {
         this.dateFilter.setDisable(true);
         this.applyFiltersButton.setDisable(true);
         this.applyFiltersButton.setVisible(false);
+        this.clearFilterButton.setVisible(true);
+        this.clearFilterButton.setDisable(false);
+        askDB("getTitles");
+        List<MovieInfo> filteredMovieInfoList=this.movieInfoList;
+        if(this.dateFilter.getValue()!=null){
+            filteredMovieInfoList=filterMovieInfoListByDate(filteredMovieInfoList,this.dateFilter.getValue());
+        }
+        if(this.genreFilter.getValue()!=null){
+            filteredMovieInfoList=filterMovieInfoListByGenre(filteredMovieInfoList,this.genreFilter.getValue());
+        }
+        if(this.cinemaFilter.getValue()!=null){
+            filteredMovieInfoList=filterMovieInfoListByCinemaName(filteredMovieInfoList,this.cinemaFilter.getValue());
+        }
+        for(MovieInfo mi: filteredMovieInfoList){
+            System.out.println(mi.getName());
+        }
+        clearDisplay();
+        displayMovies(filteredMovieInfoList);
+
     }
 
     @FXML
@@ -184,6 +230,7 @@ public class StartingScreenController {
     }
     @FXML
     void loginButtonPressed(ActionEvent event) {
+        //case id is short or not userlogin
         if(nameTextField.getText().length()!=9 && customerLoginModeEnabled){
             Platform.runLater(()->{
                 Alert alert=new Alert(Alert.AlertType.ERROR);
@@ -589,12 +636,45 @@ public class StartingScreenController {
         }
         return list;
     }
+    private List<MovieInfo> filterMovieInfoListByCinemaName(List<MovieInfo> list,String cinemaName){
+        List<MovieInfo> mylist=new ArrayList<>();
+        for(MovieInfo mi:list){
+            for(CinemaInfo ci: mi.getCinemaInfoList()){
+                if(cinemaName.equals(ci.getName())){
+                    mylist.add(mi);
+                    break;
+                }
+            }
+        }
+        return mylist;
+    }
+    private List<MovieInfo> filterMovieInfoListByGenre(List<MovieInfo> list, String genre){
+        List<MovieInfo> mylist=new ArrayList<>();
+        for(MovieInfo mi:list){
+            if(mi.getGenre().equals(genre)){
+                mylist.add(mi);
+            }
+        }
+        return mylist;
+    }
+    private List<MovieInfo> filterMovieInfoListByDate(List<MovieInfo> list, String date){
+        List<MovieInfo> mylist=new ArrayList<>();
+        for(MovieInfo mi:list){
+            for(DisplayTimeInfo di:mi.getDisplayTimeInfoList()){
+                if(di.getDate().equals(date)){
+                    mylist.add(mi);
+                    break;
+                }
+            }
+        }
+        return mylist;
+    }
 
     @Subscribe
     public void catchCinemaInfoList(CinemaInfoListEvent event){
         this.cinemaInfoList=event.getMessage().getCinemaInfoList();
+        this.cinemaFilter.getItems().clear();
         for(CinemaInfo c:this.cinemaInfoList){
-            this.cinemaFilter.getItems().clear();
             this.cinemaFilter.getItems().add(c.getName());
         }
     }
@@ -729,7 +809,6 @@ public class StartingScreenController {
         }
         this.dateFilter.getItems().addAll(dateList);
         askDB("getCinemas");
-        //setting cinema filter combobox <--- TO DO
 
     }
 }

@@ -62,6 +62,9 @@ public class DisplayTimeInfo implements Serializable {
         this.displayTime = displayTime;
     }
 
+    public String getDate(){
+        return this.displayTime.substring(7,17);
+    }
 
     public void addTicketInfo(TicketInfo ticketInfo){
         for(TicketInfo t : this.ticketInfoList){

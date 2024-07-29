@@ -80,7 +80,8 @@ public class UpdateController{
     void dateToAddWasChosen(){}
 
     public void setCurrUserInfo(UserInfo u){
-        this.currUserInfo=u;this.connectedAsLabel.setText(currUserInfo.getName());
+        this.currUserInfo=u;
+        this.connectedAsLabel.setText(currUserInfo.getName());
     }
 
     @FXML
@@ -412,6 +413,7 @@ public class UpdateController{
         askDB("disconnectWorker "+name);
         stage.close();
     }
+
     @FXML
     void initialize(){
         EventBus.getDefault().register(this);

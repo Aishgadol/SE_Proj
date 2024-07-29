@@ -89,6 +89,9 @@ public class SimpleServer extends AbstractServer {
 			Customer c1=new Customer("000000000","bo");
 			session.save(c1);
 			Cinema cinema1=new Cinema("YisPlanit",5);
+			cinema1.addMovie(movie4);
+			movie4.addCinema(cinema1);
+			session.saveOrUpdate(movie4);
 			session.save(cinema1);
 			Cinema cinema2=new Cinema("NoPlanit",9);
 			session.save(cinema2);
@@ -1025,7 +1028,7 @@ public class SimpleServer extends AbstractServer {
 			}
 			e.printStackTrace();
 		}//uncomment this section when running server for the first time
-		/*try{
+		try{
 			generateData();
 			setMovieInfoList();
 			setUserInfoList();
@@ -1035,7 +1038,7 @@ public class SimpleServer extends AbstractServer {
 
 		}catch(Exception e) {
 			e.printStackTrace();
-		}*/
+		}
 		session.getTransaction().commit();
 		session.beginTransaction();
 	}

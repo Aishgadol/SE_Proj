@@ -67,7 +67,9 @@ public class DisplayTime implements Serializable {
     }
     public Movie getMovie(){return this.movie;}
     public void setMovie(Movie movies){this.movie=movies;}
-
+    public String getDate(){
+        return this.displayTime.substring(7,17);
+    }
     public void setTicketList(List<Ticket> ticketList){this.ticketList=ticketList;}
     public List<Ticket> getTicketList(){return this.ticketList;}
 

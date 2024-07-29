@@ -18,6 +18,7 @@ public class SimpleClient extends AbstractClient {
 		super("localhost",3000);
 	}
 
+
 	@Override
 	protected void handleMessageFromServer(Object msg) {
 		Message message = (Message) msg;
